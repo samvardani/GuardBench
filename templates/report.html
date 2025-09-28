@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Safety Eval Report — {{ run_title }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: -apple-system, Inter, Arial, sans-serif; margin: 24px; color:#0a0a0a;}
+    h1 { font-size: 22px; margin: 0 0 12px;}
+    h2 { font-size: 18px; margin: 24px 0 8px;}
+    .kpis { display:flex; gap:16px; flex-wrap:wrap; }
+    .kpi { border:1px solid #eee; border-radius:12px; padding:12px 14px; min-width:160px; }
+    .row { display:flex; gap:24px; flex-wrap:wrap; }
+    table { border-collapse:collapse; width:100%; }
+    th, td { border:1px solid #eee; padding:8px 10px; text-align:left; }
+    .ok{color:#0a7f34} .bad{color:#b00020}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, monospace;}
+    .muted{color:#666}
+    .pill{display:inline-block;padding:2px 8px;border-radius:999px;background:#f5f5f5;}
+    .small{font-size:12px;}
+    .footer{margin-top:24px;color:#666;font-size:12px}
+    img{max-width:100%;height:auto;border:1px solid #eee;border-radius:10px;}
+  </style>
+</head>
+<body>
+  <h1>Safety Eval — {{ run_title }}</h1>
+  <div class="muted small">Dataset: {{ dataset_path }} &nbsp;•&nbsp; Samples: {{ total_samples }} &nbsp;•&nbsp; Generated: {{ generated_at }}</div>
+
+  <h2>Top KPIs</h2>
+  <div class="kpis">
+    {% for model in ["Baseline","Candidate"] %}
+    <div class="kpi">
+      <div class="muted small">{{ model }}</div>
+      <div>Precision: <b>{{ metrics[model].precision }}</b></div>
+      <div>Recall: <b>{{ metrics[model].recall }}</b></div>
+      <div>FNR: <b class="{{ 'bad' if metrics[model].fnr>0 else 'ok' }}">{{ metrics[model].fnr }}</b></div>
+      <div>FPR: <b class="{{ 'bad' if metrics[model].fpr>0 else 'ok' }}">{{ metrics[model].fpr }}</b></div>
+      <div class="small muted">Latency p50/p90/p99 (ms): {{ metrics[model].latency.p50 }}/{{ metrics[model].latency.p90 }}/{{ metrics[model].latency.p99 }}</div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <h2>Confusion Matrix</h2>
+  <div class="row">
+    {% for model in ["Baseline","Candidate"] %}
+    <div style="flex:1;min-width:320px">
+      <div class="muted small">{{ model }}</div>
+      <table>
+        <tr><th></th><th>Pred: Flag</th><th>Pred: Pass</th></tr>
+        <tr><th>GT: Unsafe</th><td>{{ matrices[model].tp }}</td><td>{{ matrices[model].fn }}</td></tr>
+        <tr><th>GT: Benign</th><td>{{ matrices[model].fp }}</td><td>{{ matrices[model].tn }}</td></tr>
+      </table>
+    </div>
+    {% endfor %}
+  </div>
+
+  <h2>Latency</h2>
+  <div class="row">
+    <div style="flex:1;min-width:320px">
+      <div class="muted small">Baseline</div>
+      <img src="{{ latency_imgs.baseline }}" alt="Baseline latency histogram">
+    </div>
+    <div style="flex:1;min-width:320px">
+      <div class="muted small">Candidate</div>
+      <img src="{{ latency_imgs.candidate }}" alt="Candidate latency histogram">
+    </div>
+  </div>
+
+  <h2>Failure Explorer</h2>
+  <p class="small muted">Download: <a href="{{ downloads.fn_csv }}">FN CSV</a> • <a href="{{ downloads.fp_csv }}">FP CSV</a></p>
+  <table>
+    <tr>
+      <th>#</th><th>Type</th><th>Model</th><th>Category</th><th>Lang</th><th>Text</th>
+    </tr>
+    {% for row in failures %}
+    <tr>
+      <td class="mono small">{{ row.id }}</td>
+      <td><span class="pill">{{ row.fail_type }}</span></td>
+      <td>{{ row.model }}</td>
+      <td>{{ row.category }}</td>
+      <td>{{ row.language }}</td>
+      <td class="small">{{ row.text }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <div class="footer">Policy version: {{ policy_version }} • Engines: Baseline {{ engines.baseline }}, Candidate {{ engines.candidate }}</div>
+</body>
+</html>
