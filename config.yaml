@@ -1,0 +1,24 @@
+dataset_path: ./dataset/sample.csv
+
+engines:
+  baseline:
+    name: "rules-v1"
+    timeout_ms: 800
+    retries: 1
+  candidate:
+    name: "candidate-v1"
+    timeout_ms: 800
+    retries: 1
+
+policy_version: "v0.1"
+risk_weights:
+  minors: 10
+  extremism: 8
+  self_harm: 7
+  violence: 6
+  crime: 6
+  malware: 6
+  hate: 6
+  pii: 5
+  medical_legal: 4
+  benign: 0
