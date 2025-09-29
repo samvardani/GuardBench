@@ -1,10 +1,12 @@
-import csv, pathlib, datetime, json
+import os, csv, json, pathlib, datetime
+from pathlib import Path
 from collections import Counter
 from jinja2 import Environment, FileSystemLoader
 import matplotlib.pyplot as plt
 
 from src.guards.baseline import predict as predict_baseline
 from src.guards.candidate import predict as predict_candidate
+from src.report.cluster_utils import cluster_failures
 from src.utils.io_utils import load_config, resolve_dataset_path, sha256_file, git_commit, new_run_id
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
@@ -13,7 +15,7 @@ OUT_DIR = ROOT / "report"
 ASSETS = ROOT / "assets"
 OUT_DIR.mkdir(exist_ok=True); ASSETS.mkdir(exist_ok=True)
 
-def load_rows(dataset_path):
+def load_rows(dataset_path: Path):
     rows=[]
     with open(dataset_path, newline="", encoding="utf-8") as f:
         r = csv.DictReader(f)
@@ -38,24 +40,21 @@ def confusion(rows, preds):
         elif (not gt_pos) and (not pr_pos): cm["tn"] += 1
         elif gt_pos and (not pr_pos): cm["fn"] += 1
     tp,fp,tn,fn = cm["tp"],cm["fp"],cm["tn"],cm["fn"]
-    precision = tp/(tp+fp) if (tp+fp) else 0.0
-    recall    = tp/(tp+fn) if (tp+fn) else 0.0
-    fnr       = fn/(tp+fn) if (tp+fn) else 0.0
-    fpr       = fp/(fp+tn) if (fp+tn) else 0.0
-    return {"tp":tp,"fp":fp,"tn":tn,"fn":fn,"precision":round(precision,3),"recall":round(recall,3),"fnr":round(fnr,3),"fpr":round(fpr,3)}
+    def pct(a,b): return round(a/b,3) if b else 0.0
+    return {"tp":tp,"fp":fp,"tn":tn,"fn":fn,
+            "precision":pct(tp,tp+fp), "recall":pct(tp,tp+fn),
+            "fnr":pct(fn,tp+fn), "fpr":pct(fp,fp+tn)}
 
 def pctiles(values):
     if not values: return {"p50":0,"p90":0,"p99":0}
-    vs = sorted(values)
-    def p(q): return vs[int((len(vs)-1)*q)]
-    return {"p50":p(0.50),"p90":p(0.90),"p99":p(0.99)}
+    vs = sorted(values); idx=lambda q:int((len(vs)-1)*q)
+    return {"p50":vs[idx(0.50)], "p90":vs[idx(0.90)], "p99":vs[idx(0.99)]}
 
 def histogram(values, out_png, title):
     if not values: values=[0]
     plt.figure()
     plt.hist(values, bins=min(10, max(3, len(set(values)))))
-    plt.title(title)
-    plt.xlabel("Latency (ms)"); plt.ylabel("Count")
+    plt.title(title); plt.xlabel("Latency (ms)"); plt.ylabel("Count")
     plt.tight_layout(); plt.savefig(out_png); plt.close()
 
 def export_failures(rows, preds, model_name):
@@ -100,11 +99,18 @@ def main():
     histogram(base_lat, base_png, "Baseline latency")
     histogram(cand_lat, cand_png, "Candidate latency")
 
-    # failure exports (table uses Candidate by default in downloads)
+    # failures + clusters
     b_fn_csv, b_fp_csv, b_fn, b_fp = export_failures(rows, base_preds, "baseline")
     c_fn_csv, c_fp_csv, c_fn, c_fp = export_failures(rows, cand_preds, "candidate")
+    base_clusters = cluster_failures(rows, base_preds)
+    cand_clusters = cluster_failures(rows, cand_preds)
+    failures = (
+        [{"id":r["id"],"fail_type":"FN","model":"Baseline", **r} for r in b_fn] +
+        [{"id":r["id"],"fail_type":"FP","model":"Baseline", **r} for r in b_fp] +
+        [{"id":r["id"],"fail_type":"FN","model":"Candidate", **r} for r in c_fn] +
+        [{"id":r["id"],"fail_type":"FP","model":"Candidate", **r} for r in c_fp]
+    )
 
-    # render HTML
     env = Environment(loader=FileSystemLoader(TPL_DIR))
     tpl = env.get_template("report.html")
     html = tpl.render(
@@ -121,20 +127,14 @@ def main():
           "Candidate":{"precision":cand_cm["precision"],"recall":cand_cm["recall"],"fnr":cand_cm["fnr"],"fpr":cand_cm["fpr"],"latency":cand_lat_pct}
         },
         matrices={"Baseline":base_cm, "Candidate":cand_cm},
-        latency_imgs={"baseline":str(base_png.relative_to(ROOT)), "candidate":str(cand_png.relative_to(ROOT))},
-        downloads={"fn_csv":str((OUT_DIR/"candidate_fn.csv").relative_to(ROOT)), "fp_csv":str((OUT_DIR/"candidate_fp.csv").relative_to(ROOT))},
-        failures=[
-            *[{"id":r["id"],"fail_type":"FN","model":"Baseline", **r} for r in b_fn],
-            *[{"id":r["id"],"fail_type":"FP","model":"Baseline", **r} for r in b_fp],
-            *[{"id":r["id"],"fail_type":"FN","model":"Candidate", **r} for r in c_fn],
-            *[{"id":r["id"],"fail_type":"FP","model":"Candidate", **r} for r in c_fp],
-        ]
+        latency_imgs={"baseline": os.path.relpath(base_png, OUT_DIR), "candidate": os.path.relpath(cand_png, OUT_DIR)},
+        downloads={"fn_csv": Path(c_fn_csv).name, "fp_csv": Path(c_fp_csv).name},
+        failures=failures,
+        clusters={"Baseline": base_clusters, "Candidate": cand_clusters}
     )
-    out_html = OUT_DIR / "index.html"
-    with open(out_html,"w",encoding="utf-8") as f:
-        f.write(html)
+    out_file = OUT_DIR / "index.html"
+    out_file.write_text(html, encoding="utf-8")
 
-    # write metrics JSON (for reproducibility / trend plots later)
     metrics_json = {
         "run_id": run_id,
         "generated_at": created_at,
@@ -145,12 +145,8 @@ def main():
         "engines": {"baseline":cfg["engines"]["baseline"]["name"], "candidate":cfg["engines"]["candidate"]["name"]},
         "metrics": {"Baseline": base_cm, "Candidate": cand_cm}
     }
-    out_json = OUT_DIR / f"metrics_{run_id}.json"
-    with open(out_json, "w", encoding="utf-8") as f:
-        json.dump(metrics_json, f, ensure_ascii=False, indent=2)
-
-    print(f"Report: {out_html}")
-    print(f"Metrics JSON: {out_json}")
+    (OUT_DIR / f"metrics_{run_id}.json").write_text(json.dumps(metrics_json, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"Report written to {out_file}")
 
 if __name__ == "__main__":
     main()

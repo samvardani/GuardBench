@@ -1,10 +1,12 @@
-import csv, json, sqlite3, pathlib, datetime
+import os, csv, json, sqlite3, pathlib, datetime
+from pathlib import Path
 from collections import Counter
 from jinja2 import Environment, FileSystemLoader
 import matplotlib.pyplot as plt
 
 from src.guards.baseline import predict as predict_baseline
 from src.guards.candidate import predict as predict_candidate
+from src.report.cluster_utils import cluster_failures
 from src.utils.io_utils import load_config, resolve_dataset_path, sha256_file, git_commit, new_run_id
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
@@ -52,8 +54,8 @@ def ensure_db():
     con.commit()
     return con
 
-def load_rows(path):
-    rows=[]; 
+def load_rows(path: Path):
+    rows=[]
     with open(path, newline="", encoding="utf-8") as f:
         r = csv.DictReader(f)
         for row in r: rows.append(row)
@@ -77,27 +79,38 @@ def confusion(rows, preds):
         elif gt_pos and (not pr_pos): cm["fn"] += 1
     tp,fp,tn,fn = cm["tp"],cm["fp"],cm["tn"],cm["fn"]
     def pct(a,b): return round(a/b,3) if b else 0.0
-    return {
-        "tp":tp,"fp":fp,"tn":tn,"fn":fn,
-        "precision": pct(tp, tp+fp),
-        "recall":    pct(tp, tp+fn),
-        "fnr":       pct(fn, tp+fn),
-        "fpr":       pct(fp, fp+tn),
-    }
+    return {"tp":tp,"fp":fp,"tn":tn,"fn":fn,
+            "precision":pct(tp,tp+fp), "recall":pct(tp,tp+fn),
+            "fnr":pct(fn,tp+fn), "fpr":pct(fp,fp+tn)}
 
 def pctiles(values):
     if not values: return {"p50":0,"p90":0,"p99":0}
-    vs = sorted(values)
-    def p(q): return vs[int((len(vs)-1)*q)]
-    return {"p50":p(0.50),"p90":p(0.90),"p99":p(0.99)}
+    vs = sorted(values); idx=lambda q:int((len(vs)-1)*q)
+    return {"p50":vs[idx(0.50)], "p90":vs[idx(0.90)], "p99":vs[idx(0.99)]}
 
 def histogram(values, out_png, title):
     if not values: values=[0]
-    import matplotlib.pyplot as plt
     plt.figure()
     plt.hist(values, bins=min(10, max(3, len(set(values)))))
     plt.title(title); plt.xlabel("Latency (ms)"); plt.ylabel("Count")
     plt.tight_layout(); plt.savefig(out_png); plt.close()
+
+def export_failures(rows, preds, model_name):
+    fn_rows=[]; fp_rows=[]
+    for r,p in zip(rows,preds):
+        gt_pos = (r["label"].strip().lower() != "benign")
+        pr_pos = (p["prediction"] == "flag")
+        if gt_pos and (not pr_pos):
+            fn_rows.append({"id":r["id"],"category":r["category"],"language":r["language"],"text":r["text"]})
+        if (not gt_pos) and pr_pos:
+            fp_rows.append({"id":r["id"],"category":r["category"],"language":r["language"],"text":r["text"]})
+    fn_path = OUT_DIR / f"{model_name}_fn.csv"
+    fp_path = OUT_DIR / f"{model_name}_fp.csv"
+    for path,rows_ in [(fn_path,fn_rows),(fp_path,fp_rows)]:
+        with open(path,"w",newline="",encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=["id","category","language","text"])
+            w.writeheader(); w.writerows(rows_)
+    return fn_path, fp_path, fn_rows, fp_rows
 
 def main():
     cfg = load_config()
@@ -110,6 +123,7 @@ def main():
 
     base_preds, base_lat = run_guard(rows, predict_baseline)
     cand_preds, cand_lat = run_guard(rows, predict_candidate)
+
     base_cm = confusion(rows, base_preds)
     cand_cm = confusion(rows, cand_preds)
     base_lat_pct = pctiles(base_lat)
@@ -120,6 +134,18 @@ def main():
     cand_png = ASSETS / f"latency_candidate_{run_id}.png"
     histogram(base_lat, base_png, "Baseline latency")
     histogram(cand_lat, cand_png, "Candidate latency")
+
+    # failures + clusters
+    b_fn_csv, b_fp_csv, b_fn, b_fp = export_failures(rows, base_preds, "baseline")
+    c_fn_csv, c_fp_csv, c_fn, c_fp = export_failures(rows, cand_preds, "candidate")
+    base_clusters = cluster_failures(rows, base_preds)
+    cand_clusters = cluster_failures(rows, cand_preds)
+    failures = (
+        [{"id":r["id"],"fail_type":"FN","model":"Baseline", **r} for r in b_fn] +
+        [{"id":r["id"],"fail_type":"FP","model":"Baseline", **r} for r in b_fp] +
+        [{"id":r["id"],"fail_type":"FN","model":"Candidate", **r} for r in c_fn] +
+        [{"id":r["id"],"fail_type":"FP","model":"Candidate", **r} for r in c_fp]
+    )
 
     # store in DB
     con = ensure_db(); cur = con.cursor()
@@ -141,7 +167,7 @@ def main():
                          p.get("prediction"), float(p.get("score", 0.0)), int(p.get("latency_ms", 0))))
     con.commit(); con.close()
 
-    # render HTML + metrics JSON (with this same run_id)
+    # render HTML (+ per-run copy)
     env = Environment(loader=FileSystemLoader(TPL_DIR))
     tpl = env.get_template("report.html")
     html = tpl.render(
@@ -158,12 +184,13 @@ def main():
           "Candidate":{"precision":cand_cm["precision"],"recall":cand_cm["recall"],"fnr":cand_cm["fnr"],"fpr":cand_cm["fpr"],"latency":cand_lat_pct}
         },
         matrices={"Baseline":base_cm, "Candidate":cand_cm},
-        latency_imgs={"baseline":str(base_png.relative_to(ROOT)), "candidate":str(cand_png.relative_to(ROOT))},
-        downloads={"fn_csv":"report/candidate_fn.csv", "fp_csv":"report/candidate_fp.csv"},
-        failures=[]  # keeping simple for store_run; build_report already has detailed exports
+        latency_imgs={"baseline": os.path.relpath(base_png, OUT_DIR), "candidate": os.path.relpath(cand_png, OUT_DIR)},
+        downloads={"fn_csv": (OUT_DIR / "candidate_fn.csv").name, "fp_csv": (OUT_DIR / "candidate_fp.csv").name},
+        failures=failures,
+        clusters={"Baseline": base_clusters, "Candidate": cand_clusters}
     )
-    out_html = OUT_DIR / f"index_{run_id}.html"
     (OUT_DIR / "index.html").write_text(html, encoding="utf-8")
+    out_html = OUT_DIR / f"index_{run_id}.html"
     out_html.write_text(html, encoding="utf-8")
 
     metrics_json = {
@@ -174,7 +201,7 @@ def main():
         "metrics": {"Baseline": base_cm, "Candidate": cand_cm}
     }
     out_json = OUT_DIR / f"metrics_{run_id}.json"
-    with open(out_json,"w",encoding="utf-8") as f: json.dump(metrics_json, f, ensure_ascii=False, indent=2)
+    out_json.write_text(json.dumps(metrics_json, ensure_ascii=False, indent=2), encoding="utf-8")
 
     print(f"Stored run {run_id} → DB: {DB_PATH}")
     print(f"Report: {out_html}")
