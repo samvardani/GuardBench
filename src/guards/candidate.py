@@ -22,7 +22,7 @@ PATTERNS = {
     ],
     "pii": [r"\bssn\b", r"\bsocial\s+security\s+number\b", r"\bcredit\s*card\b"],
     "extremism": [r"\bisis\b", r"\bal[-\s]?qaeda\b", r"\bneo[-\s]?nazi\b"],
-    "fa_violence": [r"\bبمب\b"]
+    "fa_violence": [r"\bبمب\b", r"\bچاقو\b", r"\bاسلحه\b", r"\bکشتن\b"]
 }
 
 WHITELIST = [
@@ -31,11 +31,12 @@ WHITELIST = [
 ]
 
 THRESHOLDS = CFG.get("thresholds", {"default": 1.0})
+SLICE_THRESHOLDS = CFG.get("slice_thresholds", {})   # e.g. { "violence": {"fa":0.85} }
 
 def _whitelisted(t: str) -> bool:
     return any(re.search(w, t) for w in WHITELIST)
 
-def predict(text: str, timeout_ms: int = 800) -> Dict:
+def predict(text: str, timeout_ms: int = 800, **meta) -> Dict:
     start = time.time()
     t = normalize(text)
 
@@ -48,14 +49,17 @@ def predict(text: str, timeout_ms: int = 800) -> Dict:
         if any(re.search(p, t) for p in pats):
             hits.append(cat)
 
-    # Score = number of categories matched + small weight
-    score = 0.0
-    for h in hits:
-        score += 1.0
+    # crude score = how many categories matched (0..N)
+    score = float(len(hits))
+
+    # pick threshold: prefer per-slice (category × language), else per-category, else default
+    lang = (meta.get("language") or meta.get("lang")) if meta else None
+    cat  = (meta.get("category")) if meta else None
 
     flagged = False
     for h in hits:
-        thr = THRESHOLDS.get(h, THRESHOLDS.get("default", 1.0))
+        slice_thr = SLICE_THRESHOLDS.get(h, {}).get(lang) if (lang is not None) else None
+        thr = slice_thr if slice_thr is not None else THRESHOLDS.get(h, THRESHOLDS.get("default", 1.0))
         if score >= thr:
             flagged = True
             break

@@ -45,7 +45,7 @@ def _normalize(text: str) -> str:
     t = re.sub(r"\s{2,}", " ", t).strip()
     return t
 
-def predict(text: str, timeout_ms: int = 800) -> Dict:
+def predict(text: str, **kwargs, timeout_ms: int = 800) -> Dict:
     """
     Returns:
       {

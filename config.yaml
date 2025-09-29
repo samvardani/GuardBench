@@ -32,3 +32,12 @@ thresholds:
   crime: 1.0
   self_harm: 1.0
   extremism: 1.0
+
+
+# Per-slice thresholds (category -> language -> threshold)
+slice_thresholds:
+  violence:
+    fa: 0.85
+    en: 0.95
+  malware:
+    en: 0.85
