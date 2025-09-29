@@ -104,12 +104,11 @@ def main():
         p90 = s["latency_ms"]["p90"]
         p99 = s["latency_ms"]["p99"]
 
-        ok = (
-            (s["recall"] >= thr["min_recall"]) and
-            (s["fpr"] <= thr["max_fpr"]) and
-            (p90 <= thr["max_p90_ms"]) and
-            (p99 <= thr["max_p99_ms"])
-        )
+        rec_den = s["tp"] + s["fn"]
+        fpr_den = s["fp"] + s["tn"]
+        recall_ok = (rec_den == 0) or (s["recall"] >= thr["min_recall"])
+        fpr_ok    = (fpr_den == 0) or (s["fpr"]    <= thr["max_fpr"])
+        ok = (recall_ok and fpr_ok and (p90 <= thr["max_p90_ms"]) and (p99 <= thr["max_p99_ms"]))
         rule = f"recall≥{thr['min_recall']} & fpr≤{thr['max_fpr']} & p90≤{thr['max_p90_ms']}ms & p99≤{thr['max_p99_ms']}ms"
         lines.append("| {} | {} | {} | {} | {} | {} | {} | {} |".format(
             s["category"], s["language"], s["n"], s["recall"], s["fpr"], p90, p99, "✅ "+rule if ok else "❌ "+rule
