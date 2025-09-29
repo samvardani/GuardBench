@@ -24,7 +24,7 @@
 </head>
 <body>
   <h1>Safety Eval — {{ run_title }}</h1>
-  <div class="muted small">Dataset: {{ dataset_path }} &nbsp;•&nbsp; Samples: {{ total_samples }} &nbsp;•&nbsp; Generated: {{ generated_at }}</div>
+  <div class="muted small">Run ID: {{ run_id }} &nbsp;•&nbsp; Dataset SHA: {{ dataset_sha[:12] }}…<br>Dataset: {{ dataset_path }} &nbsp;•&nbsp; Samples: {{ total_samples }} &nbsp;•&nbsp; Generated: {{ generated_at }}</div>
 
   <h2>Top KPIs</h2>
   <div class="kpis">

@@ -1,26 +1,32 @@
-import csv, pathlib, datetime, json
+import csv, pathlib, yaml, datetime
+from statistics import mean
 from collections import Counter
 from jinja2 import Environment, FileSystemLoader
 import matplotlib.pyplot as plt
 
 from src.guards.baseline import predict as predict_baseline
 from src.guards.candidate import predict as predict_candidate
-from src.utils.io_utils import load_config, resolve_dataset_path, sha256_file, git_commit, new_run_id
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
+DATA = ROOT / "dataset" / "sample.csv"
 TPL_DIR = ROOT / "templates"
 OUT_DIR = ROOT / "report"
 ASSETS = ROOT / "assets"
-OUT_DIR.mkdir(exist_ok=True); ASSETS.mkdir(exist_ok=True)
+OUT_DIR.mkdir(exist_ok=True)
+ASSETS.mkdir(exist_ok=True)
 
-def load_rows(dataset_path):
+def load_cfg():
+    with open(ROOT / "config.yaml","r") as f:
+        return yaml.safe_load(f)
+
+def load_rows():
     rows=[]
-    with open(dataset_path, newline="", encoding="utf-8") as f:
+    with open(DATA, newline="", encoding="utf-8") as f:
         r = csv.DictReader(f)
         for row in r: rows.append(row)
     return rows
 
-def run_guard(rows, guard_fn):
+def run_guard(rows, guard_fn, name):
     preds=[]; lat=[]
     for r in rows:
         out = guard_fn(r["text"])
@@ -47,7 +53,7 @@ def confusion(rows, preds):
 def pctiles(values):
     if not values: return {"p50":0,"p90":0,"p99":0}
     vs = sorted(values)
-    def p(q): return vs[int((len(vs)-1)*q)]
+    def p(pct): return vs[int((len(vs)-1)*pct)]
     return {"p50":p(0.50),"p90":p(0.90),"p99":p(0.99)}
 
 def histogram(values, out_png, title):
@@ -55,8 +61,11 @@ def histogram(values, out_png, title):
     plt.figure()
     plt.hist(values, bins=min(10, max(3, len(set(values)))))
     plt.title(title)
-    plt.xlabel("Latency (ms)"); plt.ylabel("Count")
-    plt.tight_layout(); plt.savefig(out_png); plt.close()
+    plt.xlabel("Latency (ms)")
+    plt.ylabel("Count")
+    plt.tight_layout()
+    plt.savefig(out_png)
+    plt.close()
 
 def export_failures(rows, preds, model_name):
     fn_rows=[]; fp_rows=[]
@@ -76,17 +85,11 @@ def export_failures(rows, preds, model_name):
     return fn_path, fp_path, fn_rows, fp_rows
 
 def main():
-    cfg = load_config()
-    dataset_path = resolve_dataset_path(cfg)
-    rows = load_rows(dataset_path)
+    cfg = load_cfg()
+    rows = load_rows()
 
-    run_id = new_run_id()
-    created_at = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-    ds_sha = sha256_file(dataset_path)
-    commit = git_commit()
-
-    base_preds, base_lat = run_guard(rows, predict_baseline)
-    cand_preds, cand_lat = run_guard(rows, predict_candidate)
+    base_preds, base_lat = run_guard(rows, predict_baseline, "baseline")
+    cand_preds, cand_lat = run_guard(rows, predict_candidate, "candidate")
 
     base_cm = confusion(rows, base_preds)
     cand_cm = confusion(rows, cand_preds)
@@ -100,20 +103,23 @@ def main():
     histogram(base_lat, base_png, "Baseline latency")
     histogram(cand_lat, cand_png, "Candidate latency")
 
-    # failure exports (table uses Candidate by default in downloads)
+    # failure exports (combine both for the table view)
     b_fn_csv, b_fp_csv, b_fn, b_fp = export_failures(rows, base_preds, "baseline")
     c_fn_csv, c_fp_csv, c_fn, c_fp = export_failures(rows, cand_preds, "candidate")
 
-    # render HTML
+    failures = []
+    for r in b_fn: failures.append({"id":r["id"],"fail_type":"FN","model":"Baseline", **r})
+    for r in b_fp: failures.append({"id":r["id"],"fail_type":"FP","model":"Baseline", **r})
+    for r in c_fn: failures.append({"id":r["id"],"fail_type":"FN","model":"Candidate", **r})
+    for r in c_fp: failures.append({"id":r["id"],"fail_type":"FP","model":"Candidate", **r})
+
     env = Environment(loader=FileSystemLoader(TPL_DIR))
     tpl = env.get_template("report.html")
     html = tpl.render(
         run_title="Baseline vs Candidate",
-        run_id=run_id,
-        dataset_path=str(dataset_path),
-        dataset_sha=ds_sha,
+        dataset_path=str(DATA),
         total_samples=len(rows),
-        generated_at=created_at,
+        generated_at=datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
         policy_version=cfg.get("policy_version","n/a"),
         engines={"baseline":cfg["engines"]["baseline"]["name"], "candidate":cfg["engines"]["candidate"]["name"]},
         metrics={
@@ -123,34 +129,12 @@ def main():
         matrices={"Baseline":base_cm, "Candidate":cand_cm},
         latency_imgs={"baseline":str(base_png.relative_to(ROOT)), "candidate":str(cand_png.relative_to(ROOT))},
         downloads={"fn_csv":str((OUT_DIR/"candidate_fn.csv").relative_to(ROOT)), "fp_csv":str((OUT_DIR/"candidate_fp.csv").relative_to(ROOT))},
-        failures=[
-            *[{"id":r["id"],"fail_type":"FN","model":"Baseline", **r} for r in b_fn],
-            *[{"id":r["id"],"fail_type":"FP","model":"Baseline", **r} for r in b_fp],
-            *[{"id":r["id"],"fail_type":"FN","model":"Candidate", **r} for r in c_fn],
-            *[{"id":r["id"],"fail_type":"FP","model":"Candidate", **r} for r in c_fp],
-        ]
+        failures=failures
     )
-    out_html = OUT_DIR / "index.html"
-    with open(out_html,"w",encoding="utf-8") as f:
+    out_file = OUT_DIR / "index.html"
+    with open(out_file,"w",encoding="utf-8") as f:
         f.write(html)
-
-    # write metrics JSON (for reproducibility / trend plots later)
-    metrics_json = {
-        "run_id": run_id,
-        "generated_at": created_at,
-        "dataset_path": str(dataset_path),
-        "dataset_sha256": ds_sha,
-        "git_commit": commit,
-        "policy_version": cfg.get("policy_version","n/a"),
-        "engines": {"baseline":cfg["engines"]["baseline"]["name"], "candidate":cfg["engines"]["candidate"]["name"]},
-        "metrics": {"Baseline": base_cm, "Candidate": cand_cm}
-    }
-    out_json = OUT_DIR / f"metrics_{run_id}.json"
-    with open(out_json, "w", encoding="utf-8") as f:
-        json.dump(metrics_json, f, ensure_ascii=False, indent=2)
-
-    print(f"Report: {out_html}")
-    print(f"Metrics JSON: {out_json}")
+    print(f"Report written to {out_file}")
 
 if __name__ == "__main__":
     main()
