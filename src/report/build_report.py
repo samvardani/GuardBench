@@ -25,7 +25,7 @@ def load_rows(dataset_path: Path):
 def run_guard(rows, guard_fn):
     preds=[]; lat=[]
     for r in rows:
-        out = guard_fn(r["text"])
+        out = guard_fn(r["text"], language=r.get("language"), category=r.get("category"))
         preds.append(out)
         lat.append(out.get("latency_ms",0))
     return preds, lat
