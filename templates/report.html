@@ -84,6 +84,29 @@
     {% endfor %}
   </table>
 
+  
+  <h2>Slice Breakdown (Category × Language)</h2>
+  <div class="row">
+    {% for model in ["Baseline","Candidate"] %}
+    <div style="flex:1;min-width:320px">
+      <div class="muted small">{{ model }}</div>
+      <table>
+        <tr><th>Category</th><th>Lang</th><th>N</th><th>Recall</th><th>FNR</th><th>FPR</th></tr>
+        {% for s in slices[model] %}
+        <tr>
+          <td>{{ s.category }}</td>
+          <td>{{ s.language }}</td>
+          <td>{{ s.n }}</td>
+          <td>{{ s.recall }}</td>
+          <td>{{ s.fnr }}</td>
+          <td>{{ s.fpr }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+    {% endfor %}
+  </div>
+
   <div class="footer">Policy version: {{ policy_version }} • Engines: Baseline {{ engines.baseline }}, Candidate {{ engines.candidate }}</div>
 </body>
 </html>
