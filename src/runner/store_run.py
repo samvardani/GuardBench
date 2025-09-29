@@ -55,16 +55,13 @@ def ensure_db():
     return con
 
 def load_rows(path: Path):
-    rows=[]
     with open(path, newline="", encoding="utf-8") as f:
-        r = csv.DictReader(f)
-        for row in r: rows.append(row)
-    return rows
+        return list(csv.DictReader(f))
 
 def run_guard(rows, fn):
     preds=[]; lats=[]
     for r in rows:
-        out = fn(r["text"])
+        out = fn(r["text"], language=r.get("language"), category=r.get("category"))
         preds.append(out); lats.append(out.get("latency_ms",0))
     return preds, lats
 
@@ -112,6 +109,28 @@ def export_failures(rows, preds, model_name):
             w.writeheader(); w.writerows(rows_)
     return fn_path, fp_path, fn_rows, fp_rows
 
+def slice_metrics(rows, preds, by=("category","language")):
+    from collections import defaultdict
+    G = defaultdict(lambda: {"tp":0,"fp":0,"tn":0,"fn":0,"n":0})
+    for r,p in zip(rows,preds):
+        key = tuple(r[k] for k in by)
+        gt_pos = (r["label"].strip().lower() != "benign")
+        pr_pos = (p["prediction"] == "flag")
+        if gt_pos and pr_pos: G[key]["tp"] += 1
+        elif (not gt_pos) and pr_pos: G[key]["fp"] += 1
+        elif (not gt_pos) and (not pr_pos): G[key]["tn"] += 1
+        elif gt_pos and (not pr_pos): G[key]["fn"] += 1
+        G[key]["n"] += 1
+    def pct(a,b): return round(a/b,3) if b else 0.0
+    out=[]
+    for (cat,lang),m in G.items():
+        tp,fp,tn,fn = m["tp"],m["fp"],m["tn"],m["fn"]
+        out.append({"category":cat,"language":lang,"n":m["n"],
+                    "precision":pct(tp,tp+fp),"recall":pct(tp,tp+fn),
+                    "fnr":pct(fn,tp+fn),"fpr":pct(fp,fp+tn)})
+    out.sort(key=lambda x:(-x["n"], x["category"], x["language"]))
+    return out
+
 def main():
     cfg = load_config()
     dataset_path = resolve_dataset_path(cfg)
@@ -123,19 +142,16 @@ def main():
 
     base_preds, base_lat = run_guard(rows, predict_baseline)
     cand_preds, cand_lat = run_guard(rows, predict_candidate)
-
     base_cm = confusion(rows, base_preds)
     cand_cm = confusion(rows, cand_preds)
     base_lat_pct = pctiles(base_lat)
     cand_lat_pct = pctiles(cand_lat)
 
-    # charts
     base_png = ASSETS / f"latency_baseline_{run_id}.png"
     cand_png = ASSETS / f"latency_candidate_{run_id}.png"
     histogram(base_lat, base_png, "Baseline latency")
     histogram(cand_lat, cand_png, "Candidate latency")
 
-    # failures + clusters
     b_fn_csv, b_fp_csv, b_fn, b_fp = export_failures(rows, base_preds, "baseline")
     c_fn_csv, c_fp_csv, c_fn, c_fp = export_failures(rows, cand_preds, "candidate")
     base_clusters = cluster_failures(rows, base_preds)
@@ -146,6 +162,8 @@ def main():
         [{"id":r["id"],"fail_type":"FN","model":"Candidate", **r} for r in c_fn] +
         [{"id":r["id"],"fail_type":"FP","model":"Candidate", **r} for r in c_fp]
     )
+    slices = {"Baseline": slice_metrics(rows, base_preds),
+              "Candidate": slice_metrics(rows, cand_preds)}
 
     # store in DB
     con = ensure_db(); cur = con.cursor()
@@ -167,7 +185,6 @@ def main():
                          p.get("prediction"), float(p.get("score", 0.0)), int(p.get("latency_ms", 0))))
     con.commit(); con.close()
 
-    # render HTML (+ per-run copy)
     env = Environment(loader=FileSystemLoader(TPL_DIR))
     tpl = env.get_template("report.html")
     html = tpl.render(
@@ -187,7 +204,8 @@ def main():
         latency_imgs={"baseline": os.path.relpath(base_png, OUT_DIR), "candidate": os.path.relpath(cand_png, OUT_DIR)},
         downloads={"fn_csv": (OUT_DIR / "candidate_fn.csv").name, "fp_csv": (OUT_DIR / "candidate_fp.csv").name},
         failures=failures,
-        clusters={"Baseline": base_clusters, "Candidate": cand_clusters}
+        clusters={"Baseline": base_clusters, "Candidate": cand_clusters},
+        slices=slices
     )
     (OUT_DIR / "index.html").write_text(html, encoding="utf-8")
     out_html = OUT_DIR / f"index_{run_id}.html"
