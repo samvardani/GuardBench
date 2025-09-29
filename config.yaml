@@ -22,3 +22,13 @@ risk_weights:
   pii: 5
   medical_legal: 4
   benign: 0
+
+
+thresholds:
+  default: 1.0
+  malware: 0.9
+  violence: 1.0
+  pii: 1.0
+  crime: 1.0
+  self_harm: 1.0
+  extremism: 1.0
