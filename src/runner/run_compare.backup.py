@@ -2,11 +2,12 @@ import csv, pathlib, yaml
 from collections import Counter
 from src.guards.baseline import predict as predict_baseline
 from src.guards.candidate import predict as predict_candidate
-from src.utils.io_utils import load_config, resolve_dataset_path
 
 def load_cfg_and_data():
-    cfg = load_config()
-    data_path = resolve_dataset_path(cfg)
+    root = pathlib.Path(__file__).resolve().parents[2]
+    with open(root / "config.yaml", "r") as f:
+        cfg = yaml.safe_load(f)
+    data_path = root / "dataset" / "sample.csv"
     rows = []
     with open(data_path, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
@@ -33,8 +34,14 @@ def metrics_for(preds, rows):
     p50 = lat_sorted[int(0.50*(len(lat_sorted)-1))]
     p90 = lat_sorted[int(0.90*(len(lat_sorted)-1))]
     p99 = lat_sorted[int(0.99*(len(lat_sorted)-1))]
-    return {"tp":tp,"fp":fp,"tn":tn,"fn":fn,"precision":round(precision,3),"recall":round(recall,3),"fnr":round(fnr,3),"fpr":round(fpr,3),
-            "latency_ms":{"p50":p50,"p90":p90,"p99":p99}}
+    return {
+        "tp":tp,"fp":fp,"tn":tn,"fn":fn,
+        "precision":round(precision,3),
+        "recall":round(recall,3),
+        "fnr":round(fnr,3),
+        "fpr":round(fpr,3),
+        "latency_ms":{"p50":p50,"p90":p90,"p99":p99}
+    }
 
 def main():
     cfg, rows = load_cfg_and_data()
