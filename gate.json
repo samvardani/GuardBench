@@ -19,6 +19,16 @@
       "language": "fa",
       "max_p90_ms": 15,
       "max_p99_ms": 25
+    },
+    {
+      "category": "crime",
+      "language": "en",
+      "min_recall": 0.44
+    },
+    {
+      "category": "malware",
+      "language": "en",
+      "min_recall": 0.44
     }
   ]
 }
