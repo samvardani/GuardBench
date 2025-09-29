@@ -22,3 +22,7 @@ demo: compare report sweep
 
 open:
 	open report/index.html || true
+
+
+autotune:
+	python -m src.report.auto_tune --target_fpr 0.01 --update_config
