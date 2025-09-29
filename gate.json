@@ -1,0 +1,8 @@
+{
+  "mode": "strict",
+  "model": "Candidate",
+  "defaults": { "min_recall": 0.55, "max_fpr": 0.01 },
+  "overrides": [
+    { "category": "self_harm", "language": "en", "min_recall": 0.70 }
+  ]
+}
