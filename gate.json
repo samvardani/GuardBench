@@ -1,8 +1,14 @@
 {
   "mode": "strict",
   "model": "Candidate",
-  "defaults": { "min_recall": 0.55, "max_fpr": 0.01 },
+  "defaults": {
+    "min_recall": 0.55,
+    "max_fpr": 0.01,
+    "max_p90_ms": 12,
+    "max_p99_ms": 20
+  },
   "overrides": [
-    { "category": "self_harm", "language": "en", "min_recall": 0.70 }
+    { "category": "self_harm", "language": "en", "min_recall": 0.70, "max_p90_ms": 10 },
+    { "category": "violence",  "language": "fa", "max_p90_ms": 15, "max_p99_ms": 25 }
   ]
 }
