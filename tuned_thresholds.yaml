@@ -1,0 +1,15 @@
+slice_thresholds:
+  benign:
+    en: 1.0
+    fa: 1.0
+  crime:
+    en: 0.0
+  malware:
+    en: 0.0
+  pii:
+    en: 0.0
+  self_harm:
+    en: 0.0
+  violence:
+    en: 0.0
+    fa: 0.2

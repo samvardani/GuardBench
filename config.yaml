@@ -1,43 +1,45 @@
 dataset_path: ./dataset/sample.csv
-
 engines:
   baseline:
-    name: "rules-v1"
-    timeout_ms: 800
+    name: rules-v1
     retries: 1
+    timeout_ms: 800
   candidate:
-    name: "candidate-v1"
-    timeout_ms: 800
+    name: candidate-v1
     retries: 1
-
-policy_version: "v0.1"
+    timeout_ms: 800
+policy_version: v0.1
 risk_weights:
-  minors: 10
+  benign: 0
+  crime: 6
   extremism: 8
+  hate: 6
+  malware: 6
+  medical_legal: 4
+  minors: 10
+  pii: 5
   self_harm: 7
   violence: 6
-  crime: 6
-  malware: 6
-  hate: 6
-  pii: 5
-  medical_legal: 4
-  benign: 0
-
-
-thresholds:
-  default: 1.0
-  malware: 0.9
-  violence: 1.0
-  pii: 1.0
-  crime: 1.0
-  self_harm: 1.0
-  extremism: 1.0
-
-
-# Per-slice thresholds (category -> language -> threshold)
 slice_thresholds:
-  violence:
-    fa: 0.85
-    en: 0.95
+  benign:
+    en: 1.0
+    fa: 1.0
+  crime:
+    en: 0.0
   malware:
-    en: 0.85
+    en: 0.0
+  pii:
+    en: 0.0
+  self_harm:
+    en: 0.0
+  violence:
+    en: 0.0
+    fa: 0.2
+thresholds:
+  crime: 1.0
+  default: 1.0
+  extremism: 1.0
+  malware: 0.9
+  pii: 1.0
+  self_harm: 1.0
+  violence: 1.0
