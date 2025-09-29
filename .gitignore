@@ -205,3 +205,13 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Build artifacts / local state
+history.db
+report/index*.html
+report/metrics_*.json
+report/ci_summary.md
+report/*.csv
+assets/latency_*.png
+config.yaml.bak-*
+templates/report.backup*.html

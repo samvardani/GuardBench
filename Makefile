@@ -26,3 +26,12 @@ open:
 
 autotune:
 	python -m src.report.auto_tune --target_fpr 0.01 --update_config
+
+tune:
+	python -m src.runner.auto_tune
+	@echo "----"
+	@echo "Review tuned_thresholds.yaml then merge into config.yaml (slice_thresholds)."
+
+apply-tuned:
+	python -m src.runner.apply_tuned
+	@echo "Applied tuned thresholds. Consider committing the change."
