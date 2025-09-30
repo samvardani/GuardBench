@@ -12,3 +12,4 @@ One-screen harness to compare a Baseline vs. Candidate safety guard.
 python -m venv .venv && source .venv/bin/activate
 pip install --upgrade pip && pip install pandas numpy scikit-learn jinja2 matplotlib pyyaml
 make demo   # compare + report + sweep
+- Gate: tuned per-slice thresholds in `config.yaml`; stricter overrides in `gate.json`.
