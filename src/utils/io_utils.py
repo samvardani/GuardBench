@@ -1,5 +1,14 @@
-import yaml, hashlib, subprocess, uuid
+import importlib
+import hashlib
+import subprocess
+import uuid
 from pathlib import Path
+
+_yaml_spec = importlib.util.find_spec("yaml")
+if _yaml_spec is not None:
+    yaml = importlib.import_module("yaml")
+else:
+    from . import simple_yaml as yaml
 
 ROOT = Path(__file__).resolve().parents[2]
 

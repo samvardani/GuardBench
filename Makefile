@@ -1,4 +1,4 @@
-.PHONY: compare report sweep store demo open
+.PHONY: compare report sweep store demo open validate
 
 compare:
 	python -m src.runner.run_compare
@@ -35,3 +35,6 @@ tune:
 apply-tuned:
 	python -m src.runner.apply_tuned
 	@echo "Applied tuned thresholds. Consider committing the change."
+
+validate:
+	python -m pytest
