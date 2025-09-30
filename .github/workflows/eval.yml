@@ -18,6 +18,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install jinja2 matplotlib pandas scikit-learn pyyaml
 
+      - name: Run unit tests
+        run: |
+          pip install pytest
+          pytest -q
+
       - name: Build report (HTML)
         run: python -m src.report.build_report
 
