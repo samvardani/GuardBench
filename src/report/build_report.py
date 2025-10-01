@@ -1,4 +1,4 @@
-import os, csv, json, pathlib, datetime
+import os, json, pathlib, datetime
 from pathlib import Path
 from collections import Counter
 from jinja2 import Environment, FileSystemLoader
@@ -8,21 +8,138 @@ from src.guards.candidate import predict as predict_candidate
 from src.report.cluster_utils import cluster_failures
 from src.utils.io_utils import load_config, resolve_dataset_path, sha256_file, git_commit, new_run_id
 
+REQUIRED_KEYS = ("text",)
+
+
+def get_text(row):
+    for key in ("text", "prompt", "question", "input", "content", "message", "utterance"):
+        value = None
+        if hasattr(row, key):
+            value = getattr(row, key)
+        elif isinstance(row, dict):
+            value = row.get(key)
+        if value:
+            return str(value)
+    return ""
+
+
+def _row_text(row):
+    """Return the best-effort textual content for a dataset row."""
+    return get_text(row)
+
+
+def _is_valid_row(row):
+    return bool(_row_text(row))
+
+
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 TPL_DIR = ROOT / "templates"
 OUT_DIR = ROOT / "report"
 ASSETS = ROOT / "assets"
 OUT_DIR.mkdir(exist_ok=True); ASSETS.mkdir(exist_ok=True)
 
+
+
+def _pred_to_bool(p):
+    """
+    Accept dict/int/bool/str predictions and return True if "flag".
+    """
+    if isinstance(p, dict):
+        if "prediction" in p:
+            v = p["prediction"]
+            if isinstance(v, str):
+                return v.lower() in ("flag","blocked","deny","unsafe","violation")
+            return bool(v)
+        if "pred" in p:
+            v = p["pred"]
+            if isinstance(v, str):
+                return v.lower() in ("flag","blocked","deny","unsafe","violation")
+            return bool(v)
+        if ("score" in p) and ("threshold" in p):
+            return p["score"] >= p["threshold"]
+        return bool(p)
+    if isinstance(p, str):
+        return p.strip().lower() in ("flag","blocked","deny","unsafe","violation","1","true","yes","y")
+    return bool(p)
+
+def _label_to_bool(x):
+    """
+    Accept 0/1, bool, or strings like 'harmful'/'safe' and return True if harmful.
+    """
+    if isinstance(x, bool):
+        return x
+    if isinstance(x, (int, float)):
+        return int(x) != 0
+    if isinstance(x, str):
+        t = x.strip().lower()
+        harmful = {"1","true","yes","y","harmful","unsafe","violation","bad","toxic","deny"}
+        safe    = {"0","false","no","n","safe","benign","ok","harmless","good","allow"}
+        if t in harmful: return True
+        if t in safe:    return False
+    return False
+
+def _call_guard(guard_fn, text, category=None, language=None):
+    # Try multiple signatures; normalize output to {"prediction": ..., "latency_ms": ...}
+    trials = [
+        ((text,), {}),
+        ((text, category), {}) if category is not None else None,
+        ((text, category, language), {}) if (category is not None and language is not None) else None,
+        ((), {"text": text, "category": category, "language": language}),
+    ]
+    trials = [t for t in trials if t is not None]
+
+    out = None
+    for args, kwargs in trials:
+        try:
+            kwargs = {k: v for k, v in kwargs.items() if v is not None}
+            out = guard_fn(*args, **kwargs)
+            break
+        except TypeError:
+            continue
+        except Exception:
+            continue
+    if out is None:
+        out = guard_fn(text)
+
+    pred, lat = None, 0
+    if isinstance(out, dict):
+        pred = out.get("prediction") or out.get("pred")
+        if pred is None and ("score" in out and "threshold" in out):
+            pred = "flag" if out["score"] >= out["threshold"] else "pass"
+        lat = int(out.get("latency_ms", out.get("latency", 0)) or 0)
+    else:
+        pred = "flag" if bool(out) else "pass"
+    return {"prediction": pred, "latency_ms": lat, "raw": out}
+
 def load_rows(dataset_path: Path):
-    with open(dataset_path, newline="", encoding="utf-8") as f:
-        return list(csv.DictReader(f))
+    import yaml, pathlib, sys
+
+    path = pathlib.Path(dataset_path)
+    data = yaml.safe_load(path.read_text(encoding="utf-8")) or []
+    rows, dropped = [], 0
+
+    for idx, raw in enumerate(data):
+        if _is_valid_row(raw):
+            rows.append({
+                "text": _row_text(raw),
+                "category": raw.get("category"),
+                "language": raw.get("language"),
+                "label": raw.get("label", 0),
+            })
+        else:
+            dropped += 1
+
+    if dropped:
+        print(f"[load_rows] skipped {dropped} malformed row(s) lacking text-like content.", file=sys.stderr)
+
+    return rows
 
 def run_guard(rows, guard_fn):
-    preds=[]; lat=[]
+    preds, lat = [], []
     for r in rows:
-        out = guard_fn(r["text"], language=r.get("language"), category=r.get("category"))
-        preds.append(out); lat.append(out.get("latency_ms",0))
+        o = _call_guard(guard_fn, r['text'], r.get('category'), r.get('language'))
+        preds.append(1 if (o['prediction'] in ('flag', True, 1)) else 0)
+        lat.append(int(o['latency_ms']))
     return preds, lat
 
 def is_pos_label(lbl: str, mode: str) -> bool:
@@ -46,7 +163,7 @@ def confusion(rows, preds, mode="strict"):
     cm = Counter()
     for r, p in zip(rows, preds):
         gt_pos = is_pos_label(r["label"], mode)
-        pr_pos = (p["prediction"] == "flag")
+        pr_pos = _pred_to_bool(p)
         if gt_pos and pr_pos: cm["tp"] += 1
         elif (not gt_pos) and pr_pos: cm["fp"] += 1
         elif (not gt_pos) and (not pr_pos): cm["tn"] += 1
@@ -86,7 +203,7 @@ def slice_metrics(rows, preds, by=("category","language"), mode="strict"):
     for r,p in zip(rows,preds):
         key = tuple(r[k] for k in by)
         gt_pos = is_pos_label(r["label"], mode)
-        pr_pos = (p["prediction"] == "flag")
+        pr_pos = _pred_to_bool(p)
         if gt_pos and pr_pos: G[key]["tp"] += 1
         elif (not gt_pos) and pr_pos: G[key]["fp"] += 1
         elif (not gt_pos) and (not pr_pos): G[key]["tn"] += 1
@@ -156,7 +273,7 @@ def main():
         fn_rows=[]; fp_rows=[]
         for r,p in zip(rows,preds):
             gt_pos = is_pos_label(r["label"], mode)
-            pr_pos = (p["prediction"] == "flag")
+            pr_pos = _pred_to_bool(p)
             if gt_pos and (not pr_pos):
                 fn_rows.append({"id":r["id"],"category":r["category"],"language":r["language"],"text":r["text"]})
             if (not gt_pos) and pr_pos:
