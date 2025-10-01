@@ -12,4 +12,27 @@ One-screen harness to compare a Baseline vs. Candidate safety guard.
 python -m venv .venv && source .venv/bin/activate
 pip install --upgrade pip && pip install pandas numpy scikit-learn jinja2 matplotlib pyyaml
 make demo   # compare + report + sweep
+```
+
 - Gate: tuned per-slice thresholds in `config.yaml`; stricter overrides in `gate.json`.
+
+## Working with the dataset
+
+- New evaluation rows live in `data/rows.yaml` (YAML list). Keep the minimal
+  shape of `text`, `category`, `language`, and `label`; any extra metadata is
+  preserved in the report and red-team generator.
+- After editing, run the loader smoke test: `pytest tests/test_dataset_schema.py -q`.
+
+## Validation + report
+
+```bash
+export MPLBACKEND=Agg MPLCONFIGDIR=/tmp/mpl
+make validate  # compare -> report -> ci gate
+```
+
+- When the gate fails, inspect `report/index.html`. Serve it locally via:
+
+  ```bash
+  make serve-report
+  # → Open http://localhost:8000/index.html
+  ```
