@@ -1,4 +1,4 @@
-import os, json, pathlib, datetime
+import os, csv, json, pathlib, datetime
 from pathlib import Path
 from collections import Counter
 from jinja2 import Environment, FileSystemLoader
@@ -26,6 +26,14 @@ def get_text(row):
 def _row_text(row):
     """Return the best-effort textual content for a dataset row."""
     return get_text(row)
+
+
+def _row_field(row, key):
+    if isinstance(row, dict):
+        return row.get(key)
+    if hasattr(row, key):
+        return getattr(row, key)
+    return None
 
 
 def _is_valid_row(row):
@@ -115,17 +123,24 @@ def load_rows(dataset_path: Path):
     import yaml, pathlib, sys
 
     path = pathlib.Path(dataset_path)
-    data = yaml.safe_load(path.read_text(encoding="utf-8")) or []
+    suffix = path.suffix.lower()
+
+    if suffix in {".yaml", ".yml"}:
+        data = yaml.safe_load(path.read_text(encoding="utf-8")) or []
+    else:
+        with path.open(newline="", encoding="utf-8") as handle:
+            data = list(csv.DictReader(handle))
     rows, dropped = [], 0
 
     for idx, raw in enumerate(data):
         if _is_valid_row(raw):
-            rows.append({
-                "text": _row_text(raw),
-                "category": raw.get("category"),
-                "language": raw.get("language"),
-                "label": raw.get("label", 0),
-            })
+            normalized = dict(raw) if isinstance(raw, dict) else {}
+            normalized["text"] = _row_text(raw)
+            normalized["category"] = normalized.get("category") or _row_field(raw, "category")
+            normalized["language"] = normalized.get("language") or _row_field(raw, "language")
+            normalized["label"] = normalized.get("label", _row_field(raw, "label") or 0)
+            normalized["id"] = normalized.get("id") or _row_field(raw, "id")
+            rows.append(normalized)
         else:
             dropped += 1
 
