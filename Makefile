@@ -23,6 +23,10 @@ demo: compare report sweep
 open:
 	open report/index.html || true
 
+serve-report:
+	python -m http.server --directory report 8000
+	@echo "Open http://localhost:8000/index.html"
+
 
 autotune:
 	python -m src.report.auto_tune --target_fpr 0.01 --update_config
