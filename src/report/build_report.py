@@ -1,6 +1,7 @@
 import os, csv, json, pathlib, datetime
 from pathlib import Path
 from collections import Counter, defaultdict
+from typing import List
 from jinja2 import Environment, FileSystemLoader
 
 from src.guards.baseline import predict as predict_baseline
@@ -365,6 +366,30 @@ def load_parity_summary(path: Path):
     }
 
 
+def load_incident_reports(directory: Path) -> List[dict]:
+    incidents = []
+    if not directory.exists():
+        return incidents
+    for path in directory.glob("incident_*.json"):
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            continue
+        metrics = data.get("metrics", {})
+        incidents.append(
+            {
+                "scenario": data.get("scenario", path.stem.replace("incident_", "")),
+                "duration_s": data.get("duration_s"),
+                "rate_rps": data.get("rate_rps"),
+                "detection_time_s": metrics.get("detection_time_s"),
+                "mitigation_time_s": metrics.get("mitigation_time_s"),
+                "residual_risk": metrics.get("residual_risk"),
+            }
+        )
+    incidents.sort(key=lambda x: x["scenario"])
+    return incidents
+
+
 def main():
     cfg = load_config()
     dataset_path = resolve_dataset_path(cfg)
@@ -439,6 +464,7 @@ def main():
     runtime_offline = {f"{s['category']}/{s['language']}": s for s in views["strict"]["slices"]["Candidate"]}
     runtime_summary, runtime_chart = load_runtime_telemetry(Path("runtime_telemetry.jsonl"), ASSETS, runtime_offline)
     parity_summary = load_parity_summary(Path("report/parity.json"))
+    incident_summary = load_incident_reports(OUT_DIR)
     failures = (
         [{"id":r["id"],"fail_type":"FN","model":"Baseline", **r} for r in b_fn] +
         [{"id":r["id"],"fail_type":"FP","model":"Baseline", **r} for r in b_fp] +
@@ -471,6 +497,7 @@ def main():
         runtime_summary=runtime_summary,
         runtime_chart=runtime_chart,
         parity_summary=parity_summary,
+        incident_summary=incident_summary,
     )
     out_file = OUT_DIR / "index.html"
     out_file.write_text(html, encoding="utf-8")

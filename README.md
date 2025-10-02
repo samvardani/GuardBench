@@ -24,6 +24,7 @@ make demo   # compare + report + sweep
 - [Policy DSL](docs/POLICY.md): declarative guard rules, validation, and compilation pipeline.
 - [Obfuscation Lab](docs/OBFUSCATION.md): stress suite metrics and hardness charts.
 - [Multilingual Parity](docs/MULTILINGUAL.md): language recall checks and targets.
+- [Incident Runbooks](docs/RUNBOOKS.md): chaos drill guidance and mitigation steps.
 
 ## Working with the dataset
 

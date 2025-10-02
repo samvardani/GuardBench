@@ -327,6 +327,26 @@
   </div>
   {% endif %}
 
+  {% if incident_summary %}
+  <div class="card" style="margin-top:16px;">
+    <h2>Incident Response Drills</h2>
+    <div class="meta">Simulated chaos scenarios with detection/mitigation timings.</div>
+    <table>
+      <tr><th>Scenario</th><th>Duration (s)</th><th>Rate (rps)</th><th>Detect (s)</th><th>Mitigate (s)</th><th>Residual risk</th></tr>
+      {% for incident in incident_summary %}
+      <tr>
+        <td>{{ incident.scenario }}</td>
+        <td>{{ incident.duration_s }}</td>
+        <td>{{ incident.rate_rps }}</td>
+        <td>{% if incident.detection_time_s is not none %}{{ incident.detection_time_s|round(2) }}{% else %}<span class="meta">n/a</span>{% endif %}</td>
+        <td>{% if incident.mitigation_time_s is not none %}{{ incident.mitigation_time_s|round(2) }}{% else %}<span class="meta">n/a</span>{% endif %}</td>
+        <td>{{ incident.residual_risk|round(3) }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% endif %}
+
   <script>
   (function(){
     const strict = document.getElementById('view-strict');
