@@ -308,6 +308,25 @@
   </div>
   {% endif %}
 
+  {% if parity_summary %}
+  <div class="card" style="margin-top:16px;">
+    <h2>Language Parity — {{ parity_summary.category }}</h2>
+    <div class="meta">Target recall delta ≤ {{ parity_summary.target_delta }} (actual {{ parity_summary.max_delta }}).</div>
+    <table>
+      <tr><th>Language</th><th>Total</th><th>Flagged</th><th>Recall</th></tr>
+      {% for row in parity_summary.rows %}
+      <tr>
+        <td>{{ row.language }}</td>
+        <td>{{ row.total }}</td>
+        <td>{{ row.flagged }}</td>
+        <td>{{ row.recall }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    <div class="meta">Variance: {{ parity_summary.variance }}</div>
+  </div>
+  {% endif %}
+
   <script>
   (function(){
     const strict = document.getElementById('view-strict');
