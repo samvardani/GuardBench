@@ -20,6 +20,7 @@ make demo   # compare + report + sweep
 
 - [Getting Started](docs/GETTING_STARTED.md): environment setup, validation flow, serving reports, CI expectations.
 - [Red-Team Swarm](docs/REDTEAM.md): adaptive red-team workflow, budgets, and outputs.
+- [AutoPatch](docs/AUTOPATCH.md): generate candidate patches, run A/B validation, and stage a PR bundle.
 
 ## Working with the dataset
 

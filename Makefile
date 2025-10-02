@@ -57,3 +57,6 @@ redteam-swarm:
 	python -m src.redteam.swarm --max-iters 200 --budget '{"violence/en":50,"self_harm/en":50,"malware/en":50,"violence/fa":50}'
 	python -m src.report.build_report
 	@echo "Open: report/index.html"
+
+autopatch:
+	python -m src.autopatch.run --target "self_harm/en,malware/en"
