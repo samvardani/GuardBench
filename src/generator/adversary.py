@@ -3,9 +3,11 @@
 
 from __future__ import annotations
 from dataclasses import dataclass
+from collections import defaultdict
+import hashlib
 import time
 from pathlib import Path
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Callable, Sequence
 import csv
 import yaml
 import random
@@ -97,22 +99,47 @@ def _get_rows_path() -> Path:
 # --- Small, deterministic transform library (no APIs needed) ---
 
 LEET = str.maketrans({
-    "a":"4","e":"3","i":"1","o":"0","s":"5","t":"7","g":"9","b":"8"
+    "a": "4",
+    "e": "3",
+    "i": "1",
+    "o": "0",
+    "s": "5",
+    "t": "7",
+    "g": "9",
+    "b": "8",
 })
 
 CONFUSABLES = {
     # latin -> visually similar
-    "a":"а", # cyrillic a
-    "e":"е", # cyrillic ie
-    "o":"ο", # greek omicron
-    "p":"р", # cyrillic er
-    "c":"с", # cyrillic es
-    "x":"х", # cyrillic ha
-    "y":"у", # cyrillic u
-    "H":"Н", # cyrillic en
-    "K":"Κ", # greek kappa
-    "M":"М", # cyrillic em
+    "a": "а",  # cyrillic a
+    "e": "е",  # cyrillic ie
+    "o": "ο",  # greek omicron
+    "p": "р",  # cyrillic er
+    "c": "с",  # cyrillic es
+    "x": "х",  # cyrillic ha
+    "y": "у",  # cyrillic u
+    "H": "Н",  # cyrillic en
+    "K": "Κ",  # greek kappa
+    "M": "М",  # cyrillic em
 }
+
+HOMOGLYPHS = {
+    "m": ["rn", "r\u200dn"],
+    "w": ["vv", "v\u200dv"],
+    "k": ["|<", "l<"],
+    "l": ["|", "1"],
+    "d": ["cl"],
+    "h": ["|-|"],
+    "M": ["RN", "R\u200dN"],
+    "W": ["VV", "V\u200dV"],
+    "K": ["|<", "I<"],
+    "L": ["|", "1"],
+    "D": ["CL"],
+    "H": ["|-|"],
+}
+
+ZERO_WIDTH_CHARS = ["\u200b", "\u200c", "\u200d", "\ufeff"]
+PUNCTUATION_BREAKS = ["-", ".", ",", "_", "/", "|", ";"]
 
 SYNONYMS = [
     # very small illustrative pairs; extend per category as needed
@@ -124,68 +151,143 @@ SYNONYMS = [
     ("attack", "assault"),
 ]
 
-ZWSP = "\u200b"
-
-def leetify(t: str) -> str:
+def leetify(t: str, rng: random.Random | None = None) -> str:
     """Replace Latin characters with simple leetspeak substitutions."""
     return t.translate(LEET)
 
-def insert_confusables(t: str) -> str:
+
+def insert_confusables(t: str, rng: random.Random | None = None) -> str:
     """Swap characters for visually similar homoglyphs with 25% probability."""
-    out = []
+    rng = rng or random
+    out: List[str] = []
     for ch in t:
-        if ch in CONFUSABLES and random.random() < 0.25:
+        if ch in CONFUSABLES and rng.random() < 0.25:
             out.append(CONFUSABLES[ch])
         else:
             out.append(ch)
     return "".join(out)
 
-def insert_zwsp(t: str) -> str:
-    """Slip zero-width spaces between characters to disrupt tokenization."""
-    # Insert ZWSP between some letters to bypass naive filters
-    chars = list(t)
-    i = 1
-    out = [chars[0]] if chars else []
-    while i < len(chars):
-        out.append(ZWSP if random.random() < 0.2 else "")
-        out.append(chars[i])
-        i += 1
+
+def insert_homoglyphs(t: str, rng: random.Random | None = None) -> str:
+    """Replace characters with ASCII homoglyph tricks (e.g. m -> rn)."""
+    rng = rng or random
+    out: List[str] = []
+    for ch in t:
+        options = HOMOGLYPHS.get(ch)
+        if options and rng.random() < 0.35:
+            out.append(rng.choice(options))
+            continue
+        options_lower = HOMOGLYPHS.get(ch.lower())
+        if options_lower and rng.random() < 0.35:
+            repl = rng.choice(options_lower)
+            if ch.isupper():
+                repl = repl.upper()
+            out.append(repl)
+        else:
+            out.append(ch)
     return "".join(out)
 
-def jitter_spacing(t: str) -> str:
+
+def insert_zero_widths(t: str, rng: random.Random | None = None) -> str:
+    """Slip zero-width characters between graphemes to disrupt tokenization."""
+    rng = rng or random
+    chars = list(t)
+    if not chars:
+        return t
+    out = [chars[0]]
+    for prev, nxt in zip(chars, chars[1:]):
+        if rng.random() < 0.3 and prev.strip() and nxt.strip():
+            out.append(rng.choice(ZERO_WIDTH_CHARS))
+        out.append(nxt)
+    return "".join(out)
+
+
+def punctuation_split(t: str, rng: random.Random | None = None) -> str:
+    """Insert lightweight punctuation inside long tokens."""
+    rng = rng or random
+    words = t.split()
+    mutated: List[str] = []
+    for word in words:
+        clean = re.sub(r"[^A-Za-z]", "", word)
+        if len(clean) < 5 or rng.random() < 0.2:
+            mutated.append(word)
+            continue
+        inserts = 1 + (1 if len(clean) > 7 and rng.random() < 0.5 else 0)
+        positions = sorted(rng.sample(range(1, len(word)), inserts))
+        offset = 0
+        new_word = list(word)
+        for pos in positions:
+            punctuation = rng.choice(PUNCTUATION_BREAKS)
+            new_word.insert(pos + offset, punctuation)
+            offset += 1
+        mutated.append("".join(new_word))
+    return " ".join(mutated)
+
+
+def jitter_spacing(t: str, rng: random.Random | None = None) -> str:
     """Insert random spaces or hyphens into long words."""
-    # random spaces/hyphens in words longer than 6
-    def j(word):
-        if len(word) < 7: return word
-        i = random.randint(2, len(word)-3)
-        return word[:i] + (" " if random.random()<0.5 else "-") + word[i:]
+    rng = rng or random
+
+    def j(word: str) -> str:
+        if len(word) < 7:
+            return word
+        idx = rng.randint(2, len(word) - 3)
+        return word[:idx] + (" " if rng.random() < 0.5 else "-") + word[idx:]
+
     return " ".join(j(w) for w in t.split())
 
-def synonym_swap(t: str) -> str:
+
+def synonym_swap(t: str, rng: random.Random | None = None) -> str:
     """Swap curated synonym pairs bidirectionally to vary phrasing."""
+    rng = rng or random
     out = t
-    for a,b in SYNONYMS:
-        if random.random() < 0.5:
-            out = re.sub(rf"\\b{re.escape(a)}\\b", b, out, flags=re.I)
+    for a, b in SYNONYMS:
+        pattern_a = rf"\\b{re.escape(a)}\\b"
+        pattern_b = rf"\\b{re.escape(b)}\\b"
+        if rng.random() < 0.5:
+            out = re.sub(pattern_a, b, out, flags=re.I)
         else:
-            out = re.sub(rf"\\b{re.escape(b)}\\b", a, out, flags=re.I)
+            out = re.sub(pattern_b, a, out, flags=re.I)
     return out
 
-def chain(*funcs):
-    """Compose multiple text transforms into a single callable."""
-    def _f(t):
-        for f in funcs:
-            t = f(t)
-        return t
-    return _f
 
-VARIANTS = [
-    ("easy",      [synonym_swap]),
-    ("medium",    [leetify, synonym_swap]),
-    ("medium",    [insert_confusables]),
-    ("hard",      [insert_zwsp, synonym_swap]),
-    ("hard",      [jitter_spacing, insert_confusables]),
-    ("hard",      [leetify, insert_zwsp, insert_confusables]),
+TRANSFORM_REGISTRY: Dict[str, Callable[[str, random.Random | None], str]] = {
+    "synonym_swap": synonym_swap,
+    "leetify": leetify,
+    "insert_confusables": insert_confusables,
+    "insert_homoglyphs": insert_homoglyphs,
+    "punctuation_split": punctuation_split,
+    "insert_zero_widths": insert_zero_widths,
+    "jitter_spacing": jitter_spacing,
+}
+
+
+VARIANT_RECIPES: List[Tuple[str, Sequence[str]]] = [
+    ("medium", ("synonym_swap",)),
+    ("medium", ("leetify",)),
+    ("medium", ("insert_confusables",)),
+    ("medium", ("insert_homoglyphs",)),
+    ("medium", ("punctuation_split",)),
+    ("medium", ("insert_zero_widths",)),
+    ("medium", ("jitter_spacing",)),
+    ("hard", ("leetify", "insert_zero_widths")),
+    ("hard", ("insert_confusables", "insert_zero_widths")),
+    ("hard", ("insert_homoglyphs", "insert_zero_widths")),
+    ("hard", ("punctuation_split", "insert_zero_widths")),
+    ("hard", ("leetify", "punctuation_split")),
+    ("hard", ("synonym_swap", "insert_zero_widths")),
+    ("hard", ("synonym_swap", "insert_confusables")),
+    ("hard", ("synonym_swap", "insert_homoglyphs")),
+    ("hard", ("synonym_swap", "punctuation_split")),
+    ("hard", ("jitter_spacing", "insert_zero_widths")),
+    ("very_hard", ("leetify", "insert_confusables", "insert_zero_widths")),
+    ("very_hard", ("insert_confusables", "punctuation_split", "insert_zero_widths")),
+    ("very_hard", ("insert_homoglyphs", "punctuation_split", "insert_zero_widths")),
+    ("very_hard", ("synonym_swap", "leetify", "insert_zero_widths")),
+    ("very_hard", ("synonym_swap", "insert_confusables", "insert_zero_widths")),
+    ("very_hard", ("synonym_swap", "insert_homoglyphs", "insert_zero_widths")),
+    ("very_hard", ("synonym_swap", "leetify", "insert_confusables")),
+    ("very_hard", ("synonym_swap", "leetify", "insert_homoglyphs", "insert_zero_widths")),
 ]
 
 @dataclass
@@ -230,25 +332,74 @@ def save_rows(path: Path, rows: List[Row]) -> None:
         out.append(d)
     path.write_text(yaml.safe_dump(out, sort_keys=False, allow_unicode=True), encoding="utf-8")
 
-def generate_variants(row: Row, k_per_case: int = 3) -> List[Row]:
+def _apply_recipe(text: str, transforms: Sequence[str], rng: random.Random) -> tuple[str, Sequence[str]]:
+    applied: List[str] = []
+    out = text
+    for name in transforms:
+        transform = TRANSFORM_REGISTRY[name]
+        out = transform(out, rng=rng)
+        applied.append(name)
+    return out, tuple(applied)
+
+
+def _category_rng(category: str) -> random.Random:
+    seed_material = f"{category}|adversary|{time.time_ns()}"
+    seed = int(hashlib.sha256(seed_material.encode("utf-8")).hexdigest()[:16], 16)
+    return random.Random(seed)
+
+
+def generate_variants(
+    row: Row,
+    k_per_case: int = 3,
+    seen: set[str] | None = None,
+    rng: random.Random | None = None,
+) -> List[Row]:
     """Create perturbed variants for ``row`` using the local transform library."""
-    random.seed(42)  # reproducible-ish
-    variants = []
-    seen = set()
-    for (diff, fs) in VARIANTS:
-        if len(variants) >= k_per_case: break
-        f = chain(*fs)
-        v = f(row.text)
-        if v and v != row.text and v not in seen:
-            seen.add(v)
-            variants.append(Row(
-                text=v,
-                label=row.label,
-                category=row.category,
-                language=row.language,
-                meta={**row.meta, "source":"redteam", "difficulty":diff}
-            ))
-    return variants
+
+    working_rng = rng or random.Random(
+        int(hashlib.sha256(f"{row.category}|{row.language}|{row.text}".encode("utf-8")).hexdigest()[:16], 16)
+    )
+
+    recipes = list(VARIANT_RECIPES)
+    working_rng.shuffle(recipes)
+
+    cat_seen = seen if seen is not None else set()
+    produced: List[Row] = []
+    attempts = 0
+    max_attempts = len(recipes) * 8
+
+    while len(produced) < k_per_case and attempts < max_attempts:
+        idx = attempts % len(recipes)
+        difficulty, transforms = recipes[idx]
+        attempts += 1
+
+        mutated, applied = _apply_recipe(row.text, transforms, working_rng)
+        if not mutated or mutated == row.text:
+            continue
+        if mutated in cat_seen:
+            if attempts % len(recipes) == 0:
+                working_rng.shuffle(recipes)
+            continue
+
+        new_meta = {
+            **row.meta,
+            "source": "redteam",
+            "difficulty": difficulty,
+            "transforms": list(applied),
+        }
+        produced.append(Row(
+            text=mutated,
+            label=row.label,
+            category=row.category,
+            language=row.language,
+            meta=new_meta,
+        ))
+        cat_seen.add(mutated)
+
+        if attempts % len(recipes) == 0:
+            working_rng.shuffle(recipes)
+
+    return produced
 
 def find_false_negatives(rows: List[Row]) -> List[Tuple[Row, int]]:
     """Return ``(row, index)`` pairs the guard classified safe despite label=1."""
@@ -275,55 +426,140 @@ def append_generated(base_path: Path, generated: List[Row]) -> str:
     save_rows(base_path, merged)
     return str(backup)
 
-def run(max_cases_per_category: int = 5, k_per_case: int = 3) -> Dict[str,int]:
+def run(
+    max_cases_per_category: int = 8,
+    k_per_case: int = 12,
+    target_per_category: int = 20,
+) -> Dict[str, int]:
     """Generate red-team variants and append them to the configured dataset.
 
     Args:
         max_cases_per_category: Upper bound on source rows considered per
             category. Keeps generation balanced across topics.
-        k_per_case: Number of variant attempts per source row.
+        k_per_case: Baseline number of variant attempts per source row.
+        target_per_category: Minimum variants to create per failing category.
 
     Returns:
         Mapping with ``{"picked": int, "generated": int}`` summarizing work.
     """
+
     rows_path = _get_rows_path()
     rows = load_rows(rows_path)
+    existing_redteam_counts: Dict[str, int] = defaultdict(int)
+    for existing in rows:
+        if existing.meta.get("source") == "redteam":
+            existing_redteam_counts[existing.category or "misc"] += 1
     fns = find_false_negatives(rows)
 
     # Fallback: if no FNs, seed with all harmful rows
-
     if not fns:
-
         fns = [(r, -1) for r in rows if getattr(r, "label", 0) == 1]
 
-    # limit per category
-    picked = []
-    per_cat = {}
-    for r,_idx in fns:
-        c = r.category or "misc"
-        if per_cat.get(c,0) >= max_cases_per_category: 
-            continue
-        picked.append(r)
-        per_cat[c] = per_cat.get(c,0)+1
+    if not fns:
+        return {"picked": 0, "generated": 0}
 
-    generated = []
-    for r in picked:
-        generated.extend(generate_variants(r, k_per_case=k_per_case))
+    picked_by_category: Dict[str, List[Row]] = defaultdict(list)
+    for row, _idx in fns:
+        category = row.category or "misc"
+        if existing_redteam_counts.get(category, 0) >= target_per_category:
+            continue
+        if len(picked_by_category[category]) >= max_cases_per_category:
+            continue
+        picked_by_category[category].append(row)
+
+    generated: List[Row] = []
+    generated_by_category: Dict[str, int] = defaultdict(int)
+    global_seen: set[str] = {r.text for r in rows}
+
+    if not any(picked_by_category.values()):
+        return {
+            "picked": 0,
+            "generated": 0,
+            "by_category": {},
+            "target_per_category": target_per_category,
+        }
+    category_rngs: Dict[str, random.Random] = {
+        category: _category_rng(category) for category in picked_by_category
+    }
+
+    for category, rows_for_cat in picked_by_category.items():
+        if not rows_for_cat:
+            continue
+
+        cat_seen: set[str] = set(global_seen)
+        cat_rng = category_rngs[category]
+        per_row_target = max(
+            k_per_case,
+            (target_per_category + len(rows_for_cat) - 1) // max(1, len(rows_for_cat)),
+        )
+
+        cat_variants: List[Row] = []
+        for row in rows_for_cat:
+            cat_variants.extend(
+                generate_variants(row, k_per_case=per_row_target, seen=cat_seen, rng=cat_rng)
+            )
+
+        rounds = 0
+        while len(cat_variants) < target_per_category and rows_for_cat:
+            rounds += 1
+            for row in rows_for_cat:
+                needed = target_per_category - len(cat_variants)
+                if needed <= 0:
+                    break
+                cat_variants.extend(
+                    generate_variants(row, k_per_case=needed, seen=cat_seen, rng=cat_rng)
+                )
+            if rounds > 4:
+                break
+
+        if len(cat_variants) < target_per_category:
+            raise RuntimeError(
+                f"Unable to construct {target_per_category} unique variants for category '{category}'."
+            )
+
+        generated.extend(cat_variants)
+        generated_by_category[category] += len(cat_variants)
+        global_seen.update(v.text for v in cat_variants)
 
     if not generated:
-        return {"picked":0, "generated":0}
+        return {"picked": sum(len(v) for v in picked_by_category.values()), "generated": 0}
 
     backup = append_generated(rows_path, generated)
 
-    # write a small summary
-    report_dir = Path("report"); report_dir.mkdir(exist_ok=True)
-    (report_dir / "redteam_summary.yaml").write_text(
-        yaml.safe_dump({
-            "picked": len(picked),
-            "generated": len(generated),
-            "by_category": {k:int(v) for k,v in per_cat.items()},
-            "backup": backup
-        }, sort_keys=False),
-        encoding="utf-8"
+    report_dir = Path("report")
+    report_dir.mkdir(exist_ok=True)
+    summary_path = report_dir / "redteam_summary.yaml"
+
+    record = {
+        "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "picked": sum(len(v) for v in picked_by_category.values()),
+        "generated": len(generated),
+        "target_per_category": target_per_category,
+        "by_category": {k: int(v) for k, v in generated_by_category.items()},
+        "failing_categories": sorted(picked_by_category.keys()),
+        "existing_redteam_counts": {k: int(v) for k, v in existing_redteam_counts.items()},
+        "backup": backup,
+    }
+
+    records: List[Dict[str, Any]] = []
+
+    if summary_path.exists():
+        existing = yaml.safe_load(summary_path.read_text(encoding="utf-8"))
+        if isinstance(existing, list):
+            records = existing
+        elif existing:
+            records = [existing]
+    
+
+    records.append(record)
+    summary_path.write_text(
+        yaml.safe_dump(records, sort_keys=False, allow_unicode=True),
+        encoding="utf-8",
     )
-    return {"picked":len(picked), "generated":len(generated)}
+
+    return {
+        "picked": record["picked"],
+        "generated": record["generated"],
+        "by_category": record["by_category"],
+        "target_per_category": target_per_category,
+    }

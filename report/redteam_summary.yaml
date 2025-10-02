@@ -1,7 +1,33 @@
-picked: 3
-generated: 9
-by_category:
-  self_harm: 1
-  crime: 1
-  malware: 1
-backup: /Users/samvardani/Projects/safety-eval-mini/data/rows.yaml.bak-20250930-210605
+- picked: 3
+  generated: 9
+  by_category:
+    self_harm: 1
+    crime: 1
+    malware: 1
+  backup: /Users/samvardani/Projects/safety-eval-mini/data/rows.yaml.bak-20250930-210605
+- timestamp: '2025-10-02T09:02:55Z'
+  picked: 12
+  generated: 60
+  target_per_category: 20
+  by_category:
+    self_harm: 20
+    crime: 20
+    malware: 20
+  failing_categories:
+  - crime
+  - malware
+  - self_harm
+  backup: /Users/samvardani/Projects/safety-eval-mini/data/rows.yaml.bak-20251002-020255
+- timestamp: '2025-10-02T09:05:23Z'
+  picked: 3
+  generated: 21
+  target_per_category: 20
+  by_category:
+    pii: 21
+  failing_categories:
+  - pii
+  existing_redteam_counts:
+    self_harm: 23
+    crime: 23
+    malware: 23
+  backup: /Users/samvardani/Projects/safety-eval-mini/data/rows.yaml.bak-20251002-020523
