@@ -25,7 +25,11 @@ def run_eval(rows, mode="strict"):
     # Per-slice confusion + latencies
     G = defaultdict(lambda: {"tp":0,"fp":0,"tn":0,"fn":0,"n":0,"lat":[]})
     for r in rows:
-        out = predict_candidate(r["text"])
+        out = predict_candidate(
+            r["text"],
+            category=r.get("category"),
+            language=r.get("language"),
+        )
         gt = is_pos(r["label"], mode)
         pr = (out["prediction"] == "flag")
         lat = int(out.get("latency_ms", 0))
