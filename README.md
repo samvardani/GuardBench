@@ -16,6 +16,10 @@ make demo   # compare + report + sweep
 
 - Gate: tuned per-slice thresholds in `config.yaml`; stricter overrides in `gate.json`.
 
+## Documentation
+
+- [Getting Started](docs/GETTING_STARTED.md): environment setup, validation flow, serving reports, CI expectations.
+
 ## Working with the dataset
 
 - New evaluation rows live in `data/rows.yaml` (YAML list). Keep the minimal
