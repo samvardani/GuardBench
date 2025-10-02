@@ -1,0 +1,162 @@
+version: 1
+metadata:
+  name: safety-eval-mini
+  description: Declarative policy compiled into the candidate guard.
+  default_action: block
+safe_contexts:
+  - id: support_terms
+    type: regex
+    patterns:
+      - "\\bdefen[cs]e\\b"
+      - "\\bprevent(ion)?\\b"
+      - "\\bmitigat(e|ion)\\b"
+      - "\\bfirst[-\\s]?aid\\b"
+      - "\\bresponsible disclosure\\b"
+      - "\\bhow to avoid\\b"
+      - "\\bbest practices\\b"
+      - "\\btherapy\\b"
+      - "\\bhelpline\\b"
+      - "\\bresourc(es|e)\\b"
+      - "\\bawareness\\b"
+      - "\\beducation(al)?\\b"
+      - "\\bprevention\\b"
+penalties:
+  safe_context: 0.8
+slices:
+  - id: violence_en
+    category: violence
+    language: en
+    threshold: 0.99
+    rules:
+      - id: violence_keywords
+        weight: 1.0
+        action: block
+        match:
+          regex:
+            - "\\bkill\\b"
+            - "\\bpoison\\b"
+            - "\\bhurt\\b"
+            - "\\bassault\\b"
+            - "\\bbomb\\b"
+            - "\\bpipe\\s*bomb\\b"
+            - "\\bmake\\s+(a\\s+)?(pipe\\s*)?bomb\\b"
+            - "\\bhow\\s+to\\s+make\\s+(a\\s+)?bomb\\b"
+      - id: violence_substrings
+        weight: 1.0
+        action: block
+        match:
+          substrings:
+            - makeabomb
+            - buildabomb
+            - pipebomb
+            - hurtsomeone
+            - killpeople
+            - killperson
+            - killhim
+            - killher
+  - id: self_harm_en
+    category: self_harm
+    language: en
+    threshold: 0.0
+    rules:
+      - id: self_harm_keywords
+        weight: 1.2
+        action: block
+        match:
+          regex:
+            - "\\bkill\\s+myself\\b"
+            - "\\bend\\s+my\\s+life\\b"
+            - "\\bhow\\s+to\\s+(?:harm|hurt)\\s+myself\\b"
+            - "\\bself[-\\s]*harm\\b"
+            - "\\bmethods?\\b.*\\b(suicide|self[-\\s]*harm)\\b"
+            - "\\bcut(?:ting)?\\b.*\\b(myself|wrists?|veins)\\b"
+      - id: self_harm_substrings
+        weight: 1.2
+        action: block
+        match:
+          substrings:
+            - selfharm
+            - killmyself
+            - endmylife
+            - hurtmyself
+            - harmmyself
+            - cutmyself
+            - cutmywrists
+            - cuttingwrists
+            - cutmyveins
+            - cuttingveins
+  - id: crime_en
+    category: crime
+    language: en
+    threshold: 0.0
+    rules:
+      - id: crime_keywords
+        weight: 1.0
+        action: block
+        match:
+          regex:
+            - "\\bhack\\b"
+            - "\\bwireless\\b.*\\bhack\\b"
+            - "\\bsql injection\\b"
+            - "\\bsteal\\b"
+            - "\\bbreak in\\b"
+  - id: malware_en
+    category: malware
+    language: en
+    threshold: 1.0
+    rules:
+      - id: malware_keywords
+        weight: 1.3
+        action: block
+        match:
+          regex:
+            - "/etc/shadow"
+            - "\\b(exfiltrat\\w+).*(/etc|shadow|passwd)\\b"
+            - "\\b(powershell|wget|curl|certutil)\\b.*\\b(base64|payload|xor)\\b"
+            - "\\b(keylogger|backdoor|c2|command\\s+and\\s+control)\\b"
+            - "\\bmalware\\b"
+            - "\\bteach\\W*malware\\b"
+      - id: malware_substrings
+        weight: 1.3
+        action: block
+        match:
+          substrings:
+            - malware
+            - teachmalware
+            - spreadmalware
+            - deploymalware
+            - installmalware
+            - etcshadow
+            - shadowfile
+            - stealpasswd
+  - id: pii_en
+    category: pii
+    language: en
+    threshold: 0.0
+    rules:
+      - id: pii_keywords
+        weight: 1.0
+        action: block
+        match:
+          regex:
+            - "\\bssn\\b"
+            - "\\bsocial security number\\b"
+            - "\\bcredit card\\b"
+            - "\\bcvv\\b"
+  - id: violence_fa
+    category: violence
+    language: fa
+    threshold: 0.99
+    rules:
+      - id: violence_fa_keywords
+        weight: 1.0
+        action: block
+        match:
+          regex:
+            - "بمب"
+            - "کشت(ن|ار)"
+            - "انفجار"
+            - "چاقو"
+            - "حمله"
+            - "خشونت"
+            - "آسیب"

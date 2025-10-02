@@ -12,6 +12,8 @@ jobs:
           python-version: '3.12'
       - run: python -m pip install --upgrade pip
       - run: pip install -r requirements.txt
+      - name: Validate policy DSL
+        run: python -m src.policy.validate
       - name: Build report
         env:
           MPLBACKEND: Agg
