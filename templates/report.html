@@ -287,6 +287,27 @@
   </div>
   {% endif %}
 
+  {% if runtime_summary %}
+  <div class="card" style="margin-top:16px;">
+    <h2>Runtime Telemetry (Shadow Mode)</h2>
+    <div class="meta">Aggregated margins vs offline recall. Shadow mode only – no live blocking.</div>
+    {% if runtime_chart %}
+    <div><img alt="Runtime drift" src="{{ runtime_chart }}" style="max-width:100%"></div>
+    {% endif %}
+    <table>
+      <tr><th>Slice</th><th>Samples</th><th>Avg(score - threshold)</th><th>Offline Recall</th></tr>
+      {% for row in runtime_summary %}
+      <tr>
+        <td>{{ row.slice }}</td>
+        <td>{{ row.count }}</td>
+        <td>{{ row.avg_margin }}</td>
+        <td>{{ row.offline_recall }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% endif %}
+
   <script>
   (function(){
     const strict = document.getElementById('view-strict');
