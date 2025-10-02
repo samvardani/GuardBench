@@ -19,6 +19,7 @@ make demo   # compare + report + sweep
 ## Documentation
 
 - [Getting Started](docs/GETTING_STARTED.md): environment setup, validation flow, serving reports, CI expectations.
+- [Red-Team Swarm](docs/REDTEAM.md): adaptive red-team workflow, budgets, and outputs.
 
 ## Working with the dataset
 

@@ -264,6 +264,29 @@
     </div>
   </div>
 
+  {% if redteam_summary %}
+  <div class="card" style="margin-top:16px;">
+    <h2>Red-Team Findings</h2>
+    <div class="meta">Recent swarm discoveries grouped by slice and agent.</div>
+    <table>
+      <tr><th>Slice</th><th>Agent</th><th>Count</th><th>Operations</th><th>Examples</th></tr>
+      {% for item in redteam_summary %}
+      <tr>
+        <td>{{ item.slice }}</td>
+        <td>{{ item.agent }}</td>
+        <td>{{ item.count }}</td>
+        <td>{% if item.operations %}{{ ", ".join(item.operations) }}{% else %}<span class="meta">—</span>{% endif %}</td>
+        <td>
+          {% for example in item.examples %}
+            <div>{{ example }}</div>
+          {% endfor %}
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% endif %}
+
   <script>
   (function(){
     const strict = document.getElementById('view-strict');
