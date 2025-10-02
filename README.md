@@ -22,6 +22,7 @@ make demo   # compare + report + sweep
 - [Red-Team Swarm](docs/REDTEAM.md): adaptive red-team workflow, budgets, and outputs.
 - [AutoPatch](docs/AUTOPATCH.md): generate candidate patches, run A/B validation, and stage a PR bundle.
 - [Policy DSL](docs/POLICY.md): declarative guard rules, validation, and compilation pipeline.
+- [Obfuscation Lab](docs/OBFUSCATION.md): stress suite metrics and hardness charts.
 
 ## Working with the dataset
 
