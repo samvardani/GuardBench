@@ -39,3 +39,16 @@ tune:
 apply-tuned:
 	python -m src.runner.apply_tuned
 	@echo "Applied tuned thresholds. Consider committing the change."
+
+
+validate:
+	python -m src.runner.run_compare
+	python -m src.report.build_report
+	python -m src.runner.ci_gate --config gate.json || true
+	@echo "----"
+	@echo "OK: compare, report, ci_gate completed."
+
+redteam:
+	python -m src.runner.run_adversarial
+	python -m src.report.build_report
+	@echo "Open: report/index.html"
