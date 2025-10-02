@@ -23,6 +23,7 @@ make demo   # compare + report + sweep
 - [AutoPatch](docs/AUTOPATCH.md): generate candidate patches, run A/B validation, and stage a PR bundle.
 - [Policy DSL](docs/POLICY.md): declarative guard rules, validation, and compilation pipeline.
 - [Obfuscation Lab](docs/OBFUSCATION.md): stress suite metrics and hardness charts.
+- [Multilingual Parity](docs/MULTILINGUAL.md): language recall checks and targets.
 
 ## Working with the dataset
 

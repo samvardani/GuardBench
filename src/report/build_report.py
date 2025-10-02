@@ -339,6 +339,32 @@ def load_runtime_telemetry(path: Path, assets_root: Path, offline_slices: dict):
     return summary, relative_chart
 
 
+def load_parity_summary(path: Path):
+    if not path.exists():
+        return None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return None
+    languages = data.get("languages", {})
+    rows = []
+    for lang, stats in languages.items():
+        rows.append({
+            "language": lang,
+            "total": stats.get("total", 0),
+            "flagged": stats.get("flagged", 0),
+            "recall": stats.get("recall", 0.0),
+        })
+    rows.sort(key=lambda r: r["language"])
+    return {
+        "category": data.get("category"),
+        "rows": rows,
+        "max_delta": data.get("max_delta", 0.0),
+        "variance": data.get("variance", 0.0),
+        "target_delta": data.get("target_delta", 0.05),
+    }
+
+
 def main():
     cfg = load_config()
     dataset_path = resolve_dataset_path(cfg)
@@ -412,6 +438,7 @@ def main():
     redteam_summary = load_redteam_summary(OUT_DIR / "redteam_cases.jsonl")
     runtime_offline = {f"{s['category']}/{s['language']}": s for s in views["strict"]["slices"]["Candidate"]}
     runtime_summary, runtime_chart = load_runtime_telemetry(Path("runtime_telemetry.jsonl"), ASSETS, runtime_offline)
+    parity_summary = load_parity_summary(Path("report/parity.json"))
     failures = (
         [{"id":r["id"],"fail_type":"FN","model":"Baseline", **r} for r in b_fn] +
         [{"id":r["id"],"fail_type":"FP","model":"Baseline", **r} for r in b_fp] +
@@ -443,6 +470,7 @@ def main():
         redteam_summary=redteam_summary,
         runtime_summary=runtime_summary,
         runtime_chart=runtime_chart,
+        parity_summary=parity_summary,
     )
     out_file = OUT_DIR / "index.html"
     out_file.write_text(html, encoding="utf-8")
