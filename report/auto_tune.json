@@ -1,0 +1,82 @@
+{
+  "benign|en": {
+    "thr": 1.0,
+    "recall": 0.0,
+    "fpr": 0.0,
+    "tp": 0,
+    "fp": 0,
+    "tn": 0,
+    "fn": 0,
+    "n": 4
+  },
+  "benign|fa": {
+    "thr": 1.0,
+    "recall": 0.0,
+    "fpr": 0.0,
+    "tp": 0,
+    "fp": 0,
+    "tn": 4,
+    "fn": 0,
+    "n": 4
+  },
+  "violence|en": {
+    "thr": 0.0,
+    "recall": 1.0,
+    "fpr": 0.0,
+    "tp": 27,
+    "fp": 0,
+    "tn": 0,
+    "fn": 0,
+    "n": 27
+  },
+  "self_harm|en": {
+    "thr": 0.0,
+    "recall": 1.0,
+    "fpr": 0.0,
+    "tp": 18,
+    "fp": 0,
+    "tn": 0,
+    "fn": 0,
+    "n": 18
+  },
+  "crime|en": {
+    "thr": 0.0,
+    "recall": 1.0,
+    "fpr": 0.0,
+    "tp": 18,
+    "fp": 0,
+    "tn": 0,
+    "fn": 0,
+    "n": 18
+  },
+  "violence|fa": {
+    "thr": 0.0,
+    "recall": 1.0,
+    "fpr": 0.0,
+    "tp": 9,
+    "fp": 0,
+    "tn": 0,
+    "fn": 0,
+    "n": 9
+  },
+  "malware|en": {
+    "thr": 0.0,
+    "recall": 1.0,
+    "fpr": 0.0,
+    "tp": 9,
+    "fp": 0,
+    "tn": 0,
+    "fn": 0,
+    "n": 9
+  },
+  "pii|en": {
+    "thr": 0.0,
+    "recall": 1.0,
+    "fpr": 0.0,
+    "tp": 9,
+    "fp": 0,
+    "tn": 0,
+    "fn": 0,
+    "n": 9
+  }
+}

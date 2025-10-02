@@ -34,7 +34,10 @@ slice_thresholds:
     en: 0.0
   violence:
     en: 0.0
-    fa: 0.2
+    fa: 0.0
+  benign:
+    en: 1.0
+    fa: 1.0
 thresholds:
   crime: 1.0
   default: 1.0

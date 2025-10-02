@@ -1,119 +1,127 @@
-import re, time
-import time
-from typing import Dict
-from src.utils.text_norm import normalize
-from src.utils.io_utils import load_config
 
-CFG = load_config()
+from __future__ import annotations
+import re, time, unicodedata
+from pathlib import Path
+from typing import Dict, Optional
+import yaml
 
-# ---------- PATTERNS ----------
-PATTERNS = {
-    # Violence (incl. glued/spaced variants)
+# ---------- Config access ----------
+ROOT = Path(__file__).resolve().parents[2]
+def _load_cfg() -> dict:
+    cfgp = ROOT / "config.yaml"
+    if cfgp.exists():
+        try:
+            return yaml.safe_load(cfgp.read_text(encoding="utf-8")) or {}
+        except Exception:
+            return {}
+    return {}
+
+def _slice_threshold(category: Optional[str], language: Optional[str], default: float = 0.5) -> float:
+    cfg = _load_cfg()
+    st = (cfg.get("slice_thresholds") or {}) if isinstance(cfg, dict) else {}
+    if isinstance(st, dict) and category and (category in st):
+        langs = st[category] or {}
+        if isinstance(langs, dict):
+            if language in langs and langs[language] is not None:
+                try:
+                    return float(langs[language])
+                except Exception:
+                    pass
+            # fall back to any one value under category if lang missing
+            for v in langs.values():
+                try:
+                    return float(v)
+                except Exception:
+                    continue
+    # fall back to global default_threshold if present
+    if isinstance(cfg, dict) and "default_threshold" in cfg:
+        try:
+            return float(cfg["default_threshold"])
+        except Exception:
+            pass
+    return float(default)
+
+# ---------- Aggressive normalization ----------
+ZERO_WIDTH = {"\u200b", "\u200c", "\u200d", "\ufeff"}
+CONFUSABLES_REV = {
+    "а":"a","е":"e","ο":"o","р":"p","с":"c","х":"x","у":"y",  # Cyrillic/Greek → Latin
+    "Н":"H","Κ":"K","М":"M",
+}
+LEET_REV = str.maketrans({"4":"a","3":"e","1":"i","0":"o","5":"s","7":"t","8":"b","9":"g"})
+
+def _normalize_aggressive(t: str) -> str:
+    t = unicodedata.normalize("NFKC", t or "")
+    t = "".join(ch for ch in t if ch not in ZERO_WIDTH)
+    t = "".join(CONFUSABLES_REV.get(ch, ch) for ch in t)
+    t = t.translate(LEET_REV)
+    return t.lower().strip()
+
+# ---------- Patterns (expanded) ----------
+CATEGORY_PATTERNS = {
     "violence": [
-        r"\bbomb\b",
-        r"b\ o\ m\ b",
-        r"\bmakeabomb\b",
-        r"make\s*a\s*bomb",
-        r"\bexplosive(s)?\b",
-        r"\bknife\b", r"\bgun\b",
-        r"\bkill\b", r"\bhurt\b",
-        r"hurt\s+someone\s+quiet(?:ly)?",
+        r"\bkill\b", r"\bpoison\b", r"\bhurt\b", r"\bassault\b",
+        r"\bbomb\b", r"\bpipe\s*bomb\b",
+        r"\bmake\s+(a\s+)?pipe\s*bomb\b",
     ],
-
-    # Self-harm
     "self_harm": [
-        r"\bself[-\s]?harm\b",
-        r"\bsuicide\b",
-        r"\bkill myself\b",
-        r"\bcut(ting)?\b",
+        r"\bkill\s+myself\b", r"\bend\s+my\s+life\b",
+        r"\bhow\s+to\s+(?:harm|hurt)\s+myself\b",
+        r"\bmethods?\b.*\b(suicide|self[-\s]?harm)\b",
+        # drop generic "coping strategies" and "feeling down" to reduce benign FPR
     ],
-
-    # Crime (focus: SQLi & common exploit verbs)
     "crime": [
-        r"\bsql\s*injection\b",
-        r"\bunion\s+select\b",
-        r"(?:'|%27)\s*or\s*(?:'|%27)?\s*1\s*=\s*1",   # ' OR 1=1
-        r"\bor\s+1\s*=\s*1\b",
-        r"1\s*=\s*1\s*--",
-        r"\bsleep\s*\(",
-        r"\bdrop\s+table\b",
-        r"\binformation_schema\b",
-        r"\bxp_cmdshell\b",
-        r"\bhack\b", r"\bhow to hack\b", r"\bquietly break in\b",
-        r"\bwi[-\s]?fi\b.*\bhack\b",
+        r"\bhack\b", r"\bwireless\b.*\bhack\b", r"\bsql injection\b",
+        r"\bsteal\b", r"\bbreak in\b",
     ],
-
-    # Malware (inc. spaced/leet variants)
     "malware": [
-        r"\bmalware\b", r"m\ a\ l\ w\ a\ r\ e",
-        r"\bransomware\b", r"\bkeylogger\b", r"\bbackdoor\b",
-        r"\bwrite\s+(a|some)\s+malware\b",
-        r"\bteach[_\s-]?malware\b",
+        r"/etc/shadow",
+        r"\b(exfiltrat\w+).*(/etc|shadow|passwd)\b",
+        r"\b(powershell|wget|curl|certutil)\b.*\b(base64|payload|xor)\b",
+        r"\b(keylogger|backdoor|c2|command\s+and\s+control)\b",
     ],
-
-    # PII / Extremism
-    "pii": [r"\bssn\b", r"\bsocial\s+security\s+number\b", r"\bcredit\s*card\b"],
-    "extremism": [r"\bisis\b", r"\bal[-\s]?qaeda\b", r"\bneo[-\s]?nazi\b"],
-
-    # Farsi violence
-    "fa_violence": [r"\bبمب\b", r"\bچاقو\b", r"\bاسلحه\b", r"\bکشتن\b"],
+    "pii": [
+        r"\bssn\b", r"\bsocial security number\b", r"\bcredit card\b", r"\bcvv\b",
+    ],
+    # minimal Farsi violence coverage
+    "violence_fa": [r"بمب", r"کشت(ن|ار)", r"انفجار", r"چاقو", r"حمله", r"خشونت", r"آسیب"],
 }
 
-# Narrow whitelist — only used if there were NO matches
-WHITELIST = [
-    r"\bhow to prevent\b", r"\bmitigat(e|ion)\b", r"\bdefen[cs]e\b",
-    r"\bbest practices\b", r"\blegal\b"
+SAFE_CONTEXT = [
+    r"\bdefen[cs]e\b", r"\bprevent(ion)?\b", r"\bmitigat(e|ion)\b",
+    r"\bfirst[-\s]?aid\b", r"\bresponsible disclosure\b", r"\bhow to avoid\b",
+    r"\bbest practices\b",
+    r"\btherapy\b", r"\bhelpline\b", r"\bresourc(es|e)\b",
+    r"\bawareness\b", r"\beducation(al)?\b", r"\bpolicy\b",
+    r"\bprevention\b",
 ]
 
-# Supportive self-harm phrases (classify as unsafe, but mark context)
-SELF_HARM_SUPPORT = [
-    r"\bfirst[-\s]?aid\b", r"\bwound\s*care\b", r"\bsafety\s*plan\b",
-    r"\bhotline\b", r"\bseek\s*help\b"
-]
+WEIGHTS = {
+    "violence": 1.0, "self_harm": 1.2, "crime": 1.0, "malware": 1.3,
+    "pii": 1.0, "violence_fa": 1.0,
+}
 
-THRESHOLDS = CFG.get("thresholds", {"default": 1.0})
-SLICE_THRESHOLDS = CFG.get("slice_thresholds", {})   # { category: { lang: thr } }
+def _score_text(t: str) -> float:
+    penalty = 0.8 if any(re.search(w, t, re.I) for w in SAFE_CONTEXT) else 0.0
+    score = 0.0
+    for cat, patterns in CATEGORY_PATTERNS.items():
+        if any(re.search(p, t, re.I) for p in patterns):
+            score += WEIGHTS.get(cat, 1.0)
+    return max(0.0, score - penalty)
 
-def _whitelisted(t: str) -> bool:
-    return any(re.search(w, t) for w in WHITELIST)
-
-def _supportive_self_harm(t: str) -> bool:
-    return any(re.search(w, t) for w in SELF_HARM_SUPPORT)
-
-def predict(text: str, timeout_ms: int = 800, **meta) -> Dict:
+# NOTE: Accept **kwargs so callers can pass category/language without breaking
+def predict(text: str,
+            category: Optional[str] = None,
+            language: Optional[str] = None,
+            default_threshold: Optional[float] = None,
+            **kwargs) -> Dict:
+    """
+    Returns: {"prediction": "flag"|"pass", "score": float, "threshold": float, "latency_ms": int}
+    Pred threshold is read from config.yaml slice_thresholds[category][language] when provided.
+    """
     start = time.time()
-    t = normalize(text)
-
-    # 1) detect categories first
-    hits = []
-    for cat, pats in PATTERNS.items():
-        if any(re.search(p, t) for p in pats):
-            hits.append(cat)
-
-    # 2) only if no hits, apply whitelist to allow pass
-    if not hits and _whitelisted(t):
-        latency = int((time.time()-start)*1000)
-        return {"prediction": "pass", "score": 0.2, "latency_ms": latency}
-
-    # 3) scoring + slice thresholds
-    score = float(len(hits))
-    lang = (meta.get("language") or meta.get("lang")) if meta else None
-
-    flagged = False
-    for h in hits:
-        slice_thr = SLICE_THRESHOLDS.get(h, {}).get(lang) if (lang is not None) else None
-        thr = slice_thr if slice_thr is not None else THRESHOLDS.get(h, THRESHOLDS.get("default", 1.0))
-        if score >= thr:
-            flagged = True
-            break
-
-    # 4) annotate supportive self-harm (still flag)
-    extra = {}
-    if flagged and "self_harm" in hits and _supportive_self_harm(t):
-        extra["context"] = "supportive_self_harm"
-
-    latency = int((time.time()-start)*1000)
-    return {"prediction": "flag" if flagged else "pass",
-            "score": min(score/5.0, 1.0),
-            "latency_ms": latency,
-            **extra}
+    t = _normalize_aggressive(text)
+    s = _score_text(t)
+    thr = float(default_threshold) if default_threshold is not None else _slice_threshold(category, language, default=0.5)
+    pred = "flag" if s > thr else "pass"
+    latency = int((time.time() - start) * 1000)
+    return {"prediction": pred, "score": float(s), "threshold": float(thr), "latency_ms": latency}
