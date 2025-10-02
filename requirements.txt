@@ -1,5 +1,3 @@
-# --- core deps used by this repo ---
-PyYAML>=6.0
-Jinja2>=3.1
-# optional/dev
-pytest>=7.4
+jinja2
+pyyaml
+matplotlib
