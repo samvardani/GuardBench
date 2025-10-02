@@ -206,6 +206,64 @@
     </div>
   </div>
 
+  <div class="row" style="margin-top:16px">
+    {% if failure_patterns %}
+    <div class="card" style="flex:2 1 520px;">
+      <h2>Why we failed (Candidate FNs)</h2>
+      <div class="meta">Top missed patterns per category/language slice (strict view).</div>
+      {% for slice in failure_patterns %}
+        <h3>{{ slice.category }} / {{ slice.language }} · {{ slice.total }} misses</h3>
+        <table>
+          <tr><th>Pattern</th><th>Normalization</th><th>Count</th><th>Examples</th></tr>
+          {% for pattern in slice.patterns %}
+          <tr>
+            <td>{{ pattern.pattern }}</td>
+            <td>{% if pattern.normalization %}{{ pattern.normalization }}{% else %}<span class="meta">—</span>{% endif %}</td>
+            <td>{{ pattern.count }}</td>
+            <td>
+              {% for example in pattern.examples %}
+                <div>{% if example.id %}<span class="meta">#{{ example.id }}</span> {% endif %}{{ example.text }}</div>
+              {% endfor %}
+            </td>
+          </tr>
+          {% endfor %}
+        </table>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="card" style="flex:1 1 320px;">
+      <h2>Failure clusters (Top 5)</h2>
+      <div class="meta">Grouped by failure type, slice, and attack/transform signature.</div>
+      {% for model, cluster_list in clusters.items() %}
+        <h3>{{ model }}</h3>
+        {% if cluster_list %}
+        <table>
+          <tr><th>Type</th><th>Category</th><th>Lang</th><th>Pattern</th><th>Count</th></tr>
+          {% for cluster in cluster_list %}
+          <tr>
+            <td>{{ cluster.fail_type }}</td>
+            <td>{{ cluster.category }}</td>
+            <td>{{ cluster.language }}</td>
+            <td>{{ cluster.pattern }}</td>
+            <td>{{ cluster.count }}</td>
+          </tr>
+          <tr>
+            <td colspan="5">
+              {% for example in cluster.examples %}
+                <div>{% if example.id %}<span class="meta">#{{ example.id }}</span> {% endif %}{{ example.text }}</div>
+              {% endfor %}
+            </td>
+          </tr>
+          {% endfor %}
+        </table>
+        {% else %}
+        <div class="meta">No recorded failures.</div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
   <script>
   (function(){
     const strict = document.getElementById('view-strict');
