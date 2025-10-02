@@ -5,6 +5,11 @@ from pathlib import Path
 from typing import Dict, Optional
 import yaml
 
+try:
+    from src.policy.compiler import load_compiled_policy
+except Exception:  # pragma: no cover - policy optional during bootstrap
+    load_compiled_policy = None  # type: ignore
+
 # ---------- Config access ----------
 ROOT = Path(__file__).resolve().parents[2]
 def _load_cfg() -> dict:
@@ -16,7 +21,30 @@ def _load_cfg() -> dict:
             return {}
     return {}
 
+
+_POLICY_CACHE = None
+
+
+def _load_policy():
+    global _POLICY_CACHE
+    if _POLICY_CACHE is None and load_compiled_policy:
+        try:
+            _POLICY_CACHE = load_compiled_policy()
+        except FileNotFoundError:
+            _POLICY_CACHE = False
+    return _POLICY_CACHE if _POLICY_CACHE is not False else None
+
+
 def _slice_threshold(category: Optional[str], language: Optional[str], default: float = 0.5) -> float:
+    policy = _load_policy()
+    if policy and category:
+        key = (category, language or "en")
+        slice_ = policy.slices.get(key)
+        if not slice_ and language:
+            slice_ = policy.slices.get((category, "en"))
+        if slice_:
+            return slice_.threshold
+
     cfg = _load_cfg()
     st = (cfg.get("slice_thresholds") or {}) if isinstance(cfg, dict) else {}
     if isinstance(st, dict) and category and (category in st):
@@ -158,7 +186,8 @@ WEIGHTS = {
     "pii": 1.0, "violence_fa": 1.0,
 }
 
-def _score_text(t: str) -> float:
+
+def _score_text_legacy(t: str) -> float:
     variants = _text_variants(t)
     compact_variants = tuple(v.replace(" ", "") for v in variants)
     penalty = 0.8 if any(re.search(w, variant, re.I) for variant in variants for w in SAFE_CONTEXT) else 0.0
@@ -173,6 +202,51 @@ def _score_text(t: str) -> float:
             score += WEIGHTS.get(cat, 1.0)
     return max(0.0, score - penalty)
 
+
+def _score_text_policy(t: str, category: Optional[str], language: Optional[str]) -> Optional[float]:
+    policy = _load_policy()
+    if not policy or not category:
+        return None
+    key = (category, language or "en")
+    slice_ = policy.slices.get(key)
+    if not slice_ and language:
+        slice_ = policy.slices.get((category, "en"))
+    if not slice_:
+        return None
+
+    variants = _text_variants(t)
+    lower_variants = [v.lower() for v in variants]
+    compact_variants = [v.replace(" ", "") for v in lower_variants]
+
+    score = 0.0
+    for rule in slice_.rules:
+        matched = False
+        if rule.regex:
+            for pattern in rule.regex:
+                if any(pattern.search(variant) for variant in variants):
+                    matched = True
+                    break
+        if not matched and rule.substrings:
+            for compact in compact_variants:
+                if any(sub in compact for sub in rule.substrings if compact):
+                    matched = True
+                    break
+        if matched:
+            score += rule.weight
+
+    if policy.safe_context_penalty > 0 and policy.safe_context_patterns:
+        if any(pattern.search(variant) for pattern in policy.safe_context_patterns for variant in variants):
+            score -= policy.safe_context_penalty
+
+    return max(0.0, score)
+
+
+def _score_text(t: str, category: Optional[str], language: Optional[str]) -> float:
+    policy_score = _score_text_policy(t, category, language)
+    if policy_score is not None:
+        return policy_score
+    return _score_text_legacy(t)
+
 # NOTE: Accept **kwargs so callers can pass category/language without breaking
 def predict(text: str,
             category: Optional[str] = None,
@@ -185,7 +259,7 @@ def predict(text: str,
     """
     start = time.time()
     t = _normalize_aggressive(text)
-    s = _score_text(t)
+    s = _score_text(t, category, language)
     thr = float(default_threshold) if default_threshold is not None else _slice_threshold(category, language, default=0.5)
     pred = "flag" if s > thr else "pass"
     latency = int((time.time() - start) * 1000)
