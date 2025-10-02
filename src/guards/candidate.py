@@ -43,6 +43,7 @@ def _slice_threshold(category: Optional[str], language: Optional[str], default: 
 
 # ---------- Aggressive normalization ----------
 ZERO_WIDTH = {"\u200b", "\u200c", "\u200d", "\ufeff"}
+TATWEEL = "\u0640"
 CONFUSABLES_REV = {
     "а":"a","е":"e","ο":"o","р":"p","с":"c","х":"x","у":"y",  # Cyrillic/Greek → Latin
     "Н":"H","Κ":"K","М":"M",
@@ -52,21 +53,61 @@ LEET_REV = str.maketrans({"4":"a","3":"e","1":"i","0":"o","5":"s","7":"t","8":"b
 def _normalize_aggressive(t: str) -> str:
     t = unicodedata.normalize("NFKC", t or "")
     t = "".join(ch for ch in t if ch not in ZERO_WIDTH)
+    t = t.replace(TATWEEL, "")
     t = "".join(CONFUSABLES_REV.get(ch, ch) for ch in t)
     t = t.translate(LEET_REV)
+    t = re.sub(r"[\\/_]+", " ", t)
+    t = re.sub(r"-+", " ", t)
+    t = re.sub(r"\s+", " ", t)
     return t.lower().strip()
+
+
+def _wordify(text: str) -> str:
+    """Collapse spaced-out characters into words to undo simple obfuscation."""
+    tokens = re.findall(r"[0-9a-z\u0600-\u06FF]+", text)
+    words = []
+    buffer = []
+
+    for tok in tokens:
+        if len(tok) == 1 and tok.isalpha():
+            buffer.append(tok)
+            continue
+        if buffer:
+            words.append("".join(buffer))
+            buffer.clear()
+        words.append(tok)
+
+    if buffer:
+        words.append("".join(buffer))
+
+    return " ".join(words)
+
+
+def _text_variants(text: str) -> tuple[str, ...]:
+    variants = []
+    for candidate in (text, _wordify(text)):
+        candidate = candidate.strip()
+        if candidate and candidate not in variants:
+            variants.append(candidate)
+    compact = variants[-1].replace(" ", "") if variants else ""
+    if compact and compact not in variants:
+        variants.append(compact)
+    return tuple(variants)
 
 # ---------- Patterns (expanded) ----------
 CATEGORY_PATTERNS = {
     "violence": [
         r"\bkill\b", r"\bpoison\b", r"\bhurt\b", r"\bassault\b",
         r"\bbomb\b", r"\bpipe\s*bomb\b",
-        r"\bmake\s+(a\s+)?pipe\s*bomb\b",
+        r"\bmake\s+(a\s+)?(pipe\s*)?bomb\b",
+        r"\bhow\s+to\s+make\s+(a\s+)?bomb\b",
     ],
     "self_harm": [
         r"\bkill\s+myself\b", r"\bend\s+my\s+life\b",
         r"\bhow\s+to\s+(?:harm|hurt)\s+myself\b",
-        r"\bmethods?\b.*\b(suicide|self[-\s]?harm)\b",
+        r"\bself[-\s]*harm\b",
+        r"\bmethods?\b.*\b(suicide|self[-\s]*harm)\b",
+        r"\bcut(?:ting)?\b.*\b(myself|wrists?|veins)\b",
         # drop generic "coping strategies" and "feeling down" to reduce benign FPR
     ],
     "crime": [
@@ -78,12 +119,29 @@ CATEGORY_PATTERNS = {
         r"\b(exfiltrat\w+).*(/etc|shadow|passwd)\b",
         r"\b(powershell|wget|curl|certutil)\b.*\b(base64|payload|xor)\b",
         r"\b(keylogger|backdoor|c2|command\s+and\s+control)\b",
+        r"\bmalware\b",
+        r"\bteach\W*malware\b",
     ],
     "pii": [
         r"\bssn\b", r"\bsocial security number\b", r"\bcredit card\b", r"\bcvv\b",
     ],
     # minimal Farsi violence coverage
     "violence_fa": [r"بمب", r"کشت(ن|ار)", r"انفجار", r"چاقو", r"حمله", r"خشونت", r"آسیب"],
+}
+
+CATEGORY_SUBSTRINGS = {
+    "violence": [
+        "makeabomb", "buildabomb", "pipebomb", "hurtsomeone", "killpeople",
+        "killperson", "killhim", "killher",
+    ],
+    "self_harm": [
+        "selfharm", "killmyself", "endmylife", "hurtmyself", "harmmyself",
+        "cutmyself", "cutmywrists", "cuttingwrists", "cutmyveins", "cuttingveins",
+    ],
+    "malware": [
+        "malware", "teachmalware", "spreadmalware", "deploymalware",
+        "installmalware", "etcshadow", "shadowfile", "stealpasswd",
+    ],
 }
 
 SAFE_CONTEXT = [
@@ -101,10 +159,17 @@ WEIGHTS = {
 }
 
 def _score_text(t: str) -> float:
-    penalty = 0.8 if any(re.search(w, t, re.I) for w in SAFE_CONTEXT) else 0.0
+    variants = _text_variants(t)
+    compact_variants = tuple(v.replace(" ", "") for v in variants)
+    penalty = 0.8 if any(re.search(w, variant, re.I) for variant in variants for w in SAFE_CONTEXT) else 0.0
     score = 0.0
     for cat, patterns in CATEGORY_PATTERNS.items():
-        if any(re.search(p, t, re.I) for p in patterns):
+        matched = any(re.search(p, variant, re.I) for variant in variants for p in patterns)
+        if not matched:
+            substrings = CATEGORY_SUBSTRINGS.get(cat, ())
+            if substrings:
+                matched = any(sub in cv for cv in compact_variants for sub in substrings if cv)
+        if matched:
             score += WEIGHTS.get(cat, 1.0)
     return max(0.0, score - penalty)
 
