@@ -243,6 +243,39 @@ def slice_metrics(rows, preds, by=("category","language"), mode="strict"):
     out.sort(key=lambda x:(-x["n"], x["category"], x["language"]))
     return out
 
+def load_redteam_summary(path: Path, max_clusters: int = 6, max_examples: int = 3):
+    if not path.exists():
+        return []
+    clusters = defaultdict(list)
+    with path.open("r", encoding="utf-8") as handle:
+        for line in handle:
+            try:
+                payload = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if not isinstance(payload, dict):
+                continue
+            slice_key = f"{payload.get('category', '?')}/{payload.get('language', '?')}"
+            agent = payload.get("agent", "unknown")
+            clusters[(slice_key, agent)].append(payload)
+
+    summary = []
+    for (slice_key, agent), items in clusters.items():
+        operations = sorted({op for item in items for op in item.get("operations", [])})
+        examples = [item.get("text", "") for item in items[:max_examples]]
+        summary.append(
+            {
+                "slice": slice_key,
+                "agent": agent,
+                "count": len(items),
+                "operations": operations,
+                "examples": examples,
+            }
+        )
+    summary.sort(key=lambda x: -x["count"])
+    return summary[:max_clusters]
+
+
 def main():
     cfg = load_config()
     dataset_path = resolve_dataset_path(cfg)
@@ -313,6 +346,7 @@ def main():
         per_pattern=3,
         example_limit=2,
     )
+    redteam_summary = load_redteam_summary(OUT_DIR / "redteam_cases.jsonl")
     failures = (
         [{"id":r["id"],"fail_type":"FN","model":"Baseline", **r} for r in b_fn] +
         [{"id":r["id"],"fail_type":"FP","model":"Baseline", **r} for r in b_fp] +
@@ -341,6 +375,7 @@ def main():
         failures=failures,
         clusters={"Baseline": base_clusters, "Candidate": cand_clusters},
         failure_patterns=failure_patterns,
+        redteam_summary=redteam_summary,
     )
     out_file = OUT_DIR / "index.html"
     out_file.write_text(html, encoding="utf-8")

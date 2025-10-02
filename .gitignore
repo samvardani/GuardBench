@@ -218,4 +218,5 @@ templates/report.backup*.html
 
 # build artifacts
 report/
+!src/report/
 assets/latency_*.png
