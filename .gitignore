@@ -215,3 +215,7 @@ report/*.csv
 assets/latency_*.png
 config.yaml.bak-*
 templates/report.backup*.html
+
+# build artifacts
+report/
+assets/latency_*.png
