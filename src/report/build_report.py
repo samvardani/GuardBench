@@ -5,7 +5,7 @@ from jinja2 import Environment, FileSystemLoader
 
 from src.guards.baseline import predict as predict_baseline
 from src.guards.candidate import predict as predict_candidate
-from src.report.cluster_utils import cluster_failures
+from src.report.cluster_utils import cluster_failures, slice_failure_patterns
 from src.utils.io_utils import load_config, resolve_dataset_path, sha256_file, git_commit, new_run_id
 
 REQUIRED_KEYS = ("text",)
@@ -303,8 +303,16 @@ def main():
 
     b_fn_csv, b_fp_csv, b_fn, b_fp = export_fail(rows, base_preds, "baseline", mode="strict")
     c_fn_csv, c_fp_csv, c_fn, c_fp = export_fail(rows, cand_preds, "candidate", mode="strict")
-    base_clusters = cluster_failures(rows, base_preds)
-    cand_clusters = cluster_failures(rows, cand_preds)
+    base_clusters = cluster_failures(rows, base_preds, mode="strict")
+    cand_clusters = cluster_failures(rows, cand_preds, mode="strict")
+    failure_patterns = slice_failure_patterns(
+        rows,
+        cand_preds,
+        mode="strict",
+        per_slice=6,
+        per_pattern=3,
+        example_limit=2,
+    )
     failures = (
         [{"id":r["id"],"fail_type":"FN","model":"Baseline", **r} for r in b_fn] +
         [{"id":r["id"],"fail_type":"FP","model":"Baseline", **r} for r in b_fp] +
@@ -331,7 +339,8 @@ def main():
                       "candidate": os.path.relpath(ASSETS / "latency_candidate.png", OUT_DIR)},
         downloads={"fn_csv": Path(c_fn_csv).name, "fp_csv": Path(c_fp_csv).name},
         failures=failures,
-        clusters={"Baseline": base_clusters, "Candidate": cand_clusters}
+        clusters={"Baseline": base_clusters, "Candidate": cand_clusters},
+        failure_patterns=failure_patterns,
     )
     out_file = OUT_DIR / "index.html"
     out_file.write_text(html, encoding="utf-8")
