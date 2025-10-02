@@ -1,6 +1,6 @@
 import os, csv, json, pathlib, datetime
 from pathlib import Path
-from collections import Counter
+from collections import Counter, defaultdict
 from jinja2 import Environment, FileSystemLoader
 
 from src.guards.baseline import predict as predict_baseline
@@ -276,6 +276,69 @@ def load_redteam_summary(path: Path, max_clusters: int = 6, max_examples: int = 
     return summary[:max_clusters]
 
 
+def load_runtime_telemetry(path: Path, assets_root: Path, offline_slices: dict):
+    if not path.exists():
+        return [], None
+    telemetry = []
+    with path.open("r", encoding="utf-8") as handle:
+        for line in handle:
+            try:
+                payload = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if isinstance(payload, dict):
+                telemetry.append(payload)
+    if not telemetry:
+        return [], None
+
+    by_slice = defaultdict(list)
+    for entry in telemetry:
+        slice_key = f"{entry.get('category_guess')}/{entry.get('language_guess')}"
+        diff = float(entry.get("score", 0.0)) - float(entry.get("threshold", 0.0))
+        by_slice[slice_key].append(diff)
+
+    summary = []
+    for slice_key, diffs in by_slice.items():
+        avg_margin = sum(diffs) / len(diffs)
+        offline = (offline_slices.get(slice_key) or {}).get("recall", 0.0)
+        summary.append({
+            "slice": slice_key,
+            "count": len(diffs),
+            "avg_margin": round(avg_margin, 3),
+            "offline_recall": offline,
+        })
+    summary.sort(key=lambda x: -x["count"])
+
+    chart_path = assets_root / "runtime_drift.png"
+    relative_chart = None
+    try:
+        import matplotlib.pyplot as plt
+
+        top = summary[:5]
+        if top:
+            labels = [item["slice"] for item in top]
+            margins = [item["avg_margin"] for item in top]
+            recalls = [item["offline_recall"] for item in top]
+
+            plt.figure(figsize=(6, 3.5))
+            x = range(len(top))
+            plt.bar(x, margins, label="Avg(score - threshold)")
+            plt.plot(x, recalls, marker="o", color="orange", label="Offline recall")
+            plt.xticks(x, labels, rotation=30, ha="right")
+            plt.ylabel("Margin / Recall")
+            plt.title("Runtime telemetry vs offline guard")
+            plt.legend()
+            plt.tight_layout()
+            chart_path.parent.mkdir(parents=True, exist_ok=True)
+            plt.savefig(chart_path)
+            plt.close()
+            relative_chart = os.path.relpath(chart_path, OUT_DIR)
+    except Exception:
+        relative_chart = None
+
+    return summary, relative_chart
+
+
 def main():
     cfg = load_config()
     dataset_path = resolve_dataset_path(cfg)
@@ -347,6 +410,8 @@ def main():
         example_limit=2,
     )
     redteam_summary = load_redteam_summary(OUT_DIR / "redteam_cases.jsonl")
+    runtime_offline = {f"{s['category']}/{s['language']}": s for s in views["strict"]["slices"]["Candidate"]}
+    runtime_summary, runtime_chart = load_runtime_telemetry(Path("runtime_telemetry.jsonl"), ASSETS, runtime_offline)
     failures = (
         [{"id":r["id"],"fail_type":"FN","model":"Baseline", **r} for r in b_fn] +
         [{"id":r["id"],"fail_type":"FP","model":"Baseline", **r} for r in b_fp] +
@@ -376,6 +441,8 @@ def main():
         clusters={"Baseline": base_clusters, "Candidate": cand_clusters},
         failure_patterns=failure_patterns,
         redteam_summary=redteam_summary,
+        runtime_summary=runtime_summary,
+        runtime_chart=runtime_chart,
     )
     out_file = OUT_DIR / "index.html"
     out_file.write_text(html, encoding="utf-8")

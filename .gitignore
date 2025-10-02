@@ -220,4 +220,5 @@ templates/report.backup*.html
 report/
 !src/report/
 .autopatch/
+runtime_telemetry.jsonl
 assets/latency_*.png

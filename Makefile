@@ -60,3 +60,6 @@ redteam-swarm:
 
 autopatch:
 	python -m src.autopatch.run --target "self_harm/en,malware/en"
+
+runtime-demo:
+	python examples/fastapi_demo/app.py
