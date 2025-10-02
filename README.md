@@ -25,6 +25,7 @@ make demo   # compare + report + sweep
 - [Obfuscation Lab](docs/OBFUSCATION.md): stress suite metrics and hardness charts.
 - [Multilingual Parity](docs/MULTILINGUAL.md): language recall checks and targets.
 - [Incident Runbooks](docs/RUNBOOKS.md): chaos drill guidance and mitigation steps.
+- [Evidence Packs](docs/EVIDENCE.md): bundle reports, policy, and telemetry for regulators.
 
 ## Working with the dataset
 
