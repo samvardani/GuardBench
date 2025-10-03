@@ -1,0 +1,37 @@
+name: nightly-redteam
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  chaos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --upgrade pip
+      - run: pip install -r requirements.txt
+      - name: Run redteam swarm
+        env:
+          MPLBACKEND: Agg
+          MPLCONFIGDIR: .mplcache
+        run: |
+          mkdir -p .mplcache
+          python -m src.redteam.swarm --max-iters 400 --budget '{"violence/en":100,"self_harm/en":100,"malware/en":80}'
+      - name: Autopatch dry run
+        run: python -m src.autopatch.run --target "self_harm/en,malware/en" --max-patches 3 || true
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-redteam
+          path: |
+            report/redteam_cases.jsonl
+            report/obfuscation.json
+            report/parity.json
+            report/incident_*.json
+            .autopatch/PR_BODY.md
+            .autopatch/diff/
