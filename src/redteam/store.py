@@ -43,6 +43,8 @@ class CaseStore:
         return texts
 
     def append(self, case: StoredCase) -> None:
+        from src.utils.scrub import scrub_record
+
         payload = {
             "text": case.text,
             "normalized_text": case.normalized_text,
@@ -56,6 +58,7 @@ class CaseStore:
             "iteration": case.iteration,
             **case.metadata,
         }
+        scrub_record(payload, keys=["text", "normalized_text", "seed_row_id"])
         with self.path.open("a", encoding="utf-8") as handle:
             handle.write(json.dumps(payload, ensure_ascii=False) + "\n")
 

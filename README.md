@@ -27,6 +27,7 @@ make demo   # compare + report + sweep
 - [Incident Runbooks](docs/RUNBOOKS.md): chaos drill guidance and mitigation steps.
 - [Evidence Packs](docs/EVIDENCE.md): bundle reports, policy, and telemetry for regulators.
 - [Service API](docs/SERVICE.md): local FastAPI endpoints for scoring and batch scorecards.
+- [Dashboard](report/dashboard.html): at-a-glance HTML summary.
 
 ## Working with the dataset
 
