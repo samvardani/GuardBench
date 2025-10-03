@@ -1,4 +1,4 @@
-.PHONY: compare report sweep store demo open
+.PHONY: compare report sweep store demo open runtime-demo service
 
 compare:
 	python -m src.runner.run_compare
@@ -62,7 +62,7 @@ autopatch:
 	python -m src.autopatch.run --target "self_harm/en,malware/en"
 
 runtime-demo:
-	python examples/fastapi_demo/app.py
+	PYTHONPATH=runtime python -m examples.fastapi_demo.app
 
 service:
 	uvicorn service.api:app --reload

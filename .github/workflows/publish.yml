@@ -1,0 +1,32 @@
+name: Publish Dashboard
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-dashboard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node (for bundling static assets)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Prepare dashboard artifact
+        run: |
+          mkdir -p public
+          cp -r dashboard public/
+          cp -r report public/report || true
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          publish_branch: gh-pages
+          commit_message: "chore: publish dashboard for ${{ github.ref }}"

@@ -27,7 +27,29 @@ make demo   # compare + report + sweep
 - [Incident Runbooks](docs/RUNBOOKS.md): chaos drill guidance and mitigation steps.
 - [Evidence Packs](docs/EVIDENCE.md): bundle reports, policy, and telemetry for regulators.
 - [Service API](docs/SERVICE.md): local FastAPI endpoints for scoring and batch scorecards.
-- [Dashboard](report/dashboard.html): at-a-glance HTML summary.
+- [Interactive Dashboard](dashboard/index.html): SPA visualising telemetry, parity, obfuscation, incidents, and red-team clusters.
+- [Dataset Upload UI](dashboard/upload.html): upload prompt CSVs, choose guards, run evaluations, and download scorecards.
+
+## Documentation Portal
+
+Render the consolidated site with MkDocs (includes Quick Start, policy, obfuscation, parity, runbooks, evidence, and service guides):
+
+```bash
+mkdocs serve
+# → http://127.0.0.1:8000/
+```
+
+## Containerisation & Deployment
+
+Build the production image (Gunicorn + Uvicorn workers) and run the API, background worker, and static dashboard via Docker Compose:
+
+```bash
+docker compose up --build
+# API → http://localhost:8000
+# Dashboard → http://localhost:3000
+```
+
+Each service mounts the `report/` and `dist/` directories so scorecards and artefacts persist on the host. The worker currently emits heartbeats and is the recommended hook for future scheduled jobs (red-team sweeps, telemetry sync, etc.).
 
 ## Working with the dataset
 
@@ -43,9 +65,9 @@ export MPLBACKEND=Agg MPLCONFIGDIR=/tmp/mpl
 make validate  # compare -> report -> ci gate
 ```
 
-- When the gate fails, inspect `report/index.html`. Serve it locally via:
+- When the gate fails, inspect `dashboard/index.html` (after regenerating artifacts). Serve it locally via:
 
   ```bash
   make serve-report
-  # → Open http://localhost:8000/index.html
+  # → Open http://localhost:8000/dashboard/index.html
   ```

@@ -6,6 +6,9 @@ import argparse
 import json
 import sys
 from pathlib import Path
+from typing import Iterable
+
+from src.autopatch import candidates as autopatch_candidates
 
 from .dedupe import TextDeduper
 from .search import SwarmSearch, load_seed_rows
@@ -26,6 +29,24 @@ def _parse_budget(raw: str) -> dict[str, int]:
         except (TypeError, ValueError):  # pragma: no cover
             raise SystemExit(f"Budget value for {key} must be an integer")
     return budget
+
+
+def _write_tuned_thresholds(slice_keys: Iterable[str]) -> None:
+    keys = [key for key in slice_keys if key]
+    if not keys:
+        return
+    generated = autopatch_candidates.generate_candidates(keys)
+    threshold_candidates = generated.get("threshold", []) or []
+    updates: dict[str, float] = {}
+    for cand in threshold_candidates:
+        updates.update(cand.data)
+    if not updates:
+        return
+    tuned_path = Path("tuned_thresholds.yaml")
+    tuned_text = tuned_path.read_text(encoding="utf-8") if tuned_path.exists() else ""
+    patched = autopatch_candidates.apply_threshold_patch_to_tuned(tuned_text, updates)
+    tuned_path.write_text(patched, encoding="utf-8")
+    print(f"AutoPatch wrote candidate thresholds for: {', '.join(sorted(updates))}")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -55,20 +76,25 @@ def main(argv: list[str] | None = None) -> int:
     stats = search.run(seeds=seeds, store=store, deduper=deduper, budgets=budget, max_iters=args.max_iters)
 
     remaining = stats.get("budget_remaining", {})
+    discovered = stats.get("discovered_slices", [])
 
-    print(
-        json.dumps(
-            {
-                "attempts": stats["attempts"],
-                "successes": stats["successes"],
-                "duplicates": stats["duplicates"],
-                "dedupe_rate": round(stats.get("dedupe_rate", 0.0), 3),
-                "elapsed": round(stats.get("elapsed", 0.0), 2),
-                "budget_remaining": remaining,
-            },
-            indent=2,
-        )
-    )
+    output = {
+        "attempts": stats["attempts"],
+        "successes": stats["successes"],
+        "duplicates": stats["duplicates"],
+        "dedupe_rate": round(stats.get("dedupe_rate", 0.0), 3),
+        "elapsed": round(stats.get("elapsed", 0.0), 2),
+        "budget_remaining": remaining,
+        "discovered_slices": discovered,
+    }
+
+    print(json.dumps(output, indent=2))
+
+    try:
+        _write_tuned_thresholds(discovered)
+    except Exception as exc:  # pragma: no cover - defensive
+        print(f"AutoPatch integration failed: {exc}", file=sys.stderr)
+
     if stats.get("dedupe_rate", 0.0) > 0.1:
         print("Warning: duplicate rate exceeded 10%; consider adjusting threshold.", file=sys.stderr)
     return 0

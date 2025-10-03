@@ -7,8 +7,12 @@ import random
 from dataclasses import dataclass
 from typing import Dict, Iterable, List, Sequence, Tuple
 
+ZERO_WIDTH_CHARS = """\u200b\u200c\u200d\ufeff"""
+ZERO_WIDTH_TABLE = {ord(ch): " " for ch in ZERO_WIDTH_CHARS}
+
 
 def _normalize(text: str) -> str:
+    text = text.translate(ZERO_WIDTH_TABLE)
     return " ".join(text.lower().split())
 
 

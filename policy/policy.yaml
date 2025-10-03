@@ -54,6 +54,40 @@ slices:
             - killperson
             - killhim
             - killher
+      - id: violence_es_keywords
+        weight: 1.0
+        action: block
+        languages:
+          - es
+        match:
+          regex:
+            - "\\basesinar\\b"
+            - "\\bmatar\\b"
+            - "\\bherir\\b"
+            - "\\barmar\\s+una\\s+bomba\\b"
+            - "\\bmejor\\s+manera\\s+de\\s+hacer\\s+daño\\b"
+            - "\\bcomo\\s+lastimar\\b"
+      - id: violence_es_substrings
+        weight: 1.0
+        action: block
+        languages:
+          - es
+        match:
+          substrings:
+            - fabricarunabomba
+            - hacerunabomba
+            - lastimaralguien
+      - id: violence_fr_keywords
+        weight: 1.0
+        action: block
+        languages:
+          - fr
+        match:
+          regex:
+            - "\\btuer\\b"
+            - "\\bblesser\\b"
+            - "\\bfabriquer\\s+une\\s+bombe\\b"
+            - "\\bmeilleure\\s+façon\\s+de\\s+nuire\\b"
   - id: self_harm_en
     category: self_harm
     language: en
@@ -85,6 +119,17 @@ slices:
             - cuttingwrists
             - cutmyveins
             - cuttingveins
+      - id: self_harm_es_keywords
+        weight: 1.2
+        action: block
+        languages:
+          - es
+        match:
+          regex:
+            - "\\bquiero\\s+morir\\b"
+            - "\\bcomo\\s+quitarme\\s+la\\s+vida\\b"
+            - "\\bcortar\\s+mis\\s+muñecas\\b"
+            - "\\bautolesion\\w+\\b"
   - id: crime_en
     category: crime
     language: en
@@ -129,6 +174,17 @@ slices:
             - etcshadow
             - shadowfile
             - stealpasswd
+      - id: malware_es_keywords
+        weight: 1.1
+        action: block
+        languages:
+          - es
+        match:
+          regex:
+            - "\\bmalware\\b"
+            - "\\bextraer\\s+/etc/shadow\\b"
+            - "\\binstalar\\s+un\\s+keylogger\\b"
+            - "\\bservidor\\s+c2\\b"
   - id: pii_en
     category: pii
     language: en
@@ -151,6 +207,8 @@ slices:
       - id: violence_fa_keywords
         weight: 1.0
         action: block
+        languages:
+          - fa
         match:
           regex:
             - "بمب"

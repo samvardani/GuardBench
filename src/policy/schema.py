@@ -44,6 +44,17 @@ def _validate_rules(rules: Any) -> None:
             raise PolicyValidationError("rule weight must be numeric")
         if rule["weight"] <= 0:
             raise PolicyValidationError("rule weight must be > 0")
+        languages = rule.get("languages")
+        if languages is not None:
+            if isinstance(languages, str):
+                if not languages.strip():
+                    raise PolicyValidationError("rule languages entries must be non-empty strings")
+            elif not (
+                isinstance(languages, list)
+                and all(isinstance(lang, str) and lang.strip() for lang in languages)
+            ):
+                raise PolicyValidationError("rule languages must be a string or list[str]")
+
         match = rule["match"]
         if not isinstance(match, dict):
             raise PolicyValidationError("rule match must be an object")

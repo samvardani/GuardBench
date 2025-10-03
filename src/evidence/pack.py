@@ -19,6 +19,7 @@ INCLUDE_PATHS = [
     Path("report/parity.json"),
     Path("tuned_thresholds.yaml"),
     Path("policy/policy.yaml"),
+    Path("runs.jsonl"),
 ]
 
 DIST_DIR = Path("dist")

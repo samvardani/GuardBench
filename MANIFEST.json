@@ -1,0 +1,41 @@
+{
+  "commit": "b502963116563393f4bf348433f99a6f05fe4491",
+  "files": [
+    {
+      "path": "report/index.html",
+      "sha256": "3937784a6c63b2ac4b1533fbf005e65da8d7f340209fda05b84e5e3e9a3204c4",
+      "size": 41336
+    },
+    {
+      "path": "report/ci_slices.json",
+      "sha256": "6ebdb47052e4496ceb072a7e62e51754c19fecab52ec45aecbefcef584ed5fb3",
+      "size": 1847
+    },
+    {
+      "path": "report/obfuscation.json",
+      "sha256": "e039ee1bcac40aa3d23a895141d630b0b88358938a58d052dcaf3e3d2d429488",
+      "size": 931
+    },
+    {
+      "path": "report/parity.json",
+      "sha256": "20ea8e03621192a3ccb2211eec7c94506b632eb9a768f12cda79c1141700fc52",
+      "size": 349
+    },
+    {
+      "path": "tuned_thresholds.yaml",
+      "sha256": "2f1280319cfd2c235d062ced964c0abc02c1c9bdbc173bda73f7ddb6636acadb",
+      "size": 178
+    },
+    {
+      "path": "policy/policy.yaml",
+      "sha256": "76fe349b0f0bbe0fa50eb1a3a1974af2e3adaa301c6e7df9904318a75bc28a6a",
+      "size": 5706
+    },
+    {
+      "path": "runs.jsonl",
+      "sha256": "2b56e685edd5251857000739450016b3a26ff1ecdf9e7e0062b59125d5575e57",
+      "size": 2924
+    }
+  ],
+  "manifest_sha256": "2d6281bf5ec63e72d186cd456358ff09971ed346c59a9243b3446f688f8cf250"
+}
