@@ -26,6 +26,7 @@ make demo   # compare + report + sweep
 - [Multilingual Parity](docs/MULTILINGUAL.md): language recall checks and targets.
 - [Incident Runbooks](docs/RUNBOOKS.md): chaos drill guidance and mitigation steps.
 - [Evidence Packs](docs/EVIDENCE.md): bundle reports, policy, and telemetry for regulators.
+- [Service API](docs/SERVICE.md): local FastAPI endpoints for scoring and batch scorecards.
 
 ## Working with the dataset
 
