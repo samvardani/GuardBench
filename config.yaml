@@ -1,4 +1,5 @@
 dataset_path: ./dataset/sample.csv
+privacy_mode: off
 engines:
   baseline:
     name: rules-v1

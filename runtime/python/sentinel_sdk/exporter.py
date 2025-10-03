@@ -32,6 +32,8 @@ def log_telemetry(
     category: Optional[str] = None,
     language: Optional[str] = None,
 ) -> None:
+    from src.utils.scrub import scrub_record
+
     text_hash = hashlib.sha256(text.encode("utf-8")).hexdigest()
     record = {
         "ts": int(time.time()),
@@ -43,6 +45,7 @@ def log_telemetry(
         "threshold": evaluation.get("threshold"),
         "latency_ms": evaluation.get("latency_ms"),
     }
+    scrub_record(record, keys=["category_guess", "language_guess"])
     exporter.log(record)
 
 
