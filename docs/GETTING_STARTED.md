@@ -39,3 +39,9 @@ The generated report lives in `report/index.html`, with supporting latency chart
 
 Keep the CI gate green before merging. When updating thresholds or datasets, re-run `make validate` locally and inspect `report/index.html` to confirm the expected behaviour.
 
+
+
+## CI & Automation
+
+- Nightly red-team chaos drills run via `.github/workflows/nightly.yml`.
+- Evidence pack releases publish on version tags via `.github/workflows/release.yml`.
