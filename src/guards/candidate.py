@@ -12,27 +12,56 @@ except Exception:  # pragma: no cover - policy optional during bootstrap
 
 # ---------- Config access ----------
 ROOT = Path(__file__).resolve().parents[2]
+_CFG_CACHE: dict | None = None
+_CFG_MTIME: float | None = None
+
+
 def _load_cfg() -> dict:
+    global _CFG_CACHE, _CFG_MTIME
     cfgp = ROOT / "config.yaml"
-    if cfgp.exists():
-        try:
-            return yaml.safe_load(cfgp.read_text(encoding="utf-8")) or {}
-        except Exception:
-            return {}
-    return {}
+    if not cfgp.exists():
+        _CFG_CACHE = None
+        _CFG_MTIME = None
+        return {}
+    try:
+        mtime = cfgp.stat().st_mtime
+    except OSError:
+        return _CFG_CACHE or {}
+    if _CFG_CACHE is not None and _CFG_MTIME == mtime:
+        return _CFG_CACHE
+    try:
+        _CFG_CACHE = yaml.safe_load(cfgp.read_text(encoding="utf-8")) or {}
+        _CFG_MTIME = mtime
+    except Exception:
+        _CFG_CACHE = {}
+    return _CFG_CACHE or {}
 
 
 _POLICY_CACHE = None
+_POLICY_MTIME: float | None = None
 
 
 def _load_policy():
-    global _POLICY_CACHE
-    if _POLICY_CACHE is None and load_compiled_policy:
+    global _POLICY_CACHE, _POLICY_MTIME
+    if not load_compiled_policy:
+        return None
+    path = ROOT / "policy" / "policy.yaml"
+    if not path.exists():
+        _POLICY_CACHE = None
+        _POLICY_MTIME = None
+        return None
+    try:
+        mtime = path.stat().st_mtime
+    except OSError:
+        return _POLICY_CACHE
+    if _POLICY_CACHE is None or _POLICY_MTIME != mtime:
         try:
-            _POLICY_CACHE = load_compiled_policy()
+            _POLICY_CACHE = load_compiled_policy(path)
+            _POLICY_MTIME = mtime
         except FileNotFoundError:
-            _POLICY_CACHE = False
-    return _POLICY_CACHE if _POLICY_CACHE is not False else None
+            _POLICY_CACHE = None
+            _POLICY_MTIME = None
+    return _POLICY_CACHE
 
 
 def _slice_threshold(category: Optional[str], language: Optional[str], default: float = 0.5) -> float:
@@ -214,12 +243,16 @@ def _score_text_policy(t: str, category: Optional[str], language: Optional[str])
     if not slice_:
         return None
 
+    lang_norm = (language or "en").lower()
+
     variants = _text_variants(t)
     lower_variants = [v.lower() for v in variants]
     compact_variants = [v.replace(" ", "") for v in lower_variants]
 
     score = 0.0
     for rule in slice_.rules:
+        if rule.languages and lang_norm not in rule.languages:
+            continue
         matched = False
         if rule.regex:
             for pattern in rule.regex:
@@ -263,4 +296,12 @@ def predict(text: str,
     thr = float(default_threshold) if default_threshold is not None else _slice_threshold(category, language, default=0.5)
     pred = "flag" if s > thr else "pass"
     latency = int((time.time() - start) * 1000)
-    return {"prediction": pred, "score": float(s), "threshold": float(thr), "latency_ms": latency}
+    cfg = _load_cfg()
+    policy_version = cfg.get("policy_version") or getattr(_load_policy(), "version", None)
+    return {
+        "prediction": pred,
+        "score": float(s),
+        "threshold": float(thr),
+        "latency_ms": latency,
+        "policy_version": policy_version,
+    }

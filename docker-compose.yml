@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  api:
+    build: .
+    command: ["gunicorn", "service.api:app", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:8000", "--workers", "2"]
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./report:/app/report
+      - ./dist:/app/dist
+    ports:
+      - "8000:8000"
+
+  worker:
+    build: .
+    command: ["python", "scripts/worker.py"]
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./report:/app/report
+      - ./dist:/app/dist
+    depends_on:
+      - api
+
+  dashboard:
+    image: nginx:alpine
+    volumes:
+      - ./dashboard:/usr/share/nginx/html:ro
+    ports:
+      - "3000:80"
+    depends_on:
+      - api

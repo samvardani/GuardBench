@@ -14,6 +14,7 @@ from .operators import (
 from .agents import AGENTS, AgentInput, AgentOutput
 from .dedupe import TextDeduper
 from .search import SwarmSearch, load_seed_rows
+from .redteam_agent import RedTeamAgent
 
 __all__ = [
     "leet_speak",
@@ -30,4 +31,5 @@ __all__ = [
     "TextDeduper",
     "SwarmSearch",
     "load_seed_rows",
+    "RedTeamAgent",
 ]

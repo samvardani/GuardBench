@@ -26,21 +26,37 @@ slice_thresholds:
     en: 1.0
     fa: 1.0
   crime:
-    en: 0.0
+    en: 5.0
+    es: 5.0
   malware:
-    en: 1.0
+    en: 5.0
+    es: 5.0
   pii:
-    en: 0.0
+    en: 5.0
+    es: 5.0
   self_harm:
-    en: 0.0
+    en: 5.0
+    es: 5.0
   violence:
-    en: 0.99
-    fa: 0.99
+    en: 5.0
+    fa: 5.0
+    es: 5.0
+    fr: 5.0
+notifications:
+  enabled: true
+  log_path: notifications.log
+  channels:
+    - type: webhook
+      name: local_mock
+      url: http://127.0.0.1:8799/notify
+  thresholds:
+    fnr: 0.05
+    runtime_margin: 0.1
 thresholds:
-  crime: 1.0
-  default: 1.0
-  extremism: 1.0
-  malware: 0.9
-  pii: 1.0
-  self_harm: 1.0
-  violence: 1.0
+  crime: 5.0
+  default: 5.0
+  extremism: 5.0
+  malware: 5.0
+  pii: 5.0
+  self_harm: 5.0
+  violence: 5.0

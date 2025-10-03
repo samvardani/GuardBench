@@ -110,6 +110,7 @@ class SwarmSearch:
             "successes": 0,
             "duplicates": 0,
             "elapsed": 0.0,
+            "discovered_slices": set(),
         }
 
         start = time.time()
@@ -179,6 +180,7 @@ class SwarmSearch:
                 )
 
                 stats["successes"] += 1
+                stats["discovered_slices"].add(slice_key)
                 mutable_budget[slice_key] -= 1
                 agent_counts[(slice_key, agent.name)] += 1
                 if mutable_budget[slice_key] <= 0:
@@ -188,6 +190,7 @@ class SwarmSearch:
         stats["elapsed"] = time.time() - start
         stats["dedupe_rate"] = deduper.duplicate_rate()
         stats["budget_remaining"] = dict(mutable_budget)
+        stats["discovered_slices"] = sorted(stats["discovered_slices"])
         return stats
 
     # Internal helpers -------------------------------------------------

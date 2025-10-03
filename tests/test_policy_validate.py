@@ -17,6 +17,7 @@ def test_validate_policy_success():
                         "id": "rule1",
                         "weight": 1.0,
                         "action": "block",
+                        "languages": ["en", "es"],
                         "match": {"regex": ["test"]},
                     }
                 ],

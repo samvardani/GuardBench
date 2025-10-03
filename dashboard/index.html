@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Safety Evaluation Dashboard</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js" crossorigin></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" crossorigin></script>
+  </head>
+  <body class="h-full bg-slate-950 text-slate-100">
+    <div id="root" class="min-h-full"></div>
+    <script type="text/babel">
+      const { useEffect, useMemo, useRef, useState } = React;
+
+      const Section = ({ title, description, children }) => (
+        <section className="mb-10">
+          <header className="mb-4 flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-semibold text-teal-300">{title}</h2>
+              {description && (
+                <p className="text-sm text-slate-400">{description}</p>
+              )}
+            </div>
+          </header>
+          <div className="rounded-md border border-slate-800 bg-slate-900/60 p-4 shadow-lg shadow-black/30">
+            {children}
+          </div>
+        </section>
+      );
+
+      const Loader = ({ text = "Loading..." }) => (
+        <div className="flex items-center gap-2 text-slate-400">
+          <span className="h-3 w-3 animate-ping rounded-full bg-teal-400"></span>
+          <span>{text}</span>
+        </div>
+      );
+
+      const ErrorNotice = ({ error }) => (
+        <div className="rounded border border-rose-500/40 bg-rose-900/20 p-3 text-sm text-rose-200">
+          {error}
+        </div>
+      );
+
+      const useJSON = (url, parser = (r) => r.json()) => {
+        const [data, setData] = useState(null);
+        const [error, setError] = useState(null);
+        useEffect(() => {
+          let cancelled = false;
+          fetch(url)
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error(`${url} returned ${response.status}`);
+              }
+              return parser(response);
+            })
+            .then((payload) => {
+              if (!cancelled) {
+                setData(payload);
+              }
+            })
+            .catch((err) => {
+              if (!cancelled) {
+                setError(err.message);
+              }
+            });
+          return () => {
+            cancelled = true;
+          };
+        }, [url, parser]);
+        return { data, error };
+      };
+
+      const RuntimeDriftSection = () => {
+        const { data, error } = useJSON("report/runtime_summary.json");
+        const chartRef = useRef(null);
+        const canvasRef = useRef(null);
+
+        useEffect(() => {
+          if (!data || !Array.isArray(data) || data.length === 0) return;
+          if (!canvasRef.current) return;
+
+          const labels = data.map((item) => item.slice || item.slice_key || "slice");
+          const margins = data.map((item) => item.avg_margin ?? 0);
+          const recalls = data.map((item) => item.offline_recall ?? 0);
+
+          const ctx = canvasRef.current.getContext("2d");
+          if (chartRef.current) {
+            chartRef.current.destroy();
+          }
+          chartRef.current = new Chart(ctx, {
+            type: "bar",
+            data: {
+              labels,
+              datasets: [
+                {
+                  label: "Avg(score - threshold)",
+                  data: margins,
+                  backgroundColor: "rgba(45, 212, 191, 0.5)",
+                  borderColor: "rgb(94, 234, 212)",
+                  borderWidth: 1,
+                },
+                {
+                  label: "Offline Recall",
+                  type: "line",
+                  data: recalls,
+                  borderColor: "rgb(129, 140, 248)",
+                  borderWidth: 2,
+                  fill: false,
+                  tension: 0.3,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              scales: {
+                y: {
+                  ticks: { color: "rgb(148, 163, 184)" },
+                  grid: { color: "rgba(148, 163, 184, 0.1)" },
+                },
+                x: {
+                  ticks: { color: "rgb(148, 163, 184)" },
+                  grid: { display: false },
+                },
+              },
+              plugins: {
+                legend: {
+                  labels: { color: "rgb(226, 232, 240)" },
+                },
+                tooltip: {
+                  callbacks: {
+                    label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.y.toFixed(3)}`,
+                  },
+                },
+              },
+            },
+          });
+        }, [data]);
+
+        return (
+          <Section
+            title="Runtime Drift"
+            description="Average score margins vs offline recall for monitored slices"
+          >
+            {error && <ErrorNotice error={error} />}
+            {!data && !error && <Loader text="Awaiting runtime telemetry" />}
+            {data && Array.isArray(data) && data.length > 0 ? (
+              <div>
+                <canvas ref={canvasRef} className="w-full" height="160"></canvas>
+                <p className="mt-3 text-xs text-slate-400">
+                  Data sourced from <code>report/runtime_summary.json</code>. Ensure telemetry exports this file when running <code>make report</code>.
+                </p>
+              </div>
+            ) : (
+              !error && <p className="text-sm text-slate-400">No runtime telemetry summaries available.</p>
+            )}
+          </Section>
+        );
+      };
+
+      const ObfuscationSection = () => {
+        const { data, error } = useJSON("report/obfuscation.json");
+        return (
+          <Section
+            title="Obfuscation Hardness"
+            description="Per-slice detection rates after applying obfuscation operators"
+          >
+            {error && <ErrorNotice error={error} />}
+            {!data && !error && <Loader />}
+            {data && (
+              <div className="space-y-4">
+                {Object.entries(data).map(([sliceKey, sliceStats]) => (
+                  <div key={sliceKey} className="rounded border border-slate-800/60 p-4">
+                    <div className="mb-2 flex items-center justify-between">
+                      <h3 className="font-medium text-teal-200">{sliceKey}</h3>
+                      <span className="text-xs text-slate-400">Hardness mean {(sliceStats.hardness?.mean ?? 0).toFixed(3)}</span>
+                    </div>
+                    <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                      {Object.entries(sliceStats.operators || {}).map(([op, rate]) => (
+                        <div
+                          key={op}
+                          className="rounded bg-slate-800/70 p-2 text-sm"
+                          title={`Detection rate ${(rate * 100).toFixed(1)}%`}
+                        >
+                          <div className="text-slate-300">{op}</div>
+                          <div className="text-slate-400">{(rate * 100).toFixed(1)}%</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Section>
+        );
+      };
+
+      const ParitySection = () => {
+        const { data, error } = useJSON("report/parity.json");
+        return (
+          <Section
+            title="Language Parity"
+            description="Flagging recall across evaluated languages"
+          >
+            {error && <ErrorNotice error={error} />}
+            {!data && !error && <Loader />}
+            {data && (
+              <div>
+                <table className="w-full table-fixed border-separate border-spacing-y-1 text-sm">
+                  <thead>
+                    <tr className="text-slate-400">
+                      <th className="text-left">Language</th>
+                      <th className="text-right">Total</th>
+                      <th className="text-right">Flagged</th>
+                      <th className="text-right">Recall</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(data.languages || []).map((row) => (
+                      <tr key={row.language} className="rounded bg-slate-800/60">
+                        <td className="px-3 py-2 font-medium text-slate-100">{row.language}</td>
+                        <td className="px-3 py-2 text-right text-slate-300">{row.total}</td>
+                        <td className="px-3 py-2 text-right text-slate-300">{row.flagged}</td>
+                        <td className="px-3 py-2 text-right text-slate-300">{(row.recall * 100).toFixed(1)}%</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <p className="mt-2 text-xs text-slate-400">
+                  Max delta: {(data.max_delta ?? 0).toFixed(3)} &nbsp; • &nbsp; Variance: {(data.variance ?? 0).toFixed(3)}
+                </p>
+              </div>
+            )}
+          </Section>
+        );
+      };
+
+      const IncidentSection = () => {
+        const [incidents, setIncidents] = useState([]);
+        const [error, setError] = useState(null);
+
+        useEffect(() => {
+          const scenarios = [
+            "report/incidents.json",
+            "report/incident_jailbreak.json",
+            "report/incident_data_leak.json",
+          ];
+
+          const attemptFetch = async () => {
+            for (const path of scenarios) {
+              try {
+                const response = await fetch(path);
+                if (!response.ok) continue;
+                const payload = await response.json();
+                if (Array.isArray(payload)) {
+                  setIncidents(payload);
+                  return;
+                }
+                if (payload && payload.scenario) {
+                  setIncidents([payload]);
+                  return;
+                }
+              } catch (err) {
+                continue;
+              }
+            }
+            setError("No incident drill summaries were found in report/.");
+          };
+          attemptFetch();
+        }, []);
+
+        return (
+          <Section
+            title="Incident Drills"
+            description="Outcomes from chaos engineering scenarios"
+          >
+            {error && <ErrorNotice error={error} />}
+            {incidents.length === 0 && !error && <Loader />}
+            {incidents.length > 0 && (
+              <div className="grid gap-3 md:grid-cols-2">
+                {incidents.map((incident) => (
+                  <div key={incident.scenario} className="rounded border border-slate-800/50 bg-slate-900/60 p-3 text-sm">
+                    <div className="mb-1 flex items-center justify-between">
+                      <span className="font-semibold text-amber-300">{incident.scenario}</span>
+                      <span className="text-xs text-slate-400">{incident.duration_s ?? "?"}s</span>
+                    </div>
+                    <ul className="space-y-1 text-slate-300">
+                      <li>
+                        Detection time: <span className="text-slate-100">{incident.detection_time_s ?? "—"}s</span>
+                      </li>
+                      <li>
+                        Mitigation time: <span className="text-slate-100">{incident.mitigation_time_s ?? "—"}s</span>
+                      </li>
+                      <li>
+                        Residual risk: <span className="text-slate-100">{incident.residual_risk ?? "—"}</span>
+                      </li>
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Section>
+        );
+      };
+
+      const RedTeamSection = () => {
+        const { data, error } = useJSON("report/redteam_cases.jsonl", async (response) => {
+          const text = await response.text();
+          return text
+            .split("\n")
+            .map((line) => line.trim())
+            .filter(Boolean)
+            .map((line) => {
+              try {
+                return JSON.parse(line);
+              } catch (err) {
+                return null;
+              }
+            })
+            .filter(Boolean);
+        });
+
+        const [selectedSlice, setSelectedSlice] = useState("all");
+        const filtered = useMemo(() => {
+          if (!data) return [];
+          if (selectedSlice === "all") return data;
+          return data.filter((row) => {
+            const sliceKey = row.slice_key || `${row.category}/${row.language}`;
+            return sliceKey === selectedSlice;
+          });
+        }, [data, selectedSlice]);
+
+        const sliceOptions = useMemo(() => {
+          if (!data) return [];
+          const set = new Set();
+          data.forEach((row) => {
+            const sliceKey = row.slice_key || `${row.category}/${row.language}`;
+            if (sliceKey) set.add(sliceKey);
+          });
+          return Array.from(set).sort();
+        }, [data]);
+
+        return (
+          <Section
+            title="Red-Team Clusters"
+            description="Recent false negatives grouped by slice"
+          >
+            {error && <ErrorNotice error={error} />}
+            {!data && !error && <Loader />}
+            {data && (
+              <div className="space-y-4">
+                <div className="flex flex-wrap items-center gap-3">
+                  <label className="text-sm text-slate-400" htmlFor="slice-filter">
+                    Filter by slice
+                  </label>
+                  <select
+                    id="slice-filter"
+                    value={selectedSlice}
+                    onChange={(event) => setSelectedSlice(event.target.value)}
+                    className="rounded border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100"
+                  >
+                    <option value="all">All slices</option>
+                    {sliceOptions.map((sliceKey) => (
+                      <option key={sliceKey} value={sliceKey}>
+                        {sliceKey}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="text-xs text-slate-500">Showing {filtered.length} / {data.length} cases</span>
+                </div>
+                <div className="grid gap-3 md:grid-cols-2">
+                  {filtered.slice(0, 12).map((row, index) => (
+                    <article
+                      key={`${row.seed_row_id || index}-${index}`}
+                      className="group rounded border border-slate-800/60 bg-slate-900/70 p-3 text-sm"
+                      title={`Score ${row.score ?? "?"} vs threshold ${row.threshold ?? "?"}`}
+                    >
+                      <header className="mb-2 flex items-center justify-between">
+                        <span className="font-semibold text-rose-300">{row.slice_key || `${row.category}/${row.language}`}</span>
+                        <span className="text-xs text-slate-400">Agent {row.agent || "?"}</span>
+                      </header>
+                      <p className="mb-2 text-slate-200">{row.text}</p>
+                      {row.operations && (
+                        <p className="text-xs text-slate-400">
+                          Ops: {Array.isArray(row.operations) ? row.operations.join(", ") : row.operations}
+                        </p>
+                      )}
+                    </article>
+                  ))}
+                </div>
+                {filtered.length > 12 && (
+                  <p className="text-xs text-slate-400">Showing first 12 entries — inspect <code>report/redteam_cases.jsonl</code> for full details.</p>
+                )}
+              </div>
+            )}
+          </Section>
+        );
+      };
+
+      const Dashboard = () => (
+        <div className="mx-auto max-w-6xl px-4 py-10">
+          <header className="mb-12">
+            <h1 className="text-3xl font-bold text-teal-200">Safety Evaluation Dashboard</h1>
+            <p className="mt-2 max-w-3xl text-sm text-slate-400">
+              Visual overview of recent offline evaluations, runtime telemetry, adversarial red-teaming, parity analysis, and incident drills. Refresh after running <code>make report</code> and associated harnesses.
+            </p>
+          </header>
+          <RuntimeDriftSection />
+          <ObfuscationSection />
+          <ParitySection />
+          <IncidentSection />
+          <RedTeamSection />
+          <footer className="mt-12 border-t border-slate-800 pt-6 text-xs text-slate-500">
+            Data sourced from files in <code>report/</code>. Missing sections indicate the corresponding artifact has not been generated.
+          </footer>
+        </div>
+      );
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<Dashboard />);
+    </script>
+  </body>
+</html>

@@ -1,37 +1,60 @@
-name: nightly-redteam
+name: Nightly Validation
 
 on:
   schedule:
-    - cron: '0 2 * * *'
+    - cron: "0 2 * * *"
   workflow_dispatch:
 
 jobs:
-  chaos:
+  nightly:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-      - run: python -m pip install --upgrade pip
-      - run: pip install -r requirements.txt
-      - name: Run redteam swarm
-        env:
-          MPLBACKEND: Agg
-          MPLCONFIGDIR: .mplcache
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
         run: |
-          mkdir -p .mplcache
-          python -m src.redteam.swarm --max-iters 400 --budget '{"violence/en":100,"self_harm/en":100,"malware/en":80}'
-      - name: Autopatch dry run
-        run: python -m src.autopatch.run --target "self_harm/en,malware/en" --max-patches 3 || true
-      - name: Upload artifacts
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Obfuscation Lab
+        run: |
+          python -m src.obfuscation.lab --slices "violence/en,self_harm/en,malware/en" --out report/obfuscation.json
+
+      - name: Multilingual Parity
+        run: |
+          python -m src.multilingual.parity --category violence --langs en,fa,es --out report/parity.json
+
+      - name: Chaos Drill Simulation
+        run: |
+          python -m src.incidents.simulator --scenario jailbreak --duration 10 --rate 5
+
+      - name: Red-Team Swarm
+        run: |
+          python -m src.redteam.swarm --max-iters 100 --budget '{"violence/en": 5}'
+
+      - name: Build Report
+        run: |
+          python -m src.report.build_report
+
+      - name: Build Evidence Pack
+        run: |
+          python -m src.evidence.pack
+
+      - name: Archive artefacts
         uses: actions/upload-artifact@v4
         with:
-          name: nightly-redteam
+          name: safety-eval-nightly
           path: |
-            report/redteam_cases.jsonl
-            report/obfuscation.json
-            report/parity.json
-            report/incident_*.json
-            .autopatch/PR_BODY.md
-            .autopatch/diff/
+            report/
+            dist/
+            runs.jsonl
+            tuned_thresholds.yaml
+            notifications.log

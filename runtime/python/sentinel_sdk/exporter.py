@@ -32,9 +32,10 @@ def log_telemetry(
     category: Optional[str] = None,
     language: Optional[str] = None,
 ) -> None:
-    from src.utils.scrub import scrub_record
+    from src.utils.scrub import privacy_mode_for, scrub_record, scrub_text
 
     text_hash = hashlib.sha256(text.encode("utf-8")).hexdigest()
+    privacy_mode = privacy_mode_for("runtime_telemetry")
     record = {
         "ts": int(time.time()),
         "text_hash": text_hash,
@@ -44,8 +45,9 @@ def log_telemetry(
         "score": evaluation.get("score"),
         "threshold": evaluation.get("threshold"),
         "latency_ms": evaluation.get("latency_ms"),
+        "text": scrub_text(text, mode=privacy_mode) or "",
     }
-    scrub_record(record, keys=["category_guess", "language_guess"])
+    scrub_record(record, keys=["category_guess", "language_guess"], mode=privacy_mode)
     exporter.log(record)
 
 

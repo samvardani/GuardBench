@@ -8,8 +8,8 @@ from typing import Dict, Iterable, List, Mapping
 
 from src.autopatch.candidates import apply_threshold_patch_to_config
 from src.guards.candidate import predict as candidate_predict
-from src.report.build_report import slice_metrics
-from src.runner.run_compare import load_cfg_and_data, metrics_for
+from src.evaluation import evaluate
+from src.runner.run_compare import load_cfg_and_data
 
 
 CONFIG_PATH = Path("config.yaml")
@@ -22,10 +22,18 @@ def _get_slice_key(row: Mapping[str, str]) -> str:
 
 
 def _evaluate_candidate(rows: List[dict]) -> Dict[str, object]:
-    preds = [candidate_predict(r["text"], category=r.get("category"), language=r.get("language")) for r in rows]
-    metrics = metrics_for(preds, rows)
-    slices = slice_metrics(rows, preds, mode="strict")
-    return {"metrics": metrics, "slices": {f"{s['category']}/{s['language']}": s for s in slices}}
+    engine = {
+        "guards": {
+            "candidate": {"name": "candidate", "predict": candidate_predict},
+        }
+    }
+    summary = evaluate(engine, rows, policy={})
+    guard = summary["guards"]["candidate"]
+    strict_view = guard["modes"]["strict"]
+    metrics = dict(strict_view["confusion"])
+    metrics["latency_ms"] = guard["latency"]
+    slices = {f"{s['category']}/{s['language']}": s for s in strict_view["slices"]}
+    return {"metrics": metrics, "slices": slices}
 
 
 def evaluate_threshold_candidate(

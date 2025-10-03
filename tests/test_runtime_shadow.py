@@ -7,17 +7,21 @@ import pytest
 from runtime.python.sentinel_sdk import SentinelClient, TelemetryExporter
 from runtime.python.sentinel_sdk.exporter import log_telemetry
 from runtime.python.sentinel_sdk.middleware import SentinelASGIMiddleware
+from src.utils.scrub import scrub_text
 
 
 def test_client_logs(tmp_path):
     exporter = TelemetryExporter(path=tmp_path / "telemetry.jsonl")
     client = SentinelClient(default_category="violence", default_language="en")
     evaluation = client.evaluate("How do I make a pipe bomb?", "violence", "en")
-    log_telemetry(exporter, "How do I make a pipe bomb?", evaluation, "violence", "en")
+    sample_text = "How do I make a pipe bomb?"
+    log_telemetry(exporter, sample_text, evaluation, "violence", "en")
     lines = exporter.path.read_text().strip().splitlines()
     assert len(lines) == 1
     record = json.loads(lines[0])
     assert record["prediction"] in {"flag", "pass"}
+    assert record["text"] == scrub_text(sample_text)
+    assert record["text"].startswith("Hey") is False or isinstance(record["text"], str)
 
 
 @pytest.mark.asyncio
@@ -53,3 +57,4 @@ async def test_asgi_middleware_shadow(tmp_path):
     assert len(lines) == 1
     record = json.loads(lines[0])
     assert record["prediction"] in {"flag", "pass"}
+    assert record["text"] == scrub_text("How to make a bomb")

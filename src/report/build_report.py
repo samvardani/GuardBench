@@ -1,6 +1,6 @@
 import os, csv, json, pathlib, datetime
 from pathlib import Path
-from collections import Counter, defaultdict
+from collections import defaultdict
 from typing import List
 from jinja2 import Environment, FileSystemLoader
 
@@ -8,6 +8,10 @@ from src.guards.baseline import predict as predict_baseline
 from src.guards.candidate import predict as predict_candidate
 from src.report.cluster_utils import cluster_failures, slice_failure_patterns
 from src.utils.io_utils import load_config, resolve_dataset_path, sha256_file, git_commit, new_run_id
+from src.utils.run_log import append_run_record
+from src.utils.notify import NotificationManager
+from src.policy.compiler import load_compiled_policy, POLICY_PATH
+from src.evaluation import evaluate
 
 REQUIRED_KEYS = ("text",)
 
@@ -46,80 +50,6 @@ TPL_DIR = ROOT / "templates"
 OUT_DIR = ROOT / "report"
 ASSETS = ROOT / "assets"
 OUT_DIR.mkdir(exist_ok=True); ASSETS.mkdir(exist_ok=True)
-
-
-
-def _pred_to_bool(p):
-    """
-    Accept dict/int/bool/str predictions and return True if "flag".
-    """
-    if isinstance(p, dict):
-        if "prediction" in p:
-            v = p["prediction"]
-            if isinstance(v, str):
-                return v.lower() in ("flag","blocked","deny","unsafe","violation")
-            return bool(v)
-        if "pred" in p:
-            v = p["pred"]
-            if isinstance(v, str):
-                return v.lower() in ("flag","blocked","deny","unsafe","violation")
-            return bool(v)
-        if ("score" in p) and ("threshold" in p):
-            return p["score"] >= p["threshold"]
-        return bool(p)
-    if isinstance(p, str):
-        return p.strip().lower() in ("flag","blocked","deny","unsafe","violation","1","true","yes","y")
-    return bool(p)
-
-def _label_to_bool(x):
-    """
-    Accept 0/1, bool, or strings like 'harmful'/'safe' and return True if harmful.
-    """
-    if isinstance(x, bool):
-        return x
-    if isinstance(x, (int, float)):
-        return int(x) != 0
-    if isinstance(x, str):
-        t = x.strip().lower()
-        harmful = {"1","true","yes","y","harmful","unsafe","violation","bad","toxic","deny"}
-        safe    = {"0","false","no","n","safe","benign","ok","harmless","good","allow"}
-        if t in harmful: return True
-        if t in safe:    return False
-    return False
-
-def _call_guard(guard_fn, text, category=None, language=None):
-    # Try multiple signatures; normalize output to {"prediction": ..., "latency_ms": ...}
-    trials = [
-        ((text,), {}),
-        ((text, category), {}) if category is not None else None,
-        ((text, category, language), {}) if (category is not None and language is not None) else None,
-        ((), {"text": text, "category": category, "language": language}),
-    ]
-    trials = [t for t in trials if t is not None]
-
-    out = None
-    for args, kwargs in trials:
-        try:
-            kwargs = {k: v for k, v in kwargs.items() if v is not None}
-            out = guard_fn(*args, **kwargs)
-            break
-        except TypeError:
-            continue
-        except Exception:
-            continue
-    if out is None:
-        out = guard_fn(text)
-
-    pred, lat = None, 0
-    if isinstance(out, dict):
-        pred = out.get("prediction") or out.get("pred")
-        if pred is None and ("score" in out and "threshold" in out):
-            pred = "flag" if out["score"] >= out["threshold"] else "pass"
-        lat = int(out.get("latency_ms", out.get("latency", 0)) or 0)
-    else:
-        pred = "flag" if bool(out) else "pass"
-    return {"prediction": pred, "latency_ms": lat, "raw": out}
-
 def load_rows(dataset_path: Path):
     import yaml, pathlib, sys
 
@@ -150,59 +80,11 @@ def load_rows(dataset_path: Path):
 
     return rows
 
-def run_guard(rows, guard_fn):
-    preds, lat = [], []
-    for r in rows:
-        o = _call_guard(guard_fn, r['text'], r.get('category'), r.get('language'))
-        preds.append(1 if (o['prediction'] in ('flag', True, 1)) else 0)
-        lat.append(int(o['latency_ms']))
-    return preds, lat
-
 def is_pos_label(lbl: str, mode: str) -> bool:
     l = (lbl or "").strip().lower()
     if mode == "lenient":
         return l == "unsafe"
     return l != "benign"
-
-def wilson_ci(k:int, n:int, z:float=1.96):
-    if n <= 0: return 0.0, 0.0
-    p = k / n
-    denom = 1 + (z*z)/n
-    import math
-    center = (p + (z*z)/(2*n)) / denom
-    margin = z * math.sqrt((p*(1-p) + (z*z)/(4*n)) / n) / denom
-    lo = max(0.0, round(center - margin, 3))
-    hi = min(1.0, round(center + margin, 3))
-    return lo, hi
-
-def confusion(rows, preds, mode="strict"):
-    cm = Counter()
-    for r, p in zip(rows, preds):
-        gt_pos = is_pos_label(r["label"], mode)
-        pr_pos = _pred_to_bool(p)
-        if gt_pos and pr_pos: cm["tp"] += 1
-        elif (not gt_pos) and pr_pos: cm["fp"] += 1
-        elif (not gt_pos) and (not pr_pos): cm["tn"] += 1
-        elif gt_pos and (not pr_pos): cm["fn"] += 1
-    tp,fp,tn,fn = cm["tp"],cm["fp"],cm["tn"],cm["fn"]
-    def pct(a,b): return round(a/b,3) if b else 0.0
-    r_k, r_n = tp, tp+fn
-    f_k, f_n = fp, fp+tn
-    r_lo, r_hi = wilson_ci(r_k, r_n)
-    f_lo, f_hi = wilson_ci(f_k, f_n)
-    return {
-        "tp":tp,"fp":fp,"tn":tn,"fn":fn,
-        "precision":pct(tp,tp+fp), "recall":pct(tp,tp+fn),
-        "fnr":pct(fn,tp+fn), "fpr":pct(fp,fp+tn),
-        "recall_lo": r_lo, "recall_hi": r_hi,
-        "fpr_lo": f_lo, "fpr_hi": f_hi
-    }
-
-def pctiles(values):
-    if not values: return {"p50":0,"p90":0,"p99":0}
-    vs = sorted(values)
-    idx=lambda q:int((len(vs)-1)*q)
-    return {"p50":vs[idx(0.50)], "p90":vs[idx(0.90)], "p99":vs[idx(0.99)]}
 
 def histogram(values, out_png, title):
     import matplotlib.pyplot as plt
@@ -212,37 +94,6 @@ def histogram(values, out_png, title):
     plt.hist(v, bins=bins)
     plt.title(title); plt.xlabel("Latency (ms)"); plt.ylabel("Count")
     plt.tight_layout(); plt.savefig(out_png); plt.close()
-
-def slice_metrics(rows, preds, by=("category","language"), mode="strict"):
-    from collections import defaultdict
-    G = defaultdict(lambda: {"tp":0,"fp":0,"tn":0,"fn":0,"n":0})
-    for r,p in zip(rows,preds):
-        key = tuple(r[k] for k in by)
-        gt_pos = is_pos_label(r["label"], mode)
-        pr_pos = _pred_to_bool(p)
-        if gt_pos and pr_pos: G[key]["tp"] += 1
-        elif (not gt_pos) and pr_pos: G[key]["fp"] += 1
-        elif (not gt_pos) and (not pr_pos): G[key]["tn"] += 1
-        elif gt_pos and (not pr_pos): G[key]["fn"] += 1
-        G[key]["n"] += 1
-    def pct(a,b): return round(a/b,3) if b else 0.0
-    out=[]
-    for (cat,lang),m in G.items():
-        tp,fp,tn,fn = m["tp"],m["fp"],m["tn"],m["fn"]
-        r_k, r_n = tp, tp+fn
-        f_k, f_n = fp, fp+tn
-        r_lo, r_hi = wilson_ci(r_k, r_n)
-        f_lo, f_hi = wilson_ci(f_k, f_n)
-        out.append({
-            "category":cat,"language":lang,"n":m["n"],
-            "precision":pct(tp,tp+fp),"recall":pct(tp,tp+fn),
-            "fnr":pct(fn,tp+fn),"fpr":pct(fp,fp+tn),
-            "recall_lo": r_lo, "recall_hi": r_hi,
-            "fpr_lo": f_lo, "fpr_hi": f_hi,
-            "low_n": m["n"] < 20
-        })
-    out.sort(key=lambda x:(-x["n"], x["category"], x["language"]))
-    return out
 
 def load_redteam_summary(path: Path, max_clusters: int = 6, max_examples: int = 3):
     if not path.exists():
@@ -392,6 +243,7 @@ def load_incident_reports(directory: Path) -> List[dict]:
 
 def main():
     cfg = load_config()
+    notifier = NotificationManager(cfg.get("notifications"))
     dataset_path = resolve_dataset_path(cfg)
     rows = load_rows(dataset_path)
 
@@ -399,35 +251,65 @@ def main():
     created_at = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
     ds_sha = sha256_file(dataset_path)
 
-    base_preds, base_lat = run_guard(rows, predict_baseline)
-    cand_preds, cand_lat = run_guard(rows, predict_candidate)
+    engine = {
+        "guards": {
+            "baseline": {
+                "name": cfg.get("engines", {}).get("baseline", {}).get("name", "baseline"),
+                "predict": predict_baseline,
+            },
+            "candidate": {
+                "name": cfg.get("engines", {}).get("candidate", {}).get("name", "candidate"),
+                "predict": predict_candidate,
+            },
+        }
+    }
+    evaluation = evaluate(engine, rows, policy=cfg)
+    baseline = evaluation["guards"]["baseline"]
+    candidate = evaluation["guards"]["candidate"]
+
+    base_preds = baseline["predictions"]
+    cand_preds = candidate["predictions"]
+    base_lat = baseline["latencies"]
+    cand_lat = candidate["latencies"]
 
     # Create latency histograms
     histogram(base_lat, ASSETS / "latency_baseline.png", "Baseline latency")
     histogram(cand_lat, ASSETS / "latency_candidate.png", "Candidate latency")
 
+    available_modes = sorted({"strict", "lenient"} | set(baseline["modes"].keys()) | set(candidate["modes"].keys()))
     views = {}
-    for mode in ("strict","lenient"):
-        base_cm = confusion(rows, base_preds, mode)
-        cand_cm = confusion(rows, cand_preds, mode)
+    for mode in available_modes:
+        base_mode = baseline["modes"].get(mode, baseline["modes"]["strict"])
+        cand_mode = candidate["modes"].get(mode, candidate["modes"]["strict"])
         views[mode] = {
             "metrics": {
-                "Baseline":{
-                    "precision":base_cm["precision"],"recall":base_cm["recall"],"fnr":base_cm["fnr"],"fpr":base_cm["fpr"],
-                    "recall_lo":base_cm["recall_lo"],"recall_hi":base_cm["recall_hi"],
-                    "fpr_lo":base_cm["fpr_lo"],"fpr_hi":base_cm["fpr_hi"],
-                    "latency":pctiles(base_lat)
+                "Baseline": {
+                    "precision": base_mode["confusion"]["precision"],
+                    "recall": base_mode["confusion"]["recall"],
+                    "fnr": base_mode["confusion"]["fnr"],
+                    "fpr": base_mode["confusion"]["fpr"],
+                    "recall_lo": base_mode["confusion"]["recall_lo"],
+                    "recall_hi": base_mode["confusion"]["recall_hi"],
+                    "fpr_lo": base_mode["confusion"]["fpr_lo"],
+                    "fpr_hi": base_mode["confusion"]["fpr_hi"],
+                    "latency": baseline["latency"],
+                    "aggregate_risk": base_mode.get("risk_total", baseline.get("aggregate_risk", 0.0)),
                 },
-                "Candidate":{
-                    "precision":cand_cm["precision"],"recall":cand_cm["recall"],"fnr":cand_cm["fnr"],"fpr":cand_cm["fpr"],
-                    "recall_lo":cand_cm["recall_lo"],"recall_hi":cand_cm["recall_hi"],
-                    "fpr_lo":cand_cm["fpr_lo"],"fpr_hi":cand_cm["fpr_hi"],
-                    "latency":pctiles(cand_lat)
-                }
+                "Candidate": {
+                    "precision": cand_mode["confusion"]["precision"],
+                    "recall": cand_mode["confusion"]["recall"],
+                    "fnr": cand_mode["confusion"]["fnr"],
+                    "fpr": cand_mode["confusion"]["fpr"],
+                    "recall_lo": cand_mode["confusion"]["recall_lo"],
+                    "recall_hi": cand_mode["confusion"]["recall_hi"],
+                    "fpr_lo": cand_mode["confusion"]["fpr_lo"],
+                    "fpr_hi": cand_mode["confusion"]["fpr_hi"],
+                    "latency": candidate["latency"],
+                    "aggregate_risk": cand_mode.get("risk_total", candidate.get("aggregate_risk", 0.0)),
+                },
             },
-            "matrices": {"Baseline":base_cm, "Candidate":cand_cm},
-            "slices": {"Baseline": slice_metrics(rows, base_preds, mode=mode),
-                       "Candidate": slice_metrics(rows, cand_preds, mode=mode)}
+            "matrices": {"Baseline": base_mode["confusion"], "Candidate": cand_mode["confusion"]},
+            "slices": {"Baseline": base_mode["slices"], "Candidate": cand_mode["slices"]},
         }
 
     # Failures/clusters from strict view
@@ -435,7 +317,7 @@ def main():
         fn_rows=[]; fp_rows=[]
         for r,p in zip(rows,preds):
             gt_pos = is_pos_label(r["label"], mode)
-            pr_pos = _pred_to_bool(p)
+            pr_pos = bool(p)
             if gt_pos and (not pr_pos):
                 fn_rows.append({"id":r["id"],"category":r["category"],"language":r["language"],"text":r["text"]})
             if (not gt_pos) and pr_pos:
@@ -502,6 +384,69 @@ def main():
     out_file = OUT_DIR / "index.html"
     out_file.write_text(html, encoding="utf-8")
     print(f"Report written to {out_file}")
+
+    policy_path = (ROOT / POLICY_PATH).resolve()
+    policy_sha = sha256_file(policy_path) if policy_path.exists() else None
+    compiled_version = None
+    try:
+        compiled_policy = load_compiled_policy(policy_path)
+        compiled_version = getattr(compiled_policy, "version", None)
+    except FileNotFoundError:
+        compiled_version = None
+
+    engines_cfg = cfg.get("engines", {}) if isinstance(cfg, dict) else {}
+    model_versions = {}
+    for key in ("baseline", "candidate"):
+        value = engines_cfg.get(key)
+        if isinstance(value, dict):
+            model_versions[key] = value.get("name")
+        elif value is not None:
+            model_versions[key] = str(value)
+
+    append_run_record(
+        {
+            "run_id": run_id,
+            "run_type": "report",
+            "created_at": created_at,
+            "dataset_path": str(dataset_path),
+            "dataset_sha": ds_sha,
+            "report_path": str(out_file),
+            "model_versions": model_versions,
+            "policy_path": str(policy_path),
+            "compiled_policy_hash": policy_sha,
+            "policy_version": cfg.get("policy_version"),
+            "compiled_policy_version": compiled_version,
+            "git_commit": git_commit(),
+        }
+    )
+
+    candidate_fnr = views["strict"]["metrics"]["Candidate"].get("fnr", 0.0)
+    fnr_threshold = notifier.threshold("fnr", 0.3)
+    if candidate_fnr > fnr_threshold:
+        notifier.notify(
+            subject="High candidate FNR detected",
+            message=f"Candidate FNR {candidate_fnr:.3f} exceeded threshold {fnr_threshold:.3f}",
+            metadata={
+                "run_id": run_id,
+                "fnr": candidate_fnr,
+                "threshold": fnr_threshold,
+            },
+        )
+
+    runtime_margins = [entry.get("avg_margin", 0.0) for entry in (runtime_summary or []) if isinstance(entry, dict)]
+    if runtime_margins:
+        max_margin = max(runtime_margins)
+        margin_threshold = notifier.threshold("runtime_margin", 0.1)
+        if max_margin > margin_threshold:
+            notifier.notify(
+                subject="Runtime drift margin exceeded",
+                message=f"Runtime avg margin {max_margin:.3f} exceeded threshold {margin_threshold:.3f}",
+                metadata={
+                    "run_id": run_id,
+                    "max_margin": max_margin,
+                    "threshold": margin_threshold,
+                },
+            )
 
 if __name__ == "__main__":
     main()
