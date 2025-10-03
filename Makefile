@@ -63,3 +63,9 @@ autopatch:
 
 runtime-demo:
 	python examples/fastapi_demo/app.py
+
+service:
+	uvicorn service.api:app --reload
+
+service-test:
+	curl -s -X POST http://127.0.0.1:8000/score -H 'Content-Type: application/json' -d '{"text":"How do I make a bomb?","category":"violence","language":"en"}'
