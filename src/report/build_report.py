@@ -49,7 +49,8 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 TPL_DIR = ROOT / "templates"
 OUT_DIR = ROOT / "report"
 ASSETS = ROOT / "assets"
-OUT_DIR.mkdir(exist_ok=True); ASSETS.mkdir(exist_ok=True)
+REPORT_ASSETS = OUT_DIR / "assets"
+OUT_DIR.mkdir(exist_ok=True); ASSETS.mkdir(exist_ok=True); REPORT_ASSETS.mkdir(exist_ok=True)
 def load_rows(dataset_path: Path):
     import yaml, pathlib, sys
 
@@ -191,6 +192,82 @@ def load_runtime_telemetry(path: Path, assets_root: Path, offline_slices: dict):
     return summary, relative_chart
 
 
+def load_obfuscation_summary(path: Path, assets_root: Path):
+    if not path.exists():
+        return [], None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return [], None
+    if not isinstance(data, dict):
+        return [], None
+
+    ordered = []
+    operators = set()
+    summary = []
+    for slice_key in sorted(data.keys()):
+        payload = data.get(slice_key) or {}
+        ops = payload.get("operators") or {}
+        operators.update(ops.keys())
+        weakest = sorted(ops.items(), key=lambda kv: kv[1])[:3]
+        summary.append(
+            {
+                "slice": slice_key,
+                "total": payload.get("total", 0),
+                "hardness": round((payload.get("hardness") or {}).get("mean", 0.0), 3),
+                "weakest": [
+                    {"operator": op, "recall": round(val, 3)}
+                    for op, val in weakest
+                ],
+            }
+        )
+        ordered.append((slice_key, payload))
+
+    chart_rel = None
+    if summary and operators:
+        chart_path = assets_root / "obfuscation_heatmap.png"
+        try:
+            import matplotlib.pyplot as plt
+
+            operator_list = sorted(operators)
+            slices = [item[0] for item in ordered]
+            matrix = [
+                [
+                    (item[1].get("operators") or {}).get(op, 0.0)
+                    for op in operator_list
+                ]
+                for item in ordered
+            ]
+
+            fig, ax = plt.subplots(
+                figsize=(max(6, len(operator_list) * 0.9), max(3, len(slices) * 0.6))
+            )
+            im = ax.imshow(matrix, aspect="auto", vmin=0, vmax=1, cmap="Blues")
+            ax.set_xticks(range(len(operator_list)))
+            ax.set_xticklabels(operator_list, rotation=35, ha="right")
+            ax.set_yticks(range(len(slices)))
+            ax.set_yticklabels(slices)
+            ax.set_xlabel("Operator")
+            ax.set_ylabel("Slice")
+            ax.set_title("Detection after obfuscation (recall)")
+
+            for y, row in enumerate(matrix):
+                for x, value in enumerate(row):
+                    color = "#0f172a" if value < 0.7 else "#f8fafc"
+                    ax.text(x, y, f"{value:.2f}", va="center", ha="center", color=color, fontsize=9)
+
+            fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04, label="Recall")
+            plt.tight_layout()
+            chart_path.parent.mkdir(parents=True, exist_ok=True)
+            plt.savefig(chart_path, dpi=150)
+            plt.close(fig)
+            chart_rel = os.path.relpath(chart_path, OUT_DIR)
+        except Exception:
+            chart_rel = None
+
+    return summary, chart_rel
+
+
 def load_parity_summary(path: Path):
     if not path.exists():
         return None
@@ -215,6 +292,52 @@ def load_parity_summary(path: Path):
         "variance": data.get("variance", 0.0),
         "target_delta": data.get("target_delta", 0.05),
     }
+
+
+def render_parity_chart(summary: dict, assets_root: Path):
+    if not summary:
+        return None
+    rows = summary.get("rows") or []
+    if not rows:
+        return None
+    chart_path = assets_root / f"parity_{summary.get('category', 'overview')}.png"
+    try:
+        import matplotlib.pyplot as plt
+
+        languages = [row["language"] for row in rows]
+        recalls = [row.get("recall", 0.0) for row in rows]
+        top = max(recalls) if recalls else 0.0
+        target_delta = summary.get("target_delta", 0.0)
+        lower_band = max(0.0, top - target_delta)
+
+        fig, ax = plt.subplots(figsize=(max(4, len(languages) * 1.2), 3.5))
+        bars = ax.bar(languages, recalls, color="#3b82f6", edgecolor="#0f172a")
+        ax.set_ylim(0, 1.05)
+        ax.set_ylabel("Recall")
+        ax.set_title(f"Language parity — {summary.get('category')}")
+        ax.axhspan(lower_band, top, color="#fde68a", alpha=0.4, label="Target band")
+        ax.set_yticks([i / 10 for i in range(0, 11, 2)])
+        ax.set_xlabel("Language")
+        ax.legend(loc="lower left")
+
+        for bar, value in zip(bars, recalls):
+            ax.text(
+                bar.get_x() + bar.get_width() / 2,
+                bar.get_height() + 0.02,
+                f"{value:.2f}",
+                ha="center",
+                va="bottom",
+                fontsize=9,
+                color="#0f172a",
+            )
+
+        plt.tight_layout()
+        chart_path.parent.mkdir(parents=True, exist_ok=True)
+        plt.savefig(chart_path, dpi=150)
+        plt.close(fig)
+        return os.path.relpath(chart_path, OUT_DIR)
+    except Exception:
+        return None
 
 
 def load_incident_reports(directory: Path) -> List[dict]:
@@ -273,8 +396,8 @@ def main():
     cand_lat = candidate["latencies"]
 
     # Create latency histograms
-    histogram(base_lat, ASSETS / "latency_baseline.png", "Baseline latency")
-    histogram(cand_lat, ASSETS / "latency_candidate.png", "Candidate latency")
+    histogram(base_lat, REPORT_ASSETS / "latency_baseline.png", "Baseline latency")
+    histogram(cand_lat, REPORT_ASSETS / "latency_candidate.png", "Candidate latency")
 
     available_modes = sorted({"strict", "lenient"} | set(baseline["modes"].keys()) | set(candidate["modes"].keys()))
     views = {}
@@ -344,8 +467,10 @@ def main():
     )
     redteam_summary = load_redteam_summary(OUT_DIR / "redteam_cases.jsonl")
     runtime_offline = {f"{s['category']}/{s['language']}": s for s in views["strict"]["slices"]["Candidate"]}
-    runtime_summary, runtime_chart = load_runtime_telemetry(Path("runtime_telemetry.jsonl"), ASSETS, runtime_offline)
-    parity_summary = load_parity_summary(Path("report/parity.json"))
+    runtime_summary, runtime_chart = load_runtime_telemetry(Path("runtime_telemetry.jsonl"), REPORT_ASSETS, runtime_offline)
+    obfuscation_summary, obfuscation_chart = load_obfuscation_summary(OUT_DIR / "obfuscation.json", REPORT_ASSETS)
+    parity_summary = load_parity_summary(OUT_DIR / "parity.json")
+    parity_chart = render_parity_chart(parity_summary, REPORT_ASSETS)
     incident_summary = load_incident_reports(OUT_DIR)
     failures = (
         [{"id":r["id"],"fail_type":"FN","model":"Baseline", **r} for r in b_fn] +
@@ -369,8 +494,8 @@ def main():
         matrices=views["strict"]["matrices"],
         slices=views["strict"]["slices"],
         modes=views,  # both views for toggle
-        latency_imgs={"baseline": os.path.relpath(ASSETS / "latency_baseline.png", OUT_DIR),
-                      "candidate": os.path.relpath(ASSETS / "latency_candidate.png", OUT_DIR)},
+        latency_imgs={"baseline": os.path.relpath(REPORT_ASSETS / "latency_baseline.png", OUT_DIR),
+                      "candidate": os.path.relpath(REPORT_ASSETS / "latency_candidate.png", OUT_DIR)},
         downloads={"fn_csv": Path(c_fn_csv).name, "fp_csv": Path(c_fp_csv).name},
         failures=failures,
         clusters={"Baseline": base_clusters, "Candidate": cand_clusters},
@@ -379,6 +504,11 @@ def main():
         runtime_summary=runtime_summary,
         runtime_chart=runtime_chart,
         parity_summary=parity_summary,
+        parity_chart=parity_chart,
+        parity_json="parity.json",
+        obfuscation_summary=obfuscation_summary,
+        obfuscation_chart=obfuscation_chart,
+        obfuscation_json="obfuscation.json",
         incident_summary=incident_summary,
     )
     out_file = OUT_DIR / "index.html"

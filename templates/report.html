@@ -5,59 +5,106 @@
   <title>{{ run_title }} • {{ run_id }}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body{font:14px/1.45 -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:16px;color:#111}
-    h1{margin:0 0 8px 0;font-size:22px}
-    h2{margin:18px 0 8px 0;font-size:18px}
-    .meta{color:#666;font-size:12px;margin-bottom:12px}
-    .row{display:flex;flex-wrap:wrap;gap:16px}
-    .card{border:1px solid #e5e7eb;border-radius:8px;padding:12px;flex:1 1 360px;min-width:300px;background:#fff}
+    :root{color-scheme:light}
+    body{
+      font-family:"SF Pro Text","SF Pro Display",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      font-size:16px;
+      line-height:1.6;
+      margin:0;
+      padding:48px 0;
+      background:#f9fafb;
+      color:#0f172a;
+    }
+    .page{max-width:1200px;margin:0 auto;padding:0 32px 48px}
+    h1{margin:0 0 16px;font-size:28px;font-weight:600;letter-spacing:-0.01em;color:#0b1120}
+    h2{margin:0 0 12px;font-size:20px;font-weight:600;color:#111827}
+    h3{margin:20px 0 12px;font-size:16px;font-weight:600;color:#1f2937}
+    .meta{color:#6b7280;font-size:13px;margin-bottom:12px}
+    .toggle{display:flex;gap:24px;align-items:center;margin:16px 0;font-size:14px;color:#1f2937}
+    .toggle label{display:flex;align-items:center;gap:8px;cursor:pointer}
+    .row{display:flex;flex-wrap:wrap;gap:24px}
+    .card{border:1px solid rgba(148,163,184,0.25);border-radius:12px;padding:20px 24px;flex:1 1 360px;min-width:320px;background:#fff;box-shadow:0 12px 32px rgba(15,23,42,0.08),0 1px 2px rgba(15,23,42,0.05)}
+    .card .row{gap:16px}
+    .card .card{min-width:0;padding:16px 20px;background:#f8fafc;border:1px solid rgba(148,163,184,0.2);box-shadow:none}
+    .card h2:first-child{margin-top:0}
+    .card table{margin-top:16px}
     table{width:100%;border-collapse:collapse;font-size:13px}
-    th,td{border-bottom:1px solid #eee;padding:8px 6px;text-align:left;white-space:nowrap}
-    th{background:#fafafa}
-    .badge{display:inline-block;border:1px solid #e5e7eb;border-radius:999px;padding:3px 8px;margin-right:6px;font-size:12px}
+    th,td{border-bottom:1px solid #e5e7eb;padding:10px 8px;text-align:left;vertical-align:top}
+    th{white-space:nowrap}
+    .text-snippet{display:inline-block;max-width:360px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:middle}
+    .text-snippet.expanded{white-space:normal;overflow:visible;max-width:none}
+    .snippet-toggle{margin-left:6px;font-size:12px;color:#2563eb;border:none;background:none;cursor:pointer;padding:0}
+    .snippet-toggle:hover{text-decoration:underline}
+    .snippet-toggle:focus-visible{outline:2px solid #94a3b8;outline-offset:2px}
+    .collapsed-row{display:none}
+    .table-toggle{margin-top:8px;font-size:12px;color:#2563eb;border:none;background:none;cursor:pointer;padding:0}
+    .table-toggle:hover{text-decoration:underline}
+    th{background:#f1f5f9;font-weight:600;color:#1f2937}
+    tr:last-child th,tr:last-child td{border-bottom:none}
+    .badge{display:inline-block;border:1px solid rgba(148,163,184,0.4);border-radius:999px;padding:4px 10px;margin-right:8px;font-size:12px;background:#fff;box-shadow:0 4px 12px rgba(15,23,42,0.06)}
     .hidden{display:none}
-    .ok{color:#0a7a1f}.warn{color:#b45309}.err{color:#b91c1c}
+    .section{margin-top:32px}
+    .card--wide{flex:2 1 520px}
+    .card--compact{flex:1 1 320px}
+    .card img{display:block;width:100%;max-width:100%;margin-top:12px;border-radius:10px;box-shadow:0 8px 24px rgba(15,23,42,0.08)}
+    .ok{color:#0c7d36}.warn{color:#b45309}.err{color:#b91c1c}
+    .footer{margin-top:48px;text-align:center;font-size:12px;color:#9ca3af}
+    @media (max-width:900px){
+      body{padding:32px 0}
+      .page{padding:0 20px 32px}
+      .row{flex-direction:column}
+      .card{min-width:0}
+      .toggle{flex-direction:column;align-items:flex-start;gap:10px}
+    }
+    @media (max-width:600px){
+      body{font-size:15px}
+      h1{font-size:24px}
+      h2{font-size:18px}
+      .meta{font-size:12px}
+      th,td{white-space:normal}
+      .card img{margin-top:10px}
+    }
   </style>
 </head>
 <body>
-  <h1>{{ run_title }}</h1>
-  <div class="meta">
-    Run: <b>{{ run_id }}</b> • Samples: <b>{{ total_samples }}</b> • Dataset SHA: <b>{{ dataset_sha }}</b> • Generated: {{ generated_at }} • Policy: {{ policy_version }}
-    <br>Engines → Baseline: <b>{{ engines.baseline }}</b> • Candidate: <b>{{ engines.candidate }}</b>
-  </div>
+  <div class="page">
+    <h1>{{ run_title }}</h1>
+    <div class="meta">
+      Run: <b>{{ run_id }}</b> • Samples: <b>{{ total_samples }}</b> • Dataset SHA: <b>{{ dataset_sha }}</b> • Generated: {{ generated_at }} • Policy: {{ policy_version }}
+      <br>Engines → Baseline: <b>{{ engines.baseline }}</b> • Candidate: <b>{{ engines.candidate }}</b>
+    </div>
 
-  <div style="margin:8px 0 14px;">
-    <label><input type="radio" name="policyView" value="strict" checked> <b>Strict</b> (borderline = unsafe)</label>
-    &nbsp;&nbsp;
-    <label><input type="radio" name="policyView" value="lenient"> <b>Lenient</b> (borderline = benign)</label>
-  </div>
+    <div class="toggle">
+      <label><input type="radio" name="policyView" value="strict" checked> <b>Strict</b> (borderline = unsafe)</label>
+      <label><input type="radio" name="policyView" value="lenient"> <b>Lenient</b> (borderline = benign)</label>
+    </div>
 
-  <!-- STRICT VIEW -->
-  <div id="view-strict">
-    <div class="row">
-      <div class="card">
-        <h2>KPIs — Baseline (Strict)</h2>
-        <div>Precision: <b>{{ modes['strict']['metrics']['Baseline'].precision }}</b></div>
-        <div>Recall: <b>{{ modes['strict']['metrics']['Baseline'].recall }}</b>
-          <span class="meta">({{ modes['strict']['metrics']['Baseline'].recall_lo }}–{{ modes['strict']['metrics']['Baseline'].recall_hi }})</span></div>
-        <div>FNR: <b>{{ modes['strict']['metrics']['Baseline'].fnr }}</b></div>
-        <div>FPR: <b>{{ modes['strict']['metrics']['Baseline'].fpr }}</b>
-          <span class="meta">({{ modes['strict']['metrics']['Baseline'].fpr_lo }}–{{ modes['strict']['metrics']['Baseline'].fpr_hi }})</span></div>
-        <div>Latency p50/p90/p99 (ms): {{ modes['strict']['metrics']['Baseline'].latency.p50 }}/{{ modes['strict']['metrics']['Baseline'].latency.p90 }}/{{ modes['strict']['metrics']['Baseline'].latency.p99 }}</div>
-      </div>
-      <div class="card">
-        <h2>KPIs — Candidate (Strict)</h2>
-        <div>Precision: <b>{{ modes['strict']['metrics']['Candidate'].precision }}</b></div>
-        <div>Recall: <b>{{ modes['strict']['metrics']['Candidate'].recall }}</b>
-          <span class="meta">({{ modes['strict']['metrics']['Candidate'].recall_lo }}–{{ modes['strict']['metrics']['Candidate'].recall_hi }})</span></div>
-        <div>FNR: <b>{{ modes['strict']['metrics']['Candidate'].fnr }}</b></div>
-        <div>FPR: <b>{{ modes['strict']['metrics']['Candidate'].fpr }}</b>
-          <span class="meta">({{ modes['strict']['metrics']['Candidate'].fpr_lo }}–{{ modes['strict']['metrics']['Candidate'].fpr_hi }})</span></div>
-        <div>Latency p50/p90/p99 (ms): {{ modes['strict']['metrics']['Candidate'].latency.p50 }}/{{ modes['strict']['metrics']['Candidate'].latency.p90 }}/{{ modes['strict']['metrics']['Candidate'].latency.p99 }}</div>
-      </div>
-      <div class="card">
-        <h2>Confusion — Strict</h2>
-        <table>
+    <!-- STRICT VIEW -->
+    <div id="view-strict" class="section">
+      <div class="row">
+        <div class="card">
+          <h2>KPIs — Baseline (Strict)</h2>
+          <div>Precision: <b>{{ modes['strict']['metrics']['Baseline'].precision }}</b></div>
+          <div>Recall: <b>{{ modes['strict']['metrics']['Baseline'].recall }}</b>
+            <span class="meta">({{ modes['strict']['metrics']['Baseline'].recall_lo }}–{{ modes['strict']['metrics']['Baseline'].recall_hi }})</span></div>
+          <div>FNR: <b>{{ modes['strict']['metrics']['Baseline'].fnr }}</b></div>
+          <div>FPR: <b>{{ modes['strict']['metrics']['Baseline'].fpr }}</b>
+            <span class="meta">({{ modes['strict']['metrics']['Baseline'].fpr_lo }}–{{ modes['strict']['metrics']['Baseline'].fpr_hi }})</span></div>
+          <div>Latency p50/p90/p99 (ms): {{ modes['strict']['metrics']['Baseline'].latency.p50 }}/{{ modes['strict']['metrics']['Baseline'].latency.p90 }}/{{ modes['strict']['metrics']['Baseline'].latency.p99 }}</div>
+        </div>
+        <div class="card">
+          <h2>KPIs — Candidate (Strict)</h2>
+          <div>Precision: <b>{{ modes['strict']['metrics']['Candidate'].precision }}</b></div>
+          <div>Recall: <b>{{ modes['strict']['metrics']['Candidate'].recall }}</b>
+            <span class="meta">({{ modes['strict']['metrics']['Candidate'].recall_lo }}–{{ modes['strict']['metrics']['Candidate'].recall_hi }})</span></div>
+          <div>FNR: <b>{{ modes['strict']['metrics']['Candidate'].fnr }}</b></div>
+          <div>FPR: <b>{{ modes['strict']['metrics']['Candidate'].fpr }}</b>
+            <span class="meta">({{ modes['strict']['metrics']['Candidate'].fpr_lo }}–{{ modes['strict']['metrics']['Candidate'].fpr_hi }})</span></div>
+          <div>Latency p50/p90/p99 (ms): {{ modes['strict']['metrics']['Candidate'].latency.p50 }}/{{ modes['strict']['metrics']['Candidate'].latency.p90 }}/{{ modes['strict']['metrics']['Candidate'].latency.p99 }}</div>
+        </div>
+        <div class="card">
+          <h2>Confusion — Strict</h2>
+          <table>
           <tr><th></th><th>TP</th><th>FP</th><th>TN</th><th>FN</th></tr>
           <tr><td>Baseline</td>
               <td>{{ modes['strict']['matrices']['Baseline'].tp }}</td>
@@ -73,7 +120,7 @@
       </div>
     </div>
 
-    <div class="card" style="margin-top:12px;">
+    <div class="card section">
       <h2>Slice Breakdown — Strict (Category × Language)</h2>
       <div class="row">
         <div class="card">
@@ -111,7 +158,7 @@
   </div>
 
   <!-- LENIENT VIEW -->
-  <div id="view-lenient" class="hidden">
+  <div id="view-lenient" class="section hidden">
     <div class="row">
       <div class="card">
         <h2>KPIs — Baseline (Lenient)</h2>
@@ -151,7 +198,7 @@
       </div>
     </div>
 
-    <div class="card" style="margin-top:12px;">
+    <div class="card section">
       <h2>Slice Breakdown — Lenient (Category × Language)</h2>
       <div class="row">
         <div class="card">
@@ -188,27 +235,27 @@
     </div>
   </div>
 
-  <div class="row" style="margin-top:16px">
-        <div class="card">
+  <div class="row section">
+    <div class="card">
       <h2>Latency Histograms</h2>
-      <div>Baseline: <img alt="Baseline latency" src="{{ latency_imgs.baseline }}" style="max-width:100%"></div>
-      <div>Candidate: <img alt="Candidate latency" src="{{ latency_imgs.candidate }}" style="max-width:100%"></div>
+      <div>Baseline: <img alt="Baseline latency" src="{{ latency_imgs.baseline }}"></div>
+      <div>Candidate: <img alt="Candidate latency" src="{{ latency_imgs.candidate }}"></div>
     </div>
-<div class="card">
+    <div class="card">
       <h2>Failures (strict view)</h2>
       <div class="meta">Downloads: <a class="badge" href="{{ downloads.fn_csv }}">candidate_fn.csv</a> <a class="badge" href="{{ downloads.fp_csv }}">candidate_fp.csv</a></div>
       <table>
         <tr><th>Type</th><th>Model</th><th>Category</th><th>Lang</th><th>Text</th></tr>
         {% for f in failures %}
-        <tr><td>{{ f.fail_type }}</td><td>{{ f.model }}</td><td>{{ f.category }}</td><td>{{ f.language }}</td><td>{{ f.text }}</td></tr>
+        <tr><td>{{ f.fail_type }}</td><td>{{ f.model }}</td><td>{{ f.category }}</td><td>{{ f.language }}</td><td><span class="text-snippet" data-full-text="{{ f.text|e }}">{{ f.text|e }}</span></td></tr>
         {% endfor %}
       </table>
     </div>
   </div>
 
-  <div class="row" style="margin-top:16px">
+  <div class="row section">
     {% if failure_patterns %}
-    <div class="card" style="flex:2 1 520px;">
+    <div class="card card--wide">
       <h2>Why we failed (Candidate FNs)</h2>
       <div class="meta">Top missed patterns per category/language slice (strict view).</div>
       {% for slice in failure_patterns %}
@@ -222,7 +269,7 @@
             <td>{{ pattern.count }}</td>
             <td>
               {% for example in pattern.examples %}
-                <div>{% if example.id %}<span class="meta">#{{ example.id }}</span> {% endif %}{{ example.text }}</div>
+                <div>{% if example.id %}<span class="meta">#{{ example.id }}</span> {% endif %}<span class="text-snippet" data-full-text="{{ example.text|e }}">{{ example.text|e }}</span></div>
               {% endfor %}
             </td>
           </tr>
@@ -232,7 +279,7 @@
     </div>
     {% endif %}
 
-    <div class="card" style="flex:1 1 320px;">
+    <div class="card card--compact">
       <h2>Failure clusters (Top 5)</h2>
       <div class="meta">Grouped by failure type, slice, and attack/transform signature.</div>
       {% for model, cluster_list in clusters.items() %}
@@ -251,7 +298,7 @@
           <tr>
             <td colspan="5">
               {% for example in cluster.examples %}
-                <div>{% if example.id %}<span class="meta">#{{ example.id }}</span> {% endif %}{{ example.text }}</div>
+                <div>{% if example.id %}<span class="meta">#{{ example.id }}</span> {% endif %}<span class="text-snippet" data-full-text="{{ example.text|e }}">{{ example.text|e }}</span></div>
               {% endfor %}
             </td>
           </tr>
@@ -264,8 +311,33 @@
     </div>
   </div>
 
+  {% if obfuscation_summary %}
+  <div class="card section">
+    <h2>Obfuscation Lab</h2>
+    <div class="meta">Static stress results against text obfuscation. Data: <a class="badge" href="{{ obfuscation_json }}">obfuscation.json</a></div>
+    {% if obfuscation_chart %}
+    <div><img alt="Obfuscation detection heatmap" src="{{ obfuscation_chart }}"></div>
+    {% endif %}
+    <table>
+      <tr><th>Slice</th><th>Avg hardness</th><th>Challenging operators</th><th>Samples</th></tr>
+      {% for entry in obfuscation_summary %}
+      <tr>
+        <td>{{ entry.slice }}</td>
+        <td>{{ entry.hardness }}</td>
+        <td>
+          {% for op in entry.weakest %}
+            <div>{{ op.operator }} <span class="meta">({{ op.recall }})</span></div>
+          {% endfor %}
+        </td>
+        <td>{{ entry.total }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% endif %}
+
   {% if redteam_summary %}
-  <div class="card" style="margin-top:16px;">
+  <div class="card section">
     <h2>Red-Team Findings</h2>
     <div class="meta">Recent swarm discoveries grouped by slice and agent.</div>
     <table>
@@ -278,7 +350,7 @@
         <td>{% if item.operations %}{{ ", ".join(item.operations) }}{% else %}<span class="meta">—</span>{% endif %}</td>
         <td>
           {% for example in item.examples %}
-            <div>{{ example }}</div>
+            <div><span class="text-snippet" data-full-text="{{ example|e }}">{{ example|e }}</span></div>
           {% endfor %}
         </td>
       </tr>
@@ -288,11 +360,11 @@
   {% endif %}
 
   {% if runtime_summary %}
-  <div class="card" style="margin-top:16px;">
+  <div class="card section">
     <h2>Runtime Telemetry (Shadow Mode)</h2>
     <div class="meta">Aggregated margins vs offline recall. Shadow mode only – no live blocking.</div>
     {% if runtime_chart %}
-    <div><img alt="Runtime drift" src="{{ runtime_chart }}" style="max-width:100%"></div>
+    <div><img alt="Runtime drift" src="{{ runtime_chart }}"></div>
     {% endif %}
     <table>
       <tr><th>Slice</th><th>Samples</th><th>Avg(score - threshold)</th><th>Offline Recall</th></tr>
@@ -309,9 +381,12 @@
   {% endif %}
 
   {% if parity_summary %}
-  <div class="card" style="margin-top:16px;">
+  <div class="card section">
     <h2>Language Parity — {{ parity_summary.category }}</h2>
-    <div class="meta">Target recall delta ≤ {{ parity_summary.target_delta }} (actual {{ parity_summary.max_delta }}).</div>
+    <div class="meta">Target recall delta ≤ {{ parity_summary.target_delta }} (actual {{ parity_summary.max_delta }}). Data: <a class="badge" href="{{ parity_json }}">parity.json</a></div>
+    {% if parity_chart %}
+    <div><img alt="Language parity chart" src="{{ parity_chart }}"></div>
+    {% endif %}
     <table>
       <tr><th>Language</th><th>Total</th><th>Flagged</th><th>Recall</th></tr>
       {% for row in parity_summary.rows %}
@@ -328,7 +403,7 @@
   {% endif %}
 
   {% if incident_summary %}
-  <div class="card" style="margin-top:16px;">
+  <div class="card section">
     <h2>Incident Response Drills</h2>
     <div class="meta">Simulated chaos scenarios with detection/mitigation timings.</div>
     <table>
@@ -347,6 +422,10 @@
   </div>
   {% endif %}
 
+  <div class="footer">Designed by Sam Vardani – SeaTechOne.com</div>
+
+  </div>
+
   <script>
   (function(){
     const strict = document.getElementById('view-strict');
@@ -356,6 +435,76 @@
         if(e.target.value==='strict'){ strict.classList.remove('hidden'); lenient.classList.add('hidden'); }
         else { lenient.classList.remove('hidden'); strict.classList.add('hidden'); }
       });
+    });
+
+    const TRUNCATE_LIMIT = 120;
+    const ELLIPSIS = '…';
+    document.querySelectorAll('.text-snippet').forEach(span=>{
+      const full = span.dataset.fullText || span.textContent || '';
+      const limitAttr = parseInt(span.dataset.truncateLimit || '', 10);
+      const limit = Number.isNaN(limitAttr) ? TRUNCATE_LIMIT : limitAttr;
+      if(full.length <= limit){
+        span.textContent = full;
+        return;
+      }
+      const truncated = full.slice(0, limit).trimEnd();
+      const applyCollapsed = () => {
+        span.textContent = truncated + ELLIPSIS;
+        span.classList.remove('expanded');
+      };
+      span.textContent = full;
+      applyCollapsed();
+      const toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'snippet-toggle';
+      toggle.textContent = 'Expand';
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.addEventListener('click', () => {
+        const expanded = span.classList.contains('expanded');
+        if(expanded){
+          applyCollapsed();
+          toggle.textContent = 'Expand';
+          toggle.setAttribute('aria-expanded', 'false');
+        } else {
+          span.textContent = full;
+          span.classList.add('expanded');
+          toggle.textContent = 'Collapse';
+          toggle.setAttribute('aria-expanded', 'true');
+        }
+      });
+      span.after(toggle);
+    });
+
+    const ROW_LIMIT = 10;
+    document.querySelectorAll('table').forEach(table=>{
+      const rows = Array.from(table.querySelectorAll('tr'));
+      if(rows.length <= 1){
+        return;
+      }
+      const dataRows = rows.slice(1);
+      if(dataRows.length <= ROW_LIMIT){
+        return;
+      }
+      const hiddenRows = dataRows.slice(ROW_LIMIT);
+      hiddenRows.forEach(row=>row.classList.add('collapsed-row'));
+      const toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'table-toggle';
+      toggle.textContent = `Show ${hiddenRows.length} more`;
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.addEventListener('click', () => {
+        const expanded = toggle.getAttribute('aria-expanded') === 'true';
+        if(expanded){
+          hiddenRows.forEach(row=>row.classList.add('collapsed-row'));
+          toggle.textContent = `Show ${hiddenRows.length} more`;
+          toggle.setAttribute('aria-expanded', 'false');
+        } else {
+          hiddenRows.forEach(row=>row.classList.remove('collapsed-row'));
+          toggle.textContent = 'Show less';
+          toggle.setAttribute('aria-expanded', 'true');
+        }
+      });
+      table.insertAdjacentElement('afterend', toggle);
     });
   })();
   </script>
