@@ -60,3 +60,6 @@ thresholds:
   pii: 5.0
   self_harm: 5.0
   violence: 5.0
+tenants:
+  default:
+    autopatch_canary: true

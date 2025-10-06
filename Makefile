@@ -27,6 +27,10 @@ serve-report:
 	python -m http.server --directory report 8000
 	@echo "Open http://localhost:8000/index.html"
 
+report-serve:
+	python3 -m http.server 3001 --directory report
+	@echo "Open http://localhost:3001/index.html"
+
 
 autotune:
 	python -m src.report.auto_tune --target_fpr 0.01 --update_config

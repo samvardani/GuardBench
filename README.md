@@ -6,11 +6,13 @@ One-screen harness to compare a Baseline vs. Candidate safety guard.
 - HTML report (KPIs, confusion, latency, failures)
 - Threshold sweep (precision/recall trade-off)
 - SQLite history
+- Multi-tenant FastAPI service with RBAC, real-time telemetry, integrations, and audit logs
 
 ## Quick Start
 ```bash
 python -m venv .venv && source .venv/bin/activate
-pip install --upgrade pip && pip install pandas numpy scikit-learn jinja2 matplotlib pyyaml
+pip install --upgrade pip
+pip install -r requirements.txt
 make demo   # compare + report + sweep
 ```
 
@@ -27,8 +29,8 @@ make demo   # compare + report + sweep
 - [Incident Runbooks](docs/RUNBOOKS.md): chaos drill guidance and mitigation steps.
 - [Evidence Packs](docs/EVIDENCE.md): bundle reports, policy, and telemetry for regulators.
 - [Service API](docs/SERVICE.md): local FastAPI endpoints for scoring and batch scorecards.
-- [Interactive Dashboard](dashboard/index.html): SPA visualising telemetry, parity, obfuscation, incidents, and red-team clusters.
-- [Dataset Upload UI](dashboard/upload.html): upload prompt CSVs, choose guards, run evaluations, and download scorecards.
+- [Interactive Dashboard](dashboard/index.html): sign in to monitor runs in real time, manage integrations, review alerts, and stream guard telemetry.
+- [Dataset Upload UI](dashboard/upload.html): reuse your dashboard token to upload prompt CSVs, trigger evaluations, and download scorecards.
 
 ## Documentation Portal
 
