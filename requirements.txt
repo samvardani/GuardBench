@@ -12,3 +12,6 @@ opentelemetry-sdk
 opentelemetry-exporter-otlp
 redis
 httpx
+
+jinja2
+MarkupSafe
