@@ -13,6 +13,7 @@
         <p class="mt-2 text-sm text-slate-400">
           Upload a CSV with prompts (columns: <code>text</code>, optional <code>category</code>, <code>language</code>, <code>label</code>). Select guard options and run an offline scorecard.
         </p>
+        <p id="auth-notice" class="mt-4 text-sm text-amber-300 hidden"></p>
       </header>
 
       <form id="upload-form" class="space-y-6 rounded-lg border border-slate-800 bg-slate-900/70 p-6">
@@ -85,20 +86,59 @@
     </main>
 
     <script>
+      const STORAGE_KEY = 'safety-service-auth';
+
+      function loadAuth() {
+        try {
+          const raw = window.localStorage.getItem(STORAGE_KEY);
+          return raw ? JSON.parse(raw) : null;
+        } catch (err) {
+          console.warn('Failed to parse auth token', err);
+          return null;
+        }
+      }
+
+      const authNotice = document.getElementById('auth-notice');
+      const formEl = document.getElementById('upload-form');
+      const resultsSection = document.getElementById('results');
+      const resultsContent = document.getElementById('results-content');
+
+      let auth = loadAuth();
+
+      function requireAuth() {
+        auth = loadAuth();
+        if (!auth?.accessToken) {
+          throw new Error('Missing access token. Sign in via the dashboard first.');
+        }
+        return auth;
+      }
+
+      function setAuthState(enabled) {
+        if (!enabled) {
+          authNotice.classList.remove('hidden');
+          formEl.classList.add('pointer-events-none', 'opacity-50');
+        } else {
+          authNotice.classList.add('hidden');
+          formEl.classList.remove('pointer-events-none', 'opacity-50');
+        }
+      }
+
       async function fetchGuards() {
         try {
-          const response = await fetch('/guards');
+          const authData = requireAuth();
+          const response = await fetch('/guards', {
+            headers: { Authorization: `Bearer ${authData.accessToken}` },
+          });
           if (!response.ok) throw new Error('Failed to load guards');
-          const data = await response.json();
-          const entries = Object.entries(data);
+          const guards = await response.json();
           const baselineSelect = document.getElementById('baseline-guard');
           const candidateSelect = document.getElementById('candidate-guard');
           baselineSelect.innerHTML = '';
           candidateSelect.innerHTML = '';
-          entries.forEach(([key, label]) => {
+          (guards || []).forEach((guard) => {
             const optionA = document.createElement('option');
-            optionA.value = key;
-            optionA.textContent = `${label} (${key})`;
+            optionA.value = guard.id;
+            optionA.textContent = `${guard.name} (${guard.id})`;
             baselineSelect.appendChild(optionA);
             const optionB = optionA.cloneNode(true);
             candidateSelect.appendChild(optionB);
@@ -107,22 +147,24 @@
           candidateSelect.value = 'candidate';
         } catch (err) {
           console.error(err);
+          authNotice.textContent = err.message;
+          setAuthState(false);
         }
       }
 
       async function submitForm(event) {
         event.preventDefault();
-        const form = event.target;
-        const formData = new FormData(form);
-        const resultsSection = document.getElementById('results');
-        const resultsContent = document.getElementById('results-content');
-        resultsContent.innerHTML = '<p class="text-slate-400">Running evaluation…</p>';
-        resultsSection.classList.remove('hidden');
-
         try {
+          const authData = requireAuth();
+          const form = event.target;
+          const formData = new FormData(form);
+          resultsContent.innerHTML = '<p class="text-slate-400">Running evaluation…</p>';
+          resultsSection.classList.remove('hidden');
+
           const response = await fetch('/upload-evaluate', {
             method: 'POST',
             body: formData,
+            headers: { Authorization: `Bearer ${authData.accessToken}` },
           });
           if (!response.ok) {
             const text = await response.text();
@@ -160,11 +202,22 @@
           `;
         } catch (err) {
           resultsContent.innerHTML = `<p class="text-sm text-rose-300">${err.message}</p>`;
+          if (err.message.includes('Missing access token')) {
+            authNotice.textContent = err.message;
+            setAuthState(false);
+          }
         }
       }
 
-      document.getElementById('upload-form').addEventListener('submit', submitForm);
-      fetchGuards();
+      formEl.addEventListener('submit', submitForm);
+
+      if (!auth?.accessToken) {
+        authNotice.textContent = 'Sign in via the dashboard to obtain an access token before uploading.';
+        setAuthState(false);
+      } else {
+        setAuthState(true);
+        fetchGuards();
+      }
     </script>
   </body>
 </html>

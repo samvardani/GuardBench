@@ -3,15 +3,58 @@
 from __future__ import annotations
 
 import argparse
+import datetime as _dt
+import hashlib
 import json
 import sys
 from pathlib import Path
+from typing import Dict
+
+import yaml
 
 from src.autopatch import ab_eval, candidates, pr_bot
+from src.utils.io_utils import load_config
+
+CANARY_PATH = Path("tuned_thresholds_canary.yaml")
 
 
 def _parse_targets(raw: str) -> list[str]:
     return [part.strip() for part in raw.split(",") if part.strip()]
+
+
+def _now_iso() -> str:
+    return _dt.datetime.now(_dt.timezone.utc).isoformat()
+
+
+def _autopatch_enabled_for(tenant: str) -> bool:
+    cfg = load_config() or {}
+    tenants = cfg.get("tenants") or {}
+    if tenant in tenants:
+        return bool(tenants[tenant].get("autopatch_canary", False))
+    default = tenants.get("default", {})
+    return bool(default.get("autopatch_canary", False))
+
+
+def _write_canary_file(
+    tenant: str,
+    candidate_id: str,
+    threshold_updates: Dict[str, float],
+    result: Dict[str, object],
+    evaluation_path: Path,
+) -> Path:
+    payload = {
+        "tenant": tenant,
+        "candidate_id": candidate_id,
+        "generated_at": _now_iso(),
+        "threshold_updates": threshold_updates,
+        "evaluation_path": str(evaluation_path),
+        "delta": result.get("delta"),
+        "per_slice": result.get("per_slice"),
+    }
+    signature_src = json.dumps(threshold_updates, sort_keys=True).encode("utf-8")
+    payload["signature"] = hashlib.sha256(signature_src).hexdigest()
+    CANARY_PATH.write_text(yaml.safe_dump(payload, sort_keys=False), encoding="utf-8")
+    return CANARY_PATH
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -19,7 +62,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--target", required=True, help="Comma separated slice keys, e.g. self_harm/en,malware/en")
     parser.add_argument("--max-patches", type=int, default=3)
     parser.add_argument("--cases", type=str, default=str(candidates.DEFAULT_CASES_PATH))
+    parser.add_argument("--tenant", type=str, default="default", help="Tenant slug to stage the canary for")
     args = parser.parse_args(argv)
+
+    if not _autopatch_enabled_for(args.tenant):
+        print(f"autopatch_canary disabled for tenant '{args.tenant}'.", file=sys.stderr)
+        return 3
 
     target_slices = _parse_targets(args.target)
     if not target_slices:
@@ -68,6 +116,14 @@ def main(argv: list[str] | None = None) -> int:
     if not best_candidate or not best_result:
         print("No candidate met acceptance criteria (ΔFPR <= 0.005 and recall improvement).", file=sys.stderr)
         return 2
+
+    _write_canary_file(
+        tenant=args.tenant,
+        candidate_id=best_candidate.id,
+        threshold_updates=best_candidate.data,
+        result=best_result,
+        evaluation_path=report_result,
+    )
 
     pr_path = pr_bot.generate_pr_bundle(
         threshold_updates=best_candidate.data,

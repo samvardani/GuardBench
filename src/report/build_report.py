@@ -1,7 +1,15 @@
-import os, csv, json, pathlib, datetime
+import argparse
+import hashlib
+import os
+import csv
+import json
+import pathlib
+import tempfile
+import datetime
+import sys
 from pathlib import Path
 from collections import defaultdict
-from typing import List
+from typing import Iterable, List, Optional
 from jinja2 import Environment, FileSystemLoader
 
 from src.guards.baseline import predict as predict_baseline
@@ -12,6 +20,7 @@ from src.utils.run_log import append_run_record
 from src.utils.notify import NotificationManager
 from src.policy.compiler import load_compiled_policy, POLICY_PATH
 from src.evaluation import evaluate
+from src.connectors import s3 as s3_connector, gcs as gcs_connector, azure as azure_connector, kafka as kafka_connector
 
 REQUIRED_KEYS = ("text",)
 
@@ -51,6 +60,48 @@ OUT_DIR = ROOT / "report"
 ASSETS = ROOT / "assets"
 REPORT_ASSETS = OUT_DIR / "assets"
 OUT_DIR.mkdir(exist_ok=True); ASSETS.mkdir(exist_ok=True); REPORT_ASSETS.mkdir(exist_ok=True)
+
+
+def _write_local_jsonl(path: Path, records: Iterable[dict], encoding: str = "utf-8") -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding=encoding) as handle:
+        for record in records:
+            handle.write(json.dumps(record, separators=(",", ":")))
+            handle.write("\n")
+
+
+def _read_local_jsonl(path: Path, encoding: str = "utf-8") -> List[dict]:
+    with path.open("r", encoding=encoding) as handle:
+        return [json.loads(line) for line in handle if line.strip()]
+
+
+def _read_remote_jsonl(uri: str) -> List[dict]:
+    if uri.startswith("s3://"):
+        return s3_connector.read_jsonl(uri)
+    if uri.startswith("gs://") or uri.startswith("gcs://"):
+        return gcs_connector.read_jsonl(uri)
+    if uri.startswith("azure://") or uri.startswith("az://") or uri.startswith("wasbs://"):
+        return azure_connector.read_jsonl(uri)
+    if uri.startswith("file://"):
+        return _read_local_jsonl(Path(uri[len("file://") :]))
+    raise ValueError(f"Unsupported input URI: {uri}")
+
+
+def _write_remote_jsonl(uri: str, records: Iterable[dict]) -> None:
+    if uri.startswith("s3://"):
+        s3_connector.write_jsonl(uri, records)
+        return
+    if uri.startswith("gs://") or uri.startswith("gcs://"):
+        gcs_connector.write_jsonl(uri, records)
+        return
+    if uri.startswith("azure://") or uri.startswith("az://") or uri.startswith("wasbs://"):
+        azure_connector.write_jsonl(uri, records)
+        return
+    if uri.startswith("file://"):
+        _write_local_jsonl(Path(uri[len("file://") :]), records)
+        return
+    raise ValueError(f"Unsupported output URI: {uri}")
+
 def load_rows(dataset_path: Path):
     import yaml, pathlib, sys
 
@@ -79,6 +130,27 @@ def load_rows(dataset_path: Path):
     if dropped:
         print(f"[load_rows] skipped {dropped} malformed row(s) lacking text-like content.", file=sys.stderr)
 
+    return rows
+
+
+def _normalize_records(records: Iterable[dict]) -> List[dict]:
+    rows: List[dict] = []
+    dropped = 0
+    for raw in records:
+        if not isinstance(raw, dict):
+            continue
+        if _is_valid_row(raw):
+            normalized = dict(raw)
+            normalized["text"] = _row_text(raw)
+            normalized["category"] = normalized.get("category") or _row_field(raw, "category")
+            normalized["language"] = normalized.get("language") or _row_field(raw, "language")
+            normalized["label"] = normalized.get("label", _row_field(raw, "label") or 0)
+            normalized["id"] = normalized.get("id") or _row_field(raw, "id")
+            rows.append(normalized)
+        else:
+            dropped += 1
+    if dropped:
+        print(f"[load_rows] skipped {dropped} malformed remote row(s) lacking text-like content.", file=sys.stderr)
     return rows
 
 def is_pos_label(lbl: str, mode: str) -> bool:
@@ -364,15 +436,45 @@ def load_incident_reports(directory: Path) -> List[dict]:
     return incidents
 
 
-def main():
+def _build_arg_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description="Build evaluation report")
+    parser.add_argument("--input-uri", help="Optional JSONL dataset from cloud storage")
+    parser.add_argument("--output-uri", help="Write summary JSONL to cloud storage")
+    parser.add_argument("--kafka-topic", help="Publish summary payload to Kafka topic")
+    parser.add_argument("--kafka-brokers", help="Kafka bootstrap servers")
+    parser.add_argument("--kafka-rest-endpoint", help="Optional REST proxy endpoint for Kafka fallback")
+    parser.add_argument("--kafka-retries", type=int, default=3)
+    parser.add_argument("--kafka-backoff", type=float, default=0.5)
+    return parser
+
+
+def main(argv: Optional[Iterable[str]] = None):
+    parser = _build_arg_parser()
+    args = parser.parse_args(list(argv) if argv is not None else None)
+
     cfg = load_config()
     notifier = NotificationManager(cfg.get("notifications"))
-    dataset_path = resolve_dataset_path(cfg)
-    rows = load_rows(dataset_path)
+
+    dataset_display: str
+    ds_sha: str
+    dataset_rows: List[dict]
+
+    if args.input_uri:
+        remote_records = _read_remote_jsonl(args.input_uri)
+        dataset_rows = _normalize_records(remote_records)
+        dataset_display = args.input_uri
+        serialized = json.dumps(dataset_rows, sort_keys=True).encode("utf-8")
+        ds_sha = hashlib.sha256(serialized).hexdigest()
+    else:
+        dataset_path = resolve_dataset_path(cfg)
+        dataset_rows = load_rows(dataset_path)
+        dataset_display = str(dataset_path)
+        ds_sha = sha256_file(dataset_path)
+
+    rows = dataset_rows
 
     run_id = new_run_id()
     created_at = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-    ds_sha = sha256_file(dataset_path)
 
     engine = {
         "guards": {
@@ -533,22 +635,45 @@ def main():
         elif value is not None:
             model_versions[key] = str(value)
 
-    append_run_record(
-        {
-            "run_id": run_id,
-            "run_type": "report",
-            "created_at": created_at,
-            "dataset_path": str(dataset_path),
-            "dataset_sha": ds_sha,
-            "report_path": str(out_file),
-            "model_versions": model_versions,
-            "policy_path": str(policy_path),
-            "compiled_policy_hash": policy_sha,
-            "policy_version": cfg.get("policy_version"),
-            "compiled_policy_version": compiled_version,
-            "git_commit": git_commit(),
-        }
-    )
+    run_record = {
+        "run_id": run_id,
+        "run_type": "report",
+        "created_at": created_at,
+        "dataset_path": str(dataset_path),
+        "dataset_sha": ds_sha,
+        "report_path": str(out_file),
+        "model_versions": model_versions,
+        "policy_path": str(policy_path),
+        "compiled_policy_hash": policy_sha,
+        "policy_version": cfg.get("policy_version"),
+        "compiled_policy_version": compiled_version,
+        "git_commit": git_commit(),
+    }
+
+    # Persist to local lineage log
+    append_run_record(run_record)
+
+    # Optional: emit a single-line JSONL summary to remote storage when --output-uri is set
+    if args.output_uri:
+        try:
+            _write_remote_jsonl(args.output_uri, [run_record])
+            print(f"Wrote summary to {args.output_uri}")
+        except Exception as e:
+            print(f"[warn] Failed to write summary to {args.output_uri}: {e}", file=sys.stderr)
+
+    # Optional: publish summary to Kafka when flags are provided
+    if args.kafka_topic:
+        try:
+            producer = kafka_connector.Producer(
+                brokers=args.kafka_brokers,
+                retries=int(args.kafka_retries or 3),
+                backoff_seconds=float(args.kafka_backoff or 0.5),
+                rest_endpoint=args.kafka_rest_endpoint,
+            )
+            producer.send_json(args.kafka_topic, run_record)
+            print(f"Published summary to Kafka topic {args.kafka_topic}")
+        except Exception as e:
+            print(f"[warn] Failed to publish to Kafka topic {args.kafka_topic}: {e}", file=sys.stderr)
 
     candidate_fnr = views["strict"]["metrics"]["Candidate"].get("fnr", 0.0)
     fnr_threshold = notifier.threshold("fnr", 0.3)
