@@ -1,3 +1,7 @@
 pytest
 pytest-cov
 httpx
+pytest-asyncio>=0.23
+ruff
+mypy
+black
