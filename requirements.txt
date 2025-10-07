@@ -1,4 +1,5 @@
 fastapi
+starlette
 uvicorn[standard]
 python-multipart
 email-validator
@@ -12,6 +13,16 @@ opentelemetry-sdk
 opentelemetry-exporter-otlp
 redis
 httpx
+anyio
+orjson
+pydantic-settings
+grpcio
+grpcio-tools
+protobuf
+grpcio-health-checking
+grpcio-reflection
+pytest-asyncio
+itsdangerous
 
 jinja2
 MarkupSafe
