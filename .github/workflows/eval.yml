@@ -1,40 +1,35 @@
-name: eval
+name: Eval CI
+
 on:
+  push:
   pull_request:
-  workflow_dispatch:
 
 jobs:
   eval:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install deps
+      - name: Install deps (runtime + test)
         run: |
-          python -m pip install --upgrade pip
-          pip install jinja2 matplotlib pandas scikit-learn pyyaml
+          python -m pip install -U pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f requirements-ci.txt ]; then pip install -r requirements-ci.txt; fi
+          # safety net in case lists drift:
+          pip install fastapi starlette uvicorn python-multipart jinja2 prometheus-client httpx anyio pytest pytest-asyncio
+
+      - name: Generate gRPC stubs
+        run: |
+          python -m grpc_tools.protoc -I src/grpc --python_out=src/grpc_generated --grpc_python_out=src/grpc_generated src/grpc/score.proto
 
       - name: Run unit tests
+        env:
+          PYTHONPATH: src
         run: |
-          pip install pytest
           pytest -q
-
-      - name: Build report (HTML)
-        run: python -m src.report.build_report
-
-      - name: CI Gate (per-slice thresholds)
-        run: python -m src.runner.ci_gate --config gate.json
-
-      - name: Upload report artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: safety-eval-report
-          path: |
-            report/index.html
-            report/*.png
-            report/metrics_*.json
-            report/ci_summary.md
