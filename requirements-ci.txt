@@ -1,0 +1,10 @@
+fastapi
+starlette
+uvicorn
+python-multipart
+jinja2
+prometheus-client
+httpx
+anyio
+pytest
+pytest-asyncio
