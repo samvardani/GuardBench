@@ -3,23 +3,34 @@ version: "3.9"
 services:
   api:
     build: .
-    command: ["gunicorn", "service.api:app", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:8000", "--workers", "2"]
     environment:
       - PYTHONUNBUFFERED=1
+      - PYTHONPATH=/app/src
+      - WORKERS=4
     volumes:
       - ./report:/app/report
       - ./dist:/app/dist
     ports:
-      - "8000:8000"
+      - "8001:8001"  # container listens on 8001 (uvicorn)
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8001/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
-  worker:
+  grpc:
     build: .
-    command: ["python", "scripts/worker.py"]
+    command: ["python", "-m", "src.grpc.server"]
     environment:
       - PYTHONUNBUFFERED=1
+      - PYTHONPATH=/app/src
+      - GRPC_PORT=50051
     volumes:
       - ./report:/app/report
       - ./dist:/app/dist
+    ports:
+      - "50051:50051"
     depends_on:
       - api
 

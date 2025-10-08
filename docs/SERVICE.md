@@ -167,3 +167,14 @@ on startup.
 
 - Tailor alerts or guard risk scoring by adjusting `config.yaml` and the policy
   weights passed into `evaluate`.
+
+## Local Run (tuning)
+
+```bash
+export PYTHONPATH=src
+export RATE_LIMIT_ENABLED=false
+export PREDICT_MAX_WORKERS=32
+uvicorn service.api:app --host 127.0.0.1 --port 8010 --workers 4 --timeout-keep-alive 5 --log-level warning
+```
+
+See also: [Configuration & Tuning](./CONFIG.md) and `config.example.yaml` for runtime knobs.

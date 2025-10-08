@@ -1,3 +1,5 @@
+import matplotlib
+matplotlib.use("Agg")
 import argparse
 import hashlib
 import os
@@ -217,10 +219,14 @@ def load_runtime_telemetry(path: Path, assets_root: Path, offline_slices: dict):
         return [], None
 
     by_slice = defaultdict(list)
+    modality_counts = defaultdict(int)
     for entry in telemetry:
         slice_key = f"{entry.get('category_guess')}/{entry.get('language_guess')}"
         diff = float(entry.get("score", 0.0)) - float(entry.get("threshold", 0.0))
         by_slice[slice_key].append(diff)
+        m = entry.get("modality")
+        if isinstance(m, str) and m:
+            modality_counts[m] += 1
 
     summary = []
     for slice_key, diffs in by_slice.items():
@@ -261,7 +267,7 @@ def load_runtime_telemetry(path: Path, assets_root: Path, offline_slices: dict):
     except Exception:
         relative_chart = None
 
-    return summary, relative_chart
+    return summary, relative_chart, dict(modality_counts)
 
 
 def load_obfuscation_summary(path: Path, assets_root: Path):
@@ -364,6 +370,15 @@ def load_parity_summary(path: Path):
         "variance": data.get("variance", 0.0),
         "target_delta": data.get("target_delta", 0.05),
     }
+
+
+def load_parity_actions(path: Path):
+    if not path.exists():
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return None
 
 
 def render_parity_chart(summary: dict, assets_root: Path):
@@ -569,10 +584,11 @@ def main(argv: Optional[Iterable[str]] = None):
     )
     redteam_summary = load_redteam_summary(OUT_DIR / "redteam_cases.jsonl")
     runtime_offline = {f"{s['category']}/{s['language']}": s for s in views["strict"]["slices"]["Candidate"]}
-    runtime_summary, runtime_chart = load_runtime_telemetry(Path("runtime_telemetry.jsonl"), REPORT_ASSETS, runtime_offline)
+    runtime_summary, runtime_chart, runtime_modalities = load_runtime_telemetry(Path("runtime_telemetry.jsonl"), REPORT_ASSETS, runtime_offline)
     obfuscation_summary, obfuscation_chart = load_obfuscation_summary(OUT_DIR / "obfuscation.json", REPORT_ASSETS)
     parity_summary = load_parity_summary(OUT_DIR / "parity.json")
     parity_chart = render_parity_chart(parity_summary, REPORT_ASSETS)
+    parity_actions = load_parity_actions(OUT_DIR / "parity_actions.json")
     incident_summary = load_incident_reports(OUT_DIR)
     failures = (
         [{"id":r["id"],"fail_type":"FN","model":"Baseline", **r} for r in b_fn] +
@@ -605,6 +621,7 @@ def main(argv: Optional[Iterable[str]] = None):
         redteam_summary=redteam_summary,
         runtime_summary=runtime_summary,
         runtime_chart=runtime_chart,
+        runtime_modalities=runtime_modalities,
         parity_summary=parity_summary,
         parity_chart=parity_chart,
         parity_json="parity.json",

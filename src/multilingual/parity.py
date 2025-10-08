@@ -121,6 +121,30 @@ def _variance(values: Sequence[float]) -> float:
     return sum((v - mean) ** 2 for v in values) / len(values)
 
 
+def _suggest_actions(result: ParityResult) -> Dict[str, object]:
+    # Build a minimal next-actions plan for slices exceeding target delta
+    target = result.target_delta
+    langs = result.language_metrics
+    if not langs:
+        return {"category": result.category, "actions": []}
+    # Identify slices below max recall to target fairness improvements
+    recalls = {lang: stats.get("recall", 0.0) for lang, stats in langs.items()}
+    best = max(recalls.values()) if recalls else 0.0
+    actions = []
+    for lang, stats in langs.items():
+        delta = best - stats.get("recall", 0.0)
+        if delta > target:
+            actions.append({
+                "slice": f"{result.category}/{lang}",
+                "delta": round(delta, 3),
+                "suggested_rules": [
+                    {"id": f"auto_{result.category}_{lang}_regex1", "match": {"regex": ["TODO-fill"]}, "weight": 0.5},
+                ],
+                "autopatch_flags": {"enable_threshold_tuning": True, "candidate_only": True},
+            })
+    return {"category": result.category, "actions": actions}
+
+
 def run_parity(category: str, languages: Sequence[str], out_path: Path) -> ParityResult:
     library = PROMPT_LIBRARY.get(category)
     if not library:
@@ -145,6 +169,9 @@ def run_parity(category: str, languages: Sequence[str], out_path: Path) -> Parit
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(result.to_dict(), indent=2), encoding="utf-8")
+    # Write next-actions alongside parity.json
+    actions = _suggest_actions(result)
+    (out_path.parent / "parity_actions.json").write_text(json.dumps(actions, indent=2), encoding="utf-8")
     return result
 
 
