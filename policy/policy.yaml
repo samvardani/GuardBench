@@ -218,3 +218,25 @@ slices:
             - "حمله"
             - "خشونت"
             - "آسیب"
+  - id: image_any
+    category: image/*
+    language: any
+    threshold: 1.0
+    rules:
+      - id: noop_image
+        weight: 1.0
+        action: pass
+        match:
+          regex:
+            - "(?!)"
+  - id: audio_any
+    category: audio/*
+    language: any
+    threshold: 1.0
+    rules:
+      - id: noop_audio
+        weight: 1.0
+        action: pass
+        match:
+          regex:
+            - "(?!)"

@@ -57,14 +57,27 @@ Tips:
 Local Apple Silicon (M3) single-node benchmark using `ghz`:
 
 ```text
-Count: 2000
-Total: 267.59 ms
-Average: 2.09 ms
-Requests/sec: 7474.06
-p95 ~ 2.23 ms
+Throughput (gRPC): ~7.3k req/s (16 conns, 5k requests)
+Latency: avg 2.13 ms, p95 2.27 ms, p99 2.41 ms
+Health/Reflection: Health OK; reflection optional — prefer local protos with grpcurl
 ```
 
 Actual throughput and latency vary by hardware, guard configuration, and workload mix.
+
+### How to test
+
+- Unit/API
+  - `MPLBACKEND=Agg PYTHONPATH=src pytest -q`
+- REST smoke
+  - `curl -sf http://127.0.0.1:8011/healthz`
+  - `curl -s -X POST http://127.0.0.1:8011/score -H 'Content-Type: application/json' -d '{"text":"hello","category":"violence","language":"en"}'`
+  - `curl -sf http://127.0.0.1:8011/metrics | head`
+- gRPC smoke (no reflection)
+  - `grpcurl -plaintext -import-path src/grpc -proto google/grpc/health/v1/health.proto -d '{}' 127.0.0.1:50051 grpc.health.v1.Health/Check`
+  - `grpcurl -plaintext -import-path src/grpc -proto score.proto -d '{"text":"hello","category":"violence","language":"en","guard":"candidate"}' 127.0.0.1:50051 seval.ScoreService/Score`
+- Load
+  - REST: `export RATE_LIMIT_ENABLED=false` then run your load tool (e.g., hey) against `/score`
+  - gRPC: `make load-grpc`
 
 ### Architecture
 

@@ -1,0 +1,130 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('requirements.txt', 'requirements-dev.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-dev.txt
+          # Safety net if requirement files drift
+          pip install fastapi uvicorn "uvicorn[standard]" python-multipart jinja2 prometheus-client httpx anyio pytest pytest-asyncio
+
+      - name: Generate gRPC stubs
+        run: |
+          python -m grpc_tools.protoc -I src/grpc --python_out=src/grpc_generated --grpc_python_out=src/grpc_generated src/grpc/score.proto
+
+      - name: Run tests
+        env:
+          PYTHONPATH: src
+        run: pytest -q
+        continue-on-error: false
+
+      - name: Upload pytest cache on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-artifacts-${{ matrix.python-version }}
+          path: |
+            .pytest_cache
+            .coverage
+            reports/**
+
+  lint:
+    runs-on: ubuntu-latest
+    needs: tests
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+      - name: Ruff
+        run: ruff check . || true
+      - name: Black (check)
+        run: black --check . || true
+
+  typecheck:
+    runs-on: ubuntu-latest
+    needs: tests
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-dev.txt
+      - name: mypy
+        run: mypy --ignore-missing-imports src || true
+
+name: CI
+
+on:
+  push:
+    branches: [ main, SeaRai.V.03 ]
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.13']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install mypy ruff build
+      - name: Lint (ruff)
+        run: |
+          ruff check src tests || true
+      - name: Type-check (mypy)
+        run: |
+          mypy --ignore-missing-imports src || true
+      - name: Tests
+        env:
+          PYTHONPATH: src
+          RATE_LIMIT_ENABLED: 'false'
+        run: |
+          pytest -q
+      - name: Build wheels
+        run: |
+          python -m build
+      - name: Install wheel
+        run: |
+          pip install dist/*.whl

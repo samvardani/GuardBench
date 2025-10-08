@@ -363,6 +363,13 @@
   <div class="card section">
     <h2>Runtime Telemetry (Shadow Mode)</h2>
     <div class="meta">Aggregated margins vs offline recall. Shadow mode only – no live blocking.</div>
+    {% if runtime_modalities %}
+    <div class="meta">Multimodal signals coming online — samples by modality:
+      {% for key, value in runtime_modalities.items() %}
+        <span class="badge">{{ key }}: {{ value }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
     {% if runtime_chart %}
     <div><img alt="Runtime drift" src="{{ runtime_chart }}"></div>
     {% endif %}

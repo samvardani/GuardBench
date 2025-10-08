@@ -409,33 +409,41 @@ def record_run(
     ensure_schema()
     created = _now()
     with db_conn() as con:
-        con.execute(
-            """
-            INSERT INTO runs (run_id, created_at, dataset_path, dataset_sha, git_commit, policy_version, engine_baseline, engine_candidate, tenant_id, run_status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT(run_id) DO UPDATE SET
-              dataset_path = excluded.dataset_path,
-              dataset_sha = excluded.dataset_sha,
-              git_commit = excluded.git_commit,
-              policy_version = excluded.policy_version,
-              engine_baseline = excluded.engine_baseline,
-              engine_candidate = excluded.engine_candidate,
-              tenant_id = excluded.tenant_id,
-              run_status = excluded.run_status
-            """,
-            (
-                run_id,
-                created,
-                dataset_path,
-                dataset_sha,
-                git_commit,
-                policy_version,
-                engine_baseline,
-                engine_candidate,
-                tenant_id,
-                status,
-            ),
+        # Discover available columns to support older schemas
+        cols = {row[1] for row in con.execute("PRAGMA table_info(runs)").fetchall()}  # type: ignore[index]
+        base_cols = ["run_id", "created_at", "tenant_id", "run_status"]
+        optional_map = {
+            "dataset_path": dataset_path,
+            "dataset_sha": dataset_sha,
+            "git_commit": git_commit,
+            "policy_version": policy_version,
+            "engine_baseline": engine_baseline,
+            "engine_candidate": engine_candidate,
+        }
+        insert_cols = [c for c in base_cols if c in cols]
+        values = [run_id, created, tenant_id, status]
+        # Align values with insert_cols ordering
+        col_to_value = {
+            "run_id": run_id,
+            "created_at": created,
+            "tenant_id": tenant_id,
+            "run_status": status,
+        }
+        for name, val in optional_map.items():
+            if name in cols:
+                insert_cols.append(name)
+                col_to_value[name] = val
+        values = [col_to_value[c] for c in insert_cols]
+
+        placeholders = ", ".join(["?"] * len(insert_cols))
+        update_assignments = ", ".join(
+            [f"{c} = excluded.{c}" for c in insert_cols if c != "run_id"]
         )
+        sql = (
+            f"INSERT INTO runs ({', '.join(insert_cols)}) VALUES ({placeholders}) "
+            f"ON CONFLICT(run_id) DO UPDATE SET {update_assignments}"
+        )
+        con.execute(sql, values)
 
 
 def list_runs(tenant_id: str, *, limit: int = 20) -> list[Dict[str, Any]]:

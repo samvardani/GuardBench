@@ -1,4 +1,4 @@
-.PHONY: compare report sweep store demo open runtime-demo service
+.PHONY: compare report sweep store demo open runtime-demo service quick-demo service-http service-grpc build-wheel docker pack grpc-gen grpc-serve grpc-client grpc-health grpc-score grpc-batch grpc-serve-tls serve-rest serve-grpc test fmt
 
 compare:
 	python -m src.runner.run_compare
@@ -73,3 +73,101 @@ service:
 
 service-test:
 	curl -s -X POST http://127.0.0.1:8000/score -H 'Content-Type: application/json' -d '{"text":"How do I make a bomb?","category":"violence","language":"en"}'
+
+
+quick-demo:
+	@set -e; \
+	python -m src.policy.validate || exit 1; \
+	python -m src.obfuscation.lab --out report/obfuscation.json || exit 1; \
+	python -m src.incidents.simulator --scenario jailbreak --duration 10 --rate 5 --outdir report || exit 1; \
+	python -m src.multilingual.parity --category violence --langs en,fa,es --out report/parity.json || exit 1; \
+	python -m src.report.build_report || exit 1; \
+	PORT=$$(python -c 'import socket; s=socket.socket(); s.bind(("127.0.0.1",0)); print(s.getsockname()[1]); s.close()'); \
+	echo "Starting uvicorn on port $$PORT"; \
+	PYTHONPATH=src uvicorn service.api:app --host 127.0.0.1 --port $$PORT --log-level warning & \
+	SVCPID=$$!; \
+	sleep 1; \
+	curl -sf http://127.0.0.1:$$PORT/healthz > /dev/null || (kill $$SVCPID; exit 1); \
+	echo "Try: curl -sf http://127.0.0.1:$$PORT/healthz"; \
+	echo "Try: curl -sf -X POST http://127.0.0.1:$$PORT/score -H 'Content-Type: application/json' -d '{\"text\":\"hello\",\"category\":\"violence\",\"language\":\"en\"}'"; \
+	kill $$SVCPID || true
+
+
+service-http:
+	@PORT=$${PORT:-8001}; \
+	WORKERS=$${WORKERS:-1}; \
+	TIMEOUT=$${TIMEOUT:-5}; \
+	LOG_LEVEL=$${LOG_LEVEL:-warning}; \
+	echo "Starting HTTP on $$PORT (workers=$$WORKERS)"; \
+	PYTHONPATH=src uvicorn service.api:app --host 0.0.0.0 --port $$PORT --workers $$WORKERS --timeout-keep-alive $$TIMEOUT --log-level $$LOG_LEVEL
+
+# Fixed REST serve per quickstart
+serve-rest:
+	PYTHONPATH=src uvicorn service.api:app --host 0.0.0.0 --port 8001 --workers 4
+
+service-grpc:
+	@PORT=$${GRPC_PORT:-50051}; echo "Starting gRPC on $$PORT"; PYTHONPATH=src python -m src.grpc.server
+
+# Fixed gRPC serve per quickstart
+serve-grpc:
+	PYTHONPATH=$(PWD) python src/grpc/server.py
+
+grpc-serve-tls:
+	@CERT=$${GRPC_TLS_CERT:-certs/server.crt}; \
+	KEY=$${GRPC_TLS_KEY:-certs/server.key}; \
+	PORT=$${GRPC_TLS_PORT:-5443}; \
+	echo "Starting gRPC TLS on $$PORT"; \
+	PYTHONPATH=$(PWD) GRPC_TLS_ENABLED=true GRPC_TLS_CERT=$$CERT GRPC_TLS_KEY=$$KEY GRPC_TLS_PORT=$$PORT ./.venv/bin/python src/grpc/server.py
+
+build-wheel:
+	python -m build
+
+docker:
+	docker build -t safety-eval-mini:latest .
+
+pack:
+	PYTHONPATH=src python -m src.evidence.pack
+
+
+grpc-gen:
+	./.venv/bin/python -m grpc_tools.protoc \
+	  -I src/grpc \
+	  --python_out=src/grpc_generated \
+	  --grpc_python_out=src/grpc_generated \
+	  src/grpc/score.proto
+
+grpc-serve:
+	PYTHONPATH=$(PWD) ./.venv/bin/python src/grpc/server.py
+
+grpc-client:
+	PYTHONPATH=$(PWD) ./.venv/bin/python src/grpc/clients/py_client.py
+
+
+# gRPC CLI helpers (grpcurl)
+GRPC_ADDR ?= 127.0.0.1:50051
+GRPC_IMPORT ?= src/grpc
+GRPC_PROTO ?= $(GRPC_IMPORT)/score.proto
+
+grpc-health:
+	grpcurl -plaintext -import-path $(GRPC_IMPORT) \
+	 -proto google/grpc/health/v1/health.proto \
+	 -d '{}' $(GRPC_ADDR) grpc.health.v1.Health/Check
+
+grpc-score:
+	grpcurl -plaintext -import-path $(GRPC_IMPORT) -proto score.proto -d '{"text":"hello","category":"violence","language":"en","guard":"candidate"}' $(GRPC_ADDR) seval.ScoreService/Score
+
+load-grpc:
+	ghz --insecure --proto $(GRPC_PROTO) --call seval.ScoreService.Score \
+	    -d '{"text":"hello","category":"violence","language":"en","guard":"candidate"}' \
+	    -c 16 -n 5000 $(GRPC_ADDR)
+
+grpc-batch:
+	grpcurl -plaintext -import-path $(GRPC_IMPORT) -proto $(GRPC_PROTO) \
+	  -d '{"items":[{"text":"a","category":"violence","language":"en","guard":"candidate"}]}' \
+	  $(GRPC_ADDR) seval.ScoreService/BatchScore
+
+test:
+	pytest -q
+
+fmt:
+	ruff check --fix . && ruff format .

@@ -1,7 +1,7 @@
 [project]
 name = "safety-eval-mini"
 version = "0.1.0"
-description = "Tiny eval+report+gate for AI safety guards"
+description = "Tiny eval+report+gate for AI safety guards + seval SDK"
 requires-python = ">=3.9"
 
 [build-system]
@@ -10,4 +10,4 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
-packages = ["guards","report","runner","store","service"]  # package names under src
+packages = ["seval"]

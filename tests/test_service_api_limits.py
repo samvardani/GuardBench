@@ -15,7 +15,10 @@ def fixture_client(monkeypatch):
         "candidate": {"name": "Candidate", "predict": _latency_stub, "version": "candidate-test"},
     }
     monkeypatch.setattr(api, "GUARD_REGISTRY", guard_registry)
-    monkeypatch.setattr(api, "rate_limiter", api.RateLimiter(2, 60))
+    # Ensure rate limiting enabled and low threshold for test
+    monkeypatch.setenv("RATE_LIMIT_ENABLED", "true")
+    rl = api.RateLimiter(2, 60)
+    monkeypatch.setattr(api, "rate_limiter", rl)
     monkeypatch.setattr(api, "circuit_breaker", api.CircuitBreaker(5, 10_000, 5))
     monkeypatch.setattr(api.db, "create_audit_event", lambda *args, **kwargs: None)
 
