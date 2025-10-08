@@ -210,6 +210,8 @@ async def add_policy_headers(request: Request, call_next):  # type: ignore
     response = await call_next(request)
     response.headers["X-Policy-Version"] = SEVAL_VERSION
     response.headers["X-Policy-Checksum"] = SEVAL_CHECKSUM
+    # Expose custom headers to JavaScript clients for CORS
+    response.headers["Access-Control-Expose-Headers"] = "X-Policy-Version, X-Policy-Checksum"
     return response
 
 
