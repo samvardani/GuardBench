@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import contextvars
 import os
 import signal
 from typing import List
@@ -18,32 +19,54 @@ from src.grpc.interceptors import TrailingMetaInterceptor
 import logging
 from src.grpc import metrics as grpc_metrics
 
+# Context variable to track if we're in batch context
+_batch_context: contextvars.ContextVar[bool] = contextvars.ContextVar("batch_context", default=False)
+
 
 class ScoreService(score_pb2_grpc.ScoreServiceServicer):  # type: ignore
     async def Score(self, request, context):  # type: ignore
         guard = request.guard or "candidate"
+        
+        # Check if we're being called from batch context
+        is_batch = _batch_context.get()
+        if is_batch:
+            # Optional: log, skip metrics, optimize, etc.
+            logging.getLogger("grpc_server").debug(
+                "Score called from batch context (text=%s...)", request.text[:20]
+            )
+        
         out = score_once(request.text, request.category, request.language, guard)
         # Override policy_version with the global value for consistency
         out["policy_version"] = POLICY_VERSION
         return score_pb2.ScoreResponse(**out)
 
     async def BatchScore(self, request, context):  # type: ignore
-        items = []
-        for req in request.items:
-            guard = req.guard or "candidate"
-            out = score_once(req.text, req.category, req.language, guard)
-            out["policy_version"] = POLICY_VERSION
-            items.append(score_pb2.ScoreResponse(**out))
-        return score_pb2.BatchScoreResponse(items=items)
+        # Set batch context for all nested Score calls
+        _batch_context.set(True)
+        try:
+            items = []
+            for req in request.items:
+                guard = req.guard or "candidate"
+                out = score_once(req.text, req.category, req.language, guard)
+                out["policy_version"] = POLICY_VERSION
+                items.append(score_pb2.ScoreResponse(**out))
+            return score_pb2.BatchScoreResponse(items=items)
+        finally:
+            _batch_context.set(False)
     
     async def BatchScoreStream(self, request, context):  # type: ignore
         """Stream batch scores one item at a time."""
-        for idx, req in enumerate(request.items):
-            guard = req.guard or "candidate"
-            out = score_once(req.text, req.category, req.language, guard)
-            out["policy_version"] = POLICY_VERSION
-            resp = score_pb2.ScoreResponse(**out)
-            yield score_pb2.StreamItem(index=idx, resp=resp)
+        # Set batch context for all streamed items
+        _batch_context.set(True)
+        try:
+            for idx, req in enumerate(request.items):
+                guard = req.guard or "candidate"
+                out = score_once(req.text, req.category, req.language, guard)
+                out["policy_version"] = POLICY_VERSION
+                resp = score_pb2.ScoreResponse(**out)
+                yield score_pb2.StreamItem(index=idx, resp=resp)
+        finally:
+            _batch_context.set(False)
 
 
 async def serve_async():
