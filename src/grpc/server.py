@@ -8,6 +8,7 @@ from typing import List
 import grpc  # type: ignore
 
 from src.seval import sdk
+from src.seval.logic import score_once
 from grpc_health.v1 import health, health_pb2, health_pb2_grpc  # type: ignore
 from grpc_reflection.v1alpha import reflection  # type: ignore
 from src.grpc_generated import score_pb2, score_pb2_grpc  # type: ignore
@@ -21,16 +22,14 @@ from src.grpc import metrics as grpc_metrics
 class ScoreService(score_pb2_grpc.ScoreServiceServicer):  # type: ignore
     async def Score(self, request, context):  # type: ignore
         guard = request.guard or "candidate"
-        result = sdk.predict(request.text, request.category, request.language, guard=guard)
-        score_val = float(result.get("score") or (1.0 if result.get("prediction") else 0.0))
-        slices = [str(s) for s in (result.get("slices") or [])]
+        result = score_once(request.text, request.category, request.language, guard)
         return score_pb2.ScoreResponse(
-            score=score_val,
-            slices=slices,
+            score=result["score"],
+            slices=result["slices"],
             policy_version=POLICY_VERSION,
-            guard_version=str(result.get("guard_version") or guard),
-            latency_ms=int(result.get("latency_ms") or 0),
-            request_id=str(result.get("request_id") or ""),
+            guard_version=result["guard_version"],
+            latency_ms=result["latency_ms"],
+            request_id=result["request_id"],
         )
 
     async def BatchScore(self, request, context):  # type: ignore
@@ -44,17 +43,15 @@ class ScoreService(score_pb2_grpc.ScoreServiceServicer):  # type: ignore
         """Stream batch scores one item at a time."""
         for idx, req in enumerate(request.items):
             guard = req.guard or "candidate"
-            result = sdk.predict(req.text, req.category, req.language, guard=guard)
-            score_val = float(result.get("score") or (1.0 if result.get("prediction") else 0.0))
-            slices = [str(s) for s in (result.get("slices") or [])]
+            result = score_once(req.text, req.category, req.language, guard)
             
             resp = score_pb2.ScoreResponse(
-                score=score_val,
-                slices=slices,
+                score=result["score"],
+                slices=result["slices"],
                 policy_version=POLICY_VERSION,
-                guard_version=str(result.get("guard_version") or guard),
-                latency_ms=int(result.get("latency_ms") or 0),
-                request_id=str(result.get("request_id") or ""),
+                guard_version=result["guard_version"],
+                latency_ms=result["latency_ms"],
+                request_id=result["request_id"],
             )
             
             yield score_pb2.StreamItem(index=idx, resp=resp)
