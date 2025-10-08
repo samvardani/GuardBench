@@ -22,38 +22,27 @@ from src.grpc import metrics as grpc_metrics
 class ScoreService(score_pb2_grpc.ScoreServiceServicer):  # type: ignore
     async def Score(self, request, context):  # type: ignore
         guard = request.guard or "candidate"
-        result = score_once(request.text, request.category, request.language, guard)
-        return score_pb2.ScoreResponse(
-            score=result["score"],
-            slices=result["slices"],
-            policy_version=POLICY_VERSION,
-            guard_version=result["guard_version"],
-            latency_ms=result["latency_ms"],
-            request_id=result["request_id"],
-        )
+        out = score_once(request.text, request.category, request.language, guard)
+        # Override policy_version with the global value for consistency
+        out["policy_version"] = POLICY_VERSION
+        return score_pb2.ScoreResponse(**out)
 
     async def BatchScore(self, request, context):  # type: ignore
         items = []
         for req in request.items:
-            r = await self.Score(req, context)
-            items.append(r)
+            guard = req.guard or "candidate"
+            out = score_once(req.text, req.category, req.language, guard)
+            out["policy_version"] = POLICY_VERSION
+            items.append(score_pb2.ScoreResponse(**out))
         return score_pb2.BatchScoreResponse(items=items)
     
     async def BatchScoreStream(self, request, context):  # type: ignore
         """Stream batch scores one item at a time."""
         for idx, req in enumerate(request.items):
             guard = req.guard or "candidate"
-            result = score_once(req.text, req.category, req.language, guard)
-            
-            resp = score_pb2.ScoreResponse(
-                score=result["score"],
-                slices=result["slices"],
-                policy_version=POLICY_VERSION,
-                guard_version=result["guard_version"],
-                latency_ms=result["latency_ms"],
-                request_id=result["request_id"],
-            )
-            
+            out = score_once(req.text, req.category, req.language, guard)
+            out["policy_version"] = POLICY_VERSION
+            resp = score_pb2.ScoreResponse(**out)
             yield score_pb2.StreamItem(index=idx, resp=resp)
 
 
