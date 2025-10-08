@@ -1,0 +1,38 @@
+syntax = "proto3";
+package seval;
+
+message ScoreRequest {
+  string text = 1;
+  string category = 2;
+  string language = 3;
+  string guard = 4;
+}
+
+message ScoreResponse {
+  double score = 1;
+  repeated string slices = 2;
+  string policy_version = 3;
+  string guard_version = 4;
+  int32 latency_ms = 5;
+  string request_id = 6;
+}
+
+message BatchScoreRequest {
+  repeated ScoreRequest items = 1;
+}
+
+message BatchScoreResponse {
+  repeated ScoreResponse items = 1;
+}
+
+message StreamItem {
+  int32 index = 1;
+  ScoreResponse resp = 2;
+}
+
+service ScoreService {
+  rpc Score(ScoreRequest) returns (ScoreResponse);
+  rpc BatchScore(BatchScoreRequest) returns (BatchScoreResponse);
+  rpc BatchScoreStream(BatchScoreRequest) returns (stream StreamItem);
+}
+

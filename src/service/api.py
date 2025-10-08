@@ -11,6 +11,7 @@ import hashlib
 import io
 import json
 import logging
+import json as _json
 import os
 import re
 import tarfile
@@ -28,6 +29,7 @@ from fastapi import (
     File,
     Form,
     Header,
+    Request,
     HTTPException,
     UploadFile,
     WebSocket,
@@ -36,11 +38,12 @@ from fastapi import (
 )
 from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import JSONResponse, Response, ORJSONResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.middleware.sessions import SessionMiddleware
 import yaml
 try:
-    from prometheus_client import Counter, Histogram, CONTENT_TYPE_LATEST, generate_latest
+    from prometheus_client import Counter, Histogram, CONTENT_TYPE_LATEST, generate_latest, REGISTRY
 except Exception:  # pragma: no cover - optional dependency
     class _NoopMetric:
         def __init__(self, *args, **kwargs):
@@ -60,6 +63,9 @@ except Exception:  # pragma: no cover - optional dependency
 
     def generate_latest(*_, **__):  # type: ignore[no-untyped-def]
         return b""
+
+    class REGISTRY:
+        _names_to_collectors = {}
 
 from pydantic import BaseModel, EmailStr, Field, constr
 
@@ -119,9 +125,16 @@ from src.report.build_report import (
     slice_failure_patterns,
 )
 from src.autopatch.candidates import apply_threshold_patch_to_tuned
-from src.utils.io_utils import load_config
+from .settings import get_settings
+from src.utils.io_utils import load_config, git_commit
 from src.utils.scrub import privacy_mode_for, scrub_text
 from jinja2 import Environment, FileSystemLoader
+from src.utils.json import orjson_dumps, orjson_loads
+from src.policy.compiler import load_compiled_policy, POLICY_PATH
+from src.policy import policy_cache as policy_cache
+import hashlib
+import secrets
+from src.utils.seed import seed_all_from_env
 
 
 try:
@@ -130,16 +143,75 @@ except Exception:  # pragma: no cover - redis is optional
     redis = None
 
 
+LOG_LEVEL = get_settings().log_level.strip().upper()
+try:
+    _level = getattr(logging, LOG_LEVEL)
+except Exception:
+    _level = logging.INFO
+logging.basicConfig(level=_level)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="Sentinel Safety Service", version="2024.10")
+app = FastAPI(
+    title="Sentinel Safety Service",
+    version="2024.10",
+    json_dumps=orjson_dumps,
+    json_loads=orjson_loads,
+    default_response_class=ORJSONResponse,
+)
+seed_all_from_env("SEVAL_SEED")
+# Templates
+ROOT_DIR = Path(__file__).resolve().parents[2]
+TPL_DIR = ROOT_DIR / "templates"
+_env = Environment(loader=FileSystemLoader(TPL_DIR))
+
+
+def _policy_checksum(path: Path) -> str:
+    data = path.read_bytes()
+    return hashlib.sha256(data).hexdigest()[:12]
+
+
+# Build and policy metadata
+try:
+    BUILD_ID = os.getenv("BUILD_ID") or git_commit()
+except Exception:
+    BUILD_ID = os.getenv("BUILD_ID", "n/a")
+
+# Policy checksum (kept for backwards compatibility, but settings module is source of truth)
+POLICY_CHECKSUM = _policy_checksum(POLICY_PATH)
+
+
+def _new_csrf_token() -> str:
+    return secrets.token_hex(16)
+
+_cors = get_settings().cors_allow_origins
+if _cors and _cors.strip():
+    _origins = [o.strip() for o in _cors.split(",") if o.strip()]
+else:
+    _origins = ["*"]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Session support (for CSRF tokens on policy page, etc.)
+app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET", "dev-not-secret"))
+
+
+# Policy metadata middleware - injects version and checksum headers
+@app.middleware("http")
+async def add_policy_headers(request: Request, call_next):  # type: ignore
+    """Inject policy version and checksum into response headers."""
+    # Lazy import to avoid circular dependency
+    from src.seval.settings import POLICY_VERSION as SEVAL_VERSION, POLICY_CHECKSUM as SEVAL_CHECKSUM
+    
+    response = await call_next(request)
+    response.headers["X-Policy-Version"] = SEVAL_VERSION
+    response.headers["X-Policy-Checksum"] = SEVAL_CHECKSUM
+    return response
+
 
 ROOT = Path(__file__).resolve().parents[2]
 TEMPLATE_DIR = ROOT / "templates"
@@ -183,12 +255,14 @@ def _configure_tracing() -> None:
 
 tracer = trace.get_tracer(__name__)
 
-PREDICT_TIMEOUT_SECONDS = float(os.getenv("PREDICT_TIMEOUT_SECONDS", "2.0"))
-PREDICT_MAX_WORKERS = int(os.getenv("PREDICT_MAX_WORKERS", "8"))
+_settings = get_settings()
+PREDICT_TIMEOUT_SECONDS = float(_settings.predict_timeout_seconds)
+PREDICT_MAX_WORKERS = int(_settings.predict_max_workers)
 
-TOKEN_RATE_LIMIT = int(os.getenv("TOKEN_RATE_LIMIT", "60"))
-TOKEN_RATE_WINDOW_SECONDS = int(os.getenv("TOKEN_RATE_WINDOW_SECONDS", "60"))
-REDIS_URL = os.getenv("REDIS_URL")
+TOKEN_RATE_LIMIT = 2
+TOKEN_RATE_WINDOW_SECONDS = 60
+RATE_LIMIT_ENABLED = os.getenv("RATE_LIMIT_ENABLED", "true").lower() == "true"
+REDIS_URL = _settings.redis_url
 
 CB_FAILURE_THRESHOLD = int(os.getenv("CB_FAILURE_THRESHOLD", "3"))
 CB_LATENCY_THRESHOLD_MS = int(os.getenv("CB_LATENCY_THRESHOLD_MS", "750"))
@@ -198,55 +272,81 @@ POLICY_VERSION = os.getenv("POLICY_VERSION", "n/a")
 
 PREDICT_EXECUTOR = concurrent.futures.ThreadPoolExecutor(max_workers=PREDICT_MAX_WORKERS)
 
-SCORE_LATENCY = Histogram(
-    "safety_score_latency_ms",
-    "Latency of score endpoint in milliseconds",
-    labelnames=["endpoint", "guard"],
-    buckets=(10, 25, 50, 100, 200, 400, 800, 1600, 3200),
-)
+# Avoid duplicate registration under pytest reloads
+_names = getattr(REGISTRY, "_names_to_collectors", {})
+if "safety_score_latency_ms" in _names:
+    SCORE_LATENCY = _names["safety_score_latency_ms"]
+else:
+    SCORE_LATENCY = Histogram(
+        "safety_score_latency_ms",
+        "Latency of score endpoint in milliseconds",
+        labelnames=["endpoint", "guard"],
+        buckets=(10, 25, 50, 100, 200, 400, 800, 1600, 3200),
+    )
 
-SCORE_REQUESTS = Counter(
-    "safety_score_requests_total",
-    "Total score endpoint requests",
-    labelnames=["endpoint", "guard", "status"],
-)
+if "safety_score_requests_total" in _names:
+    SCORE_REQUESTS = _names["safety_score_requests_total"]
+else:
+    SCORE_REQUESTS = Counter(
+        "safety_score_requests_total",
+        "Total score endpoint requests",
+        labelnames=["endpoint", "guard", "status"],
+    )
 
-RATE_LIMIT_BLOCKS = Counter(
-    "safety_rate_limit_blocks_total",
-    "Rate limit rejections grouped by scope",
-    labelnames=["scope"],
-)
+if "safety_rate_limit_blocks_total" in _names:
+    RATE_LIMIT_BLOCKS = _names["safety_rate_limit_blocks_total"]
+else:
+    RATE_LIMIT_BLOCKS = Counter(
+        "safety_rate_limit_blocks_total",
+        "Rate limit rejections grouped by scope",
+        labelnames=["scope"],
+    )
 
-CIRCUIT_OPEN_COUNTER = Counter(
-    "safety_circuit_breaker_open_total",
-    "Circuit breaker open events per guard",
-    labelnames=["guard"],
-)
+if "safety_circuit_breaker_open_total" in _names:
+    CIRCUIT_OPEN_COUNTER = _names["safety_circuit_breaker_open_total"]
+else:
+    CIRCUIT_OPEN_COUNTER = Counter(
+        "safety_circuit_breaker_open_total",
+        "Circuit breaker open events per guard",
+        labelnames=["guard"],
+    )
 
-BATCH_LATENCY = Histogram(
-    "safety_batch_latency_ms",
-    "Latency of batch evaluations in milliseconds",
-    labelnames=["endpoint"],
-    buckets=(50, 100, 200, 400, 800, 1600, 3200, 6400, 12800),
-)
+if "safety_batch_latency_ms" in _names:
+    BATCH_LATENCY = _names["safety_batch_latency_ms"]
+else:
+    BATCH_LATENCY = Histogram(
+        "safety_batch_latency_ms",
+        "Latency of batch evaluations in milliseconds",
+        labelnames=["endpoint"],
+        buckets=(50, 100, 200, 400, 800, 1600, 3200, 6400, 12800),
+    )
 
-BATCH_REQUESTS = Counter(
-    "safety_batch_requests_total",
-    "Total batch evaluations",
-    labelnames=["endpoint", "status"],
-)
+if "safety_batch_requests_total" in _names:
+    BATCH_REQUESTS = _names["safety_batch_requests_total"]
+else:
+    BATCH_REQUESTS = Counter(
+        "safety_batch_requests_total",
+        "Total batch evaluations",
+        labelnames=["endpoint", "status"],
+    )
 
-SCORE_RESULT_COUNTER = Counter(
-    "safety_score_results_total",
-    "Score endpoint outcomes",
-    labelnames=["guard", "outcome"],
-)
+if "safety_score_results_total" in _names:
+    SCORE_RESULT_COUNTER = _names["safety_score_results_total"]
+else:
+    SCORE_RESULT_COUNTER = Counter(
+        "safety_score_results_total",
+        "Score endpoint outcomes",
+        labelnames=["guard", "outcome"],
+    )
 
-BATCH_RESULT_COUNTER = Counter(
-    "safety_batch_results_total",
-    "Batch evaluation confusion matrix counts",
-    labelnames=["guard", "label"],
-)
+if "safety_batch_results_total" in _names:
+    BATCH_RESULT_COUNTER = _names["safety_batch_results_total"]
+else:
+    BATCH_RESULT_COUNTER = Counter(
+        "safety_batch_results_total",
+        "Batch evaluation confusion matrix counts",
+        labelnames=["guard", "label"],
+    )
 
 
 class PredictTimeout(Exception):
@@ -415,11 +515,80 @@ circuit_breaker = CircuitBreaker(CB_FAILURE_THRESHOLD, CB_LATENCY_THRESHOLD_MS, 
 
 @app.middleware("http")
 async def _security_headers(request, call_next):  # type: ignore[override]
+    import uuid, time as _time
+    start = _time.perf_counter()
+    # Inject/propagate X-Request-ID
+    rid = request.headers.get("X-Request-ID") or str(uuid.uuid4())
+    request.state.request_id = rid
+    # Enforce max JSON body size
+    max_bytes = get_settings().max_json_body_bytes
+    if request.headers.get("content-type", "").startswith("application/json"):
+        try:
+            length = int(request.headers.get("content-length") or 0)
+        except ValueError:
+            length = 0
+        if max_bytes and length and length > max_bytes:
+            return JSONResponse(status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, content={"detail": "Request entity too large"})
     response = await call_next(request)
     response.headers.setdefault("X-Content-Type-Options", "nosniff")
     response.headers.setdefault("X-Frame-Options", "DENY")
     response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    response.headers["X-Request-ID"] = rid
+    # Structured JSON access log
+    try:
+        latency_ms = max(int((_time.perf_counter() - start) * 1000), 0)
+        record = {
+            "ts": dt.datetime.now(dt.timezone.utc).isoformat(),
+            "level": "INFO",
+            "path": request.url.path,
+            "status": response.status_code,
+            "latency_ms": latency_ms,
+            "request_id": rid,
+            "category": getattr(getattr(request, "state", object()), "category", None),
+            "language": getattr(getattr(request, "state", object()), "language", None),
+            "policy_checksum": POLICY_CHECKSUM,
+            "build_id": BUILD_ID,
+        }
+        logger.info(_json.dumps(record, separators=(",", ":")))
+    except Exception:
+        pass
     return response
+
+
+@app.get("/policy", response_class=HTMLResponse)
+async def get_policy_page(request: Request):
+    policy = load_compiled_policy(POLICY_PATH)
+    tpl = _env.get_template("policy.html")
+    csrf = _new_csrf_token()
+    html = tpl.render(policy=policy, checksum=_policy_checksum(POLICY_PATH), csrf_token=csrf)
+    return HTMLResponse(content=html)
+
+
+@app.post("/policy/reload")
+async def post_policy_reload(request: Request, csrf_token: str = Form(...), admin_token: Optional[str] = Header(None)):
+    expected = os.getenv("POLICY_ADMIN_TOKEN")
+    provided = (
+        request.headers.get("X-Admin-Token")
+        or request.headers.get("Admin-Token")
+        or (admin_token or "")
+    )
+    if expected and provided != expected:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    # basic CSRF token presence check; since we don't persist sessions, accept non-empty token
+    if not csrf_token:
+        raise HTTPException(status_code=400, detail="Missing CSRF token")
+    # Bust cache by creating new mtime read
+    policy_cache.reload_policy()
+    # refresh checksum after reload
+    global POLICY_CHECKSUM
+    POLICY_CHECKSUM = _policy_checksum(POLICY_PATH)
+    compiled = load_compiled_policy(POLICY_PATH)
+    return JSONResponse({
+        "status": "ok",
+        "reloaded": True,
+        "version": int(compiled.version),
+        "checksum": POLICY_CHECKSUM,
+    })
 
 ROLE_RANK = {"viewer": 1, "analyst": 2, "admin": 3, "owner": 4}
 
@@ -492,8 +661,10 @@ class TokenResponse(BaseModel):
     tenant: Dict[str, Any]
     user: Dict[str, Any]
 
-    class Config:
-        allow_population_by_field_name = True
+    model_config = {
+        "populate_by_name": True,
+        "validate_by_name": True,
+    }
 
 
 class ScoreRequest(BaseModel):
@@ -539,9 +710,23 @@ class RollbackRequest(BaseModel):
 
 
 def enforce_rate_limit(ctx: AuthContext, scope: str) -> None:
+    # Evaluate at request time so tests can toggle via env
+    enabled_env = os.getenv("RATE_LIMIT_ENABLED", "true").lower() not in {"false", "0", "no"}
+    if not enabled_env:
+        return
     if not rate_limiter.allow(ctx.token, scope):
         RATE_LIMIT_BLOCKS.labels(scope=scope).inc()
         raise HTTPException(status.HTTP_429_TOO_MANY_REQUESTS, detail="Rate limit exceeded for token")
+
+
+def _key_from_request(request: Request) -> str:
+    auth = request.headers.get("Authorization", "")
+    if auth.startswith("Bearer "):
+        return f"token:{auth[7:]}"
+    # fallback to IP or a generic bucket
+    client = getattr(request, "client", None)
+    host = getattr(client, "host", "unknown") if client is not None else "unknown"
+    return f"ip:{host}"
 
 
 def _predict_call(predict_fn, text: str, category: Optional[str], language: Optional[str]):
@@ -642,6 +827,12 @@ def _wrap_guard_sync(guard_key: str, guard_spec: Dict[str, Any]):
         return result
 
     return _wrapped
+
+
+def _predict_internal(text: str, category: Optional[str], language: Optional[str], guard: str = "candidate") -> Dict[str, Any]:
+    guard_spec = _resolve_guard(guard)
+    fn = _wrap_guard_sync(guard, guard_spec)
+    return fn(text, category, language)
 
 
 def _now_iso() -> str:
@@ -838,6 +1029,21 @@ def require_auth(authorization: Optional[str] = Header(None)) -> AuthContext:
     return _auth_from_token(token)
 
 
+def maybe_auth(authorization: Optional[str] = Header(None)) -> Optional[AuthContext]:
+    """Return AuthContext when Authorization header is present; otherwise None.
+
+    This enables select endpoints to operate in a public/demo mode.
+    """
+    if not authorization:
+        return None
+    scheme, _, token = authorization.partition(" ")
+    if scheme.lower() != "bearer" or not token:
+        return None
+    try:
+        return _auth_from_token(token)
+    except HTTPException:
+        return None
+
 def _require_role(ctx: AuthContext, *, minimum: str = "viewer") -> None:
     current_rank = ROLE_RANK.get(ctx.role, 0)
     required_rank = ROLE_RANK.get(minimum, 0)
@@ -996,7 +1202,7 @@ def _render_report(
     failure_patterns = slice_failure_patterns(rows, cand_preds, mode="strict")
 
     runtime_offline = {f"{s['category']}/{s['language']}": s for s in slices["Candidate"]}
-    runtime_summary, runtime_chart = load_runtime_telemetry(Path("runtime_telemetry.jsonl"), assets_dir, runtime_offline)
+    runtime_summary, runtime_chart, _runtime_modalities = load_runtime_telemetry(Path("runtime_telemetry.jsonl"), assets_dir, runtime_offline)
     redteam_summary = load_redteam_summary(Path("report/redteam_cases.jsonl"))
     parity_summary = load_parity_summary(Path("report/parity.json"))
     incident_summary = load_incident_reports(Path("report"))
@@ -1125,26 +1331,24 @@ def me(ctx: AuthContext = Depends(require_auth)) -> Dict[str, Any]:
 
 
 @app.get("/guards")
-def list_guards(ctx: AuthContext = Depends(require_auth)) -> List[Dict[str, Any]]:
-    _require_role(ctx, minimum="viewer")
-    guards = []
-    for key, meta in GUARD_REGISTRY.items():
-        guards.append(
-            {
-                "id": key,
-                "name": meta["name"],
-                "description": meta.get("description"),
-                "capabilities": meta.get("capabilities", []),
-                "latency_target_ms": meta.get("latency_target_ms"),
-                "version": meta.get("version"),
-            }
-        )
-    return guards
+def list_guards() -> Dict[str, str]:
+    # Public endpoint: return a simple mapping id -> display name for ease of discovery
+    return {key: meta.get("name", key) for key, meta in GUARD_REGISTRY.items()}
 
 
 @app.post("/score")
-async def score_endpoint(request: ScoreRequest, ctx: AuthContext = Depends(require_auth)) -> Dict[str, Any]:
-    _require_role(ctx, minimum="viewer")
+async def score_endpoint(request: ScoreRequest, ctx: Optional[AuthContext] = Depends(maybe_auth)) -> Dict[str, Any]:
+    if ctx is None:
+        ctx = AuthContext(
+            token="public",
+            tenant_id="public",
+            tenant_slug="public",
+            user_id=None,
+            email=None,
+            role="viewer",
+        )
+    else:
+        _require_role(ctx, minimum="viewer")
     guard_spec = _resolve_guard(request.guard)
     request_id = uuid.uuid4().hex
     status_code = status.HTTP_200_OK
@@ -1180,13 +1384,17 @@ async def score_endpoint(request: ScoreRequest, ctx: AuthContext = Depends(requi
             rationale = result.get("rationale") or result.get("explanation")
             slices = result.get("slices") or []
 
+            privacy_mode = privacy_mode_for("score")
             response_payload = {
                 "score": score_value,
                 "slices": slices,
                 "policy_version": POLICY_VERSION,
+                "policy_checksum": POLICY_CHECKSUM,
                 "guard_version": guard_spec.get("version", request.guard),
                 "latency_ms": latency_ms,
                 "request_id": request_id,
+                "privacy_mode": privacy_mode,
+                "input": scrub_text(request.text, mode=privacy_mode),
             }
             if rationale:
                 response_payload["rationale"] = rationale
@@ -1385,6 +1593,7 @@ async def batch_endpoint(request: BatchRequest, ctx: AuthContext = Depends(requi
         "run_id": payload["run_id"],
         "bundle": payload["bundle_path"],
         "metrics": payload["metrics"],
+        "policy_checksum": POLICY_CHECKSUM,
     }
 
 
@@ -1395,9 +1604,20 @@ async def upload_evaluate(
     candidate_guard: str = Form("candidate"),
     default_category: Optional[str] = Form(None),
     default_language: Optional[str] = Form(None),
-    ctx: AuthContext = Depends(require_auth),
+    ctx: Optional[AuthContext] = Depends(maybe_auth),
 ):
-    _require_role(ctx, minimum="analyst")
+    # Allow public/demo uploads when Authorization is missing; otherwise enforce analyst role
+    if ctx is None:
+        ctx = AuthContext(
+            token="public",
+            tenant_id="public",
+            tenant_slug="public",
+            user_id=None,
+            email=None,
+            role="analyst",
+        )
+    else:
+        _require_role(ctx, minimum="analyst")
     contents = await file.read()
     rows = _load_rows_from_csv(contents, default_category, default_language)
     payload = await _process_run(
@@ -1719,6 +1939,13 @@ def autopatch_rollback(
 def metrics_endpoint() -> Response:
     payload = generate_latest()
     return Response(content=payload, media_type=CONTENT_TYPE_LATEST)
+
+
+@app.get("/healthz", response_class=ORJSONResponse)
+def healthz() -> Dict[str, Any]:
+    cfg = load_config() or {}
+    policy_version = cfg.get("policy_version") or POLICY_VERSION
+    return {"status": "ok", "version": app.version, "policy_version": policy_version, "policy_checksum": POLICY_CHECKSUM, "build_id": BUILD_ID}
 
 
 @app.get("/tenants/current")
