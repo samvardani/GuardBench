@@ -3,7 +3,7 @@ from collections import Counter
 import numpy as np
 import matplotlib.pyplot as plt
 
-from src.guards.candidate import predict as predict_candidate
+from guards.candidate import predict as predict_candidate
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 DATA = ROOT / "dataset" / "sample.csv"

@@ -1,9 +1,9 @@
 import argparse, csv, json
 from pathlib import Path
 from collections import defaultdict
-from src.utils.io_utils import load_config, resolve_dataset_path
-from src.utils.text_norm import normalize
-from src.guards import candidate as C
+from utils.io_utils import load_config, resolve_dataset_path
+from utils.text_norm import normalize
+from guards import candidate as C
 
 # Reuse Candidate’s patterns/normalize so tuning matches runtime
 PATTERNS = C.PATTERNS

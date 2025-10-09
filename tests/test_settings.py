@@ -1,5 +1,5 @@
 from pathlib import Path
-from src.service.settings import Settings
+from service.settings import Settings
 
 
 def test_settings_defaults_no_env(tmp_path, monkeypatch):

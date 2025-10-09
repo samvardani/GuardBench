@@ -4,8 +4,8 @@ import re
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
-from src.guards.candidate import predict as candidate_predict
-from src.policy.compiler import load_compiled_policy, POLICY_PATH
+from guards.candidate import predict as candidate_predict
+from policy.compiler import load_compiled_policy, POLICY_PATH
 
 
 _TRANSFORMS = [

@@ -1,4 +1,4 @@
-from src.utils.json import orjson_dumps, orjson_loads
+from utils.json import orjson_dumps, orjson_loads
 
 
 def test_orjson_roundtrip_simple():

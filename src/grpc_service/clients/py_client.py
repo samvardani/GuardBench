@@ -4,7 +4,7 @@ import os
 import asyncio
 import grpc  # type: ignore
 
-from src.grpc_generated import score_pb2, score_pb2_grpc  # type: ignore
+from grpc_generated import score_pb2, score_pb2_grpc  # type: ignore
 
 
 async def main():

@@ -2,7 +2,7 @@ from pathlib import Path
 
 import yaml
 
-from src.conversations.harness import load_script, run_conversation
+from conversations.harness import load_script, run_conversation
 
 
 def test_conversation_detects_manipulation_and_policy(tmp_path):

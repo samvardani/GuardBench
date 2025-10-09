@@ -1,5 +1,5 @@
 
-from src.runner.ci_gate import ptiles
+from runner.ci_gate import ptiles
 
 def test_ptiles_quantiles():
     vals = [0, 1, 2, 10, 20, 100]

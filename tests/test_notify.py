@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from src.utils.notify import NotificationManager
+from utils.notify import NotificationManager
 
 
 def test_notification_manager_writes_log(tmp_path):

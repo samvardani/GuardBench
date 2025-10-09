@@ -10,8 +10,8 @@ from fastapi.testclient import TestClient
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 
 from service import api, db
-from src.autopatch import run as autopatch_run
-from src.autopatch import candidates
+from autopatch import run as autopatch_run
+from autopatch import candidates
 
 
 def _hash_updates(updates):

@@ -1,5 +1,5 @@
-from src.report.build_report import load_rows
-from src.generator.adversary import _get_rows_path
+from report.build_report import load_rows
+from generator.adversary import _get_rows_path
 
 
 def test_dataset_rows_have_text_like_content():

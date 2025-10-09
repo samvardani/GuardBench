@@ -8,7 +8,7 @@ This ensures the guard can detect adversarial prompt injection attempts.
 """
 import pytest
 from typing import List, Tuple
-from src.seval import sdk
+from seval import sdk
 
 
 # Malicious prompt injection attacks (should be detected)

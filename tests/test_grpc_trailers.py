@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 import grpc
 
-from src.grpc_generated import score_pb2, score_pb2_grpc
+from grpc_generated import score_pb2, score_pb2_grpc
 
 
 @pytest.mark.asyncio

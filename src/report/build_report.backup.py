@@ -4,8 +4,8 @@ from collections import Counter
 from jinja2 import Environment, FileSystemLoader
 import matplotlib.pyplot as plt
 
-from src.guards.baseline import predict as predict_baseline
-from src.guards.candidate import predict as predict_candidate
+from guards.baseline import predict as predict_baseline
+from guards.candidate import predict as predict_candidate
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 DATA = ROOT / "dataset" / "sample.csv"

@@ -8,7 +8,7 @@ This ensures distributed tracing coverage for debugging and audit.
 import pytest
 import asyncio
 import grpc
-from src.grpc_generated import score_pb2, score_pb2_grpc
+from grpc_generated import score_pb2, score_pb2_grpc
 
 
 class TestTraceIdValidation:

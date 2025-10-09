@@ -7,7 +7,7 @@ import re
 import math
 from typing import Dict, Iterable, List, Optional
 
-from src.utils.io_utils import load_config
+from utils.io_utils import load_config
 
 _EMAIL_RE = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 _PHONE_RE = re.compile(r"\b(?:\+?\d[\d\-\s]{7,}\d)\b")

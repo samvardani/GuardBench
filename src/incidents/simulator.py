@@ -9,8 +9,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Sequence
 
-from src.guards.candidate import predict as candidate_predict
-from src.obfuscation.operators import (
+from guards.candidate import predict as candidate_predict
+from obfuscation.operators import (
     leet_speak,
     insert_zero_width,
     swap_homoglyphs,

@@ -8,7 +8,7 @@ This ensures the guard doesn't over-block legitimate content.
 import os
 import pytest
 from typing import List, Dict
-from src.seval import sdk
+from seval import sdk
 
 
 # Safe prompts that should NOT be blocked

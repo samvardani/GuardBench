@@ -2,8 +2,8 @@ import os
 import json
 from pathlib import Path
 
-from src.connectors import s3 as s3c, gcs as gcsc, azure as azc
-from src.connectors.kafka import Producer
+from connectors import s3 as s3c, gcs as gcsc, azure as azc
+from connectors.kafka import Producer
 
 
 def test_s3_local_fallback_roundtrip(tmp_path, monkeypatch):

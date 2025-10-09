@@ -14,15 +14,15 @@ from collections import defaultdict
 from typing import Iterable, List, Optional
 from jinja2 import Environment, FileSystemLoader
 
-from src.guards.baseline import predict as predict_baseline
-from src.guards.candidate import predict as predict_candidate
-from src.report.cluster_utils import cluster_failures, slice_failure_patterns
-from src.utils.io_utils import load_config, resolve_dataset_path, sha256_file, git_commit, new_run_id
-from src.utils.run_log import append_run_record
-from src.utils.notify import NotificationManager
-from src.policy.compiler import load_compiled_policy, POLICY_PATH
-from src.evaluation import evaluate
-from src.connectors import s3 as s3_connector, gcs as gcs_connector, azure as azure_connector, kafka as kafka_connector
+from guards.baseline import predict as predict_baseline
+from guards.candidate import predict as predict_candidate
+from report.cluster_utils import cluster_failures, slice_failure_patterns
+from utils.io_utils import load_config, resolve_dataset_path, sha256_file, git_commit, new_run_id
+from utils.run_log import append_run_record
+from utils.notify import NotificationManager
+from policy.compiler import load_compiled_policy, POLICY_PATH
+from evaluation import evaluate
+from connectors import s3 as s3_connector, gcs as gcs_connector, azure as azure_connector, kafka as kafka_connector
 
 REQUIRED_KEYS = ("text",)
 

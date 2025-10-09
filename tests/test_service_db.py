@@ -6,7 +6,7 @@ import pytest
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 
 from service import db
-from src.store import init_db
+from store import init_db
 
 
 @pytest.fixture

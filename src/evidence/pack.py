@@ -10,7 +10,7 @@ import tarfile
 from pathlib import Path
 from typing import Dict, List
 
-from src.utils.io_utils import git_commit
+from utils.io_utils import git_commit
 
 INCLUDE_PATHS = [
     Path("report/index.html"),

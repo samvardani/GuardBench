@@ -12,10 +12,10 @@ python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt -r requirements-dev.txt
 
 # Generate gRPC stubs
-python -m grpc_tools.protoc -I src/grpc \
+python -m grpc_tools.protoc -I src/grpc_service \
   --python_out=src/grpc_generated \
   --grpc_python_out=src/grpc_generated \
-  src/grpc/score.proto
+  src/grpc_service/score.proto
 
 # Start REST API (port 8001)
 PYTHONPATH=src uvicorn service.api:app --host 0.0.0.0 --port 8001 --workers 4
@@ -39,9 +39,9 @@ grpcurl -plaintext \
   127.0.0.1:50051 seval.ScoreService/BatchScore
 
 # gRPC Health (standard)
-mkdir -p src/grpc/google/grpc/health/v1 && \
+mkdir -p src/grpc_service/google/grpc/health/v1 && \
 curl -fsSL https://raw.githubusercontent.com/grpc/grpc/v1.64.0/src/proto/grpc/health/v1/health.proto \
-  -o src/grpc/google/grpc/health/v1/health.proto
+  -o src/grpc_service/google/grpc/health/v1/health.proto
 grpcurl -plaintext \
   -import-path src/grpc \
   -proto google/grpc/health/v1/health.proto \

@@ -6,10 +6,10 @@ import json
 from pathlib import Path
 from typing import Dict, Iterable, List, Mapping
 
-from src.autopatch.candidates import apply_threshold_patch_to_config
-from src.guards.candidate import predict as candidate_predict
-from src.evaluation import evaluate
-from src.runner.run_compare import load_cfg_and_data
+from autopatch.candidates import apply_threshold_patch_to_config
+from guards.candidate import predict as candidate_predict
+from evaluation import evaluate
+from runner.run_compare import load_cfg_and_data
 
 
 CONFIG_PATH = Path("config.yaml")

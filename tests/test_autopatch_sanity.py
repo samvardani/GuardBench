@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from src.autopatch import ab_eval
+from autopatch import ab_eval
 
 
 def test_ab_eval_produces_result_json(tmp_path):

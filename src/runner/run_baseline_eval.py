@@ -1,6 +1,6 @@
 import csv, pathlib, yaml
-from src.guards.baseline import predict
-from src.evaluation import evaluate
+from guards.baseline import predict
+from evaluation import evaluate
 
 def load_cfg_and_data():
     root = pathlib.Path(__file__).resolve().parents[2]

@@ -2,13 +2,13 @@ import csv, json, sqlite3, datetime, pathlib
 from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 
-from src.guards.baseline import predict as predict_baseline
-from src.guards.candidate import predict as predict_candidate
-from src.utils.io_utils import load_config, resolve_dataset_path, sha256_file, git_commit, new_run_id
-from src.utils.run_log import append_run_record
-from src.utils.notify import NotificationManager
-from src.policy.compiler import load_compiled_policy, POLICY_PATH
-from src.evaluation import evaluate
+from guards.baseline import predict as predict_baseline
+from guards.candidate import predict as predict_candidate
+from utils.io_utils import load_config, resolve_dataset_path, sha256_file, git_commit, new_run_id
+from utils.run_log import append_run_record
+from utils.notify import NotificationManager
+from policy.compiler import load_compiled_policy, POLICY_PATH
+from evaluation import evaluate
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 TPL_DIR = ROOT / "templates"

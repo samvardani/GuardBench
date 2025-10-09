@@ -1,4 +1,4 @@
-from src.multilingual.parity import _variance, ParityResult
+from multilingual.parity import _variance, ParityResult
 
 
 def test_variance_calculation():

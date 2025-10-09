@@ -1,4 +1,4 @@
-from src.assist.counterfactual import generate_safe_rewrite
+from assist.counterfactual import generate_safe_rewrite
 
 
 def test_counterfactual_reduces_score_below_threshold_violence():

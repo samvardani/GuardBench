@@ -13,7 +13,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from src.store import init_db
+from store import init_db
 
 DB_PATH = Path(__file__).resolve().parents[2] / "history.db"
 _PBKDF2_ROUNDS = 160_000

@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from src.multimodal.adapters import ImageInput, AudioInput, score_image, score_audio, TELEMETRY_PATH
+from multimodal.adapters import ImageInput, AudioInput, score_image, score_audio, TELEMETRY_PATH
 
 
 def test_image_adapter_logs_and_validates(tmp_path, monkeypatch):

@@ -2,8 +2,8 @@ import argparse, csv, json, sys
 from pathlib import Path
 from collections import defaultdict
 
-from src.utils.io_utils import load_config, resolve_dataset_path
-from src.guards.candidate import predict as predict_candidate
+from utils.io_utils import load_config, resolve_dataset_path
+from guards.candidate import predict as predict_candidate
 
 def is_pos(label: str, mode: str) -> bool:
     l = (label or "").strip().lower()

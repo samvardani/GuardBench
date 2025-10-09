@@ -1,4 +1,4 @@
-from src.federation.signatures import canonicalize, build_signature, Matcher
+from federation.signatures import canonicalize, build_signature, Matcher
 
 
 def test_canonicalize_removes_noise():

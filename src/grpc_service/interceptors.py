@@ -6,7 +6,7 @@ import grpc  # type: ignore
 import time
 from opentelemetry import trace
 
-from src.seval.settings import POLICY_VERSION, POLICY_CHECKSUM
+from seval.settings import POLICY_VERSION, POLICY_CHECKSUM
 
 # Get tracer for this module
 tracer = trace.get_tracer(__name__)

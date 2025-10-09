@@ -7,7 +7,7 @@ import time
 from pathlib import Path
 from typing import Optional
 
-from src.federation.signatures import Matcher, Signature
+from federation.signatures import Matcher, Signature
 
 
 class FeedService:

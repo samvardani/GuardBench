@@ -7,9 +7,9 @@ from typing import AsyncIterator
 
 import grpc  # type: ignore
 
-from src.service.api import _resolve_guard, _wrap_guard_sync, POLICY_VERSION
-from src.policy.compiler import POLICY_PATH
-from src.service.api import _policy_checksum
+from service.api import _resolve_guard, _wrap_guard_sync, POLICY_VERSION
+from policy.compiler import POLICY_PATH
+from service.api import _policy_checksum
 
 # Import generated stubs (assumes protoc has been run to generate seval_pb2, seval_pb2_grpc)
 try:

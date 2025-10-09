@@ -110,14 +110,14 @@ service-grpc:
 
 # Fixed gRPC serve per quickstart
 serve-grpc:
-	PYTHONPATH=$(PWD) python src/grpc/server.py
+	PYTHONPATH=$(PWD) python src/grpc_service/server.py
 
 grpc-serve-tls:
 	@CERT=$${GRPC_TLS_CERT:-certs/server.crt}; \
 	KEY=$${GRPC_TLS_KEY:-certs/server.key}; \
 	PORT=$${GRPC_TLS_PORT:-5443}; \
 	echo "Starting gRPC TLS on $$PORT"; \
-	PYTHONPATH=$(PWD) GRPC_TLS_ENABLED=true GRPC_TLS_CERT=$$CERT GRPC_TLS_KEY=$$KEY GRPC_TLS_PORT=$$PORT ./.venv/bin/python src/grpc/server.py
+	PYTHONPATH=$(PWD) GRPC_TLS_ENABLED=true GRPC_TLS_CERT=$$CERT GRPC_TLS_KEY=$$KEY GRPC_TLS_PORT=$$PORT ./.venv/bin/python src/grpc_service/server.py
 
 build-wheel:
 	python -m build
@@ -131,16 +131,16 @@ pack:
 
 grpc-gen:
 	./.venv/bin/python -m grpc_tools.protoc \
-	  -I src/grpc \
+	  -I src/grpc_service \
 	  --python_out=src/grpc_generated \
 	  --grpc_python_out=src/grpc_generated \
-	  src/grpc/score.proto
+	  src/grpc_service/score.proto
 
 grpc-serve:
-	PYTHONPATH=$(PWD) ./.venv/bin/python src/grpc/server.py
+	PYTHONPATH=$(PWD) ./.venv/bin/python src/grpc_service/server.py
 
 grpc-client:
-	PYTHONPATH=$(PWD) ./.venv/bin/python src/grpc/clients/py_client.py
+	PYTHONPATH=$(PWD) ./.venv/bin/python src/grpc_service/clients/py_client.py
 
 
 # gRPC CLI helpers (grpcurl)
@@ -171,3 +171,42 @@ test:
 
 fmt:
 	ruff check --fix . && ruff format .
+
+# Smart HTTP server with automatic port selection
+serve:
+	@python3 - <<'PY'
+import socket, http.server, socketserver, os, subprocess
+port = int(os.environ.get('PORT', '3001'))
+s = socket.socket()
+try:
+    s.bind(('127.0.0.1', port))
+    s.close()
+    print(f"Starting HTTP server on http://127.0.0.1:{port}")
+    os.execvp('python3', ['python3', '-m', 'http.server', str(port), '--directory', 'report'])
+except OSError:
+    print(f"❌ Port {port} in use. Try these fixes:")
+    print(f"   1. Set different port: PORT=8080 make serve")
+    print(f"   2. Kill process: lsof -ti :{port} | xargs kill -9")
+    result = subprocess.run(['lsof', '-i', f':{port}'], capture_output=True, text=True)
+    if result.stdout:
+        print(f"\nProcess using port {port}:")
+        print(result.stdout)
+PY
+
+# Generate gRPC stubs
+stubs:
+	python3 -m grpc_tools.protoc -I src/grpc_service \
+		--python_out=src/grpc_generated \
+		--grpc_python_out=src/grpc_generated \
+		src/grpc_service/score.proto
+	@echo "✅ gRPC stubs generated"
+
+# Run gRPC server
+run-grpc:
+	PYTHONPATH=$(PWD)/src python3 src/grpc_service/server.py
+
+# gRPC smoke tests
+grpc-smoke:
+	@echo "Testing gRPC server..."
+	@grpcurl -plaintext 127.0.0.1:50051 list || echo "❌ Reflection not enabled. Use: ENABLE_GRPC_REFLECTION=true make run-grpc"
+	@grpcurl -plaintext -d '{"text":"hello","category":"violence","language":"en"}' 127.0.0.1:50051 seval.ScoreService/Score || echo "❌ gRPC server not running. Run: make run-grpc"

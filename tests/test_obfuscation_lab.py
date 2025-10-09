@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from src.obfuscation.lab import run_media_lab
+from obfuscation.lab import run_media_lab
 
 
 def test_image_lab_confusion(tmp_path):
