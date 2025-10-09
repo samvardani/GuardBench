@@ -77,15 +77,20 @@ async def serve_async():
         interceptors.append(prometheus_interceptor)
     
     # Create server with interceptors and message size limits (32MB)
+    # Production tip: Add max_concurrent_streams if high load on streaming endpoints
+    # e.g., ("grpc.max_concurrent_streams", 100) to prevent resource exhaustion
     server = grpc.aio.server(
         interceptors=interceptors,
         options=[
             ("grpc.max_send_message_length", 32 * 1024 * 1024),
             ("grpc.max_receive_message_length", 32 * 1024 * 1024),
+            # Uncomment if needed under load:
+            # ("grpc.max_concurrent_streams", 100),
         ]
     )
     score_pb2_grpc.add_ScoreServiceServicer_to_server(ScoreService(), server)
-    # Register gRPC Health Checking service and set status to SERVING
+    
+    # Register gRPC Health Checking service and wire real health checks
     try:
         health_servicer = health.aio.HealthServicer()  # type: ignore[attr-defined]
         is_aio_health = True
@@ -93,6 +98,28 @@ async def serve_async():
         health_servicer = health.HealthServicer()  # type: ignore
         is_aio_health = False
     health_pb2_grpc.add_HealthServicer_to_server(health_servicer, server)
+    
+    # Perform real health checks before marking as SERVING
+    logger = logging.getLogger("grpc_server")
+    health_ok = True
+    
+    # Check 1: Verify policy can be loaded
+    try:
+        from src.policy.compiler import load_compiled_policy
+        policy = load_compiled_policy(POLICY_PATH)
+        logger.info("Health check: Policy loaded successfully (%d slices)", len(policy.slices))
+    except Exception as e:
+        logger.error("Health check: Policy load failed - %s", e)
+        health_ok = False
+    
+    # Check 2: Verify guard model is ready (warmup test)
+    try:
+        warmup_result = score_once("warmup", "violence", "en", "candidate")
+        logger.info("Health check: Guard model warmed up (latency: %dms)", warmup_result.get("latency_ms", 0))
+    except Exception as e:
+        logger.error("Health check: Guard warmup failed - %s", e)
+        health_ok = False
+    
     host = os.getenv("GRPC_HOST", "0.0.0.0")
     # TLS settings
     tls_enabled = os.getenv("GRPC_TLS_ENABLED", "false").lower() in {"1", "true", "yes"}
@@ -110,24 +137,31 @@ async def serve_async():
         port = int(os.getenv("GRPC_PORT", "50051"))
         server.add_insecure_port(f"{host}:{port}")
         logging.getLogger("grpc_server").info("gRPC listening plaintext on %s:%s", host, port)
-    # Set health status for overall server and specific service
+    
+    # Set health status based on real health checks
     service_name = 'seval.ScoreService'
-    serving = health_pb2.HealthCheckResponse.SERVING  # type: ignore[attr-defined]
+    if health_ok:
+        status = health_pb2.HealthCheckResponse.SERVING  # type: ignore[attr-defined]
+        logger.info("Health check: All checks passed, marking SERVING")
+    else:
+        status = health_pb2.HealthCheckResponse.NOT_SERVING  # type: ignore[attr-defined]
+        logger.warning("Health check: Some checks failed, marking NOT_SERVING")
+    
     if is_aio_health:
         try:
-            await health_servicer.set('', serving)  # type: ignore[attr-defined]
-            await health_servicer.set(service_name, serving)  # type: ignore[attr-defined]
+            await health_servicer.set('', status)  # type: ignore[attr-defined]
+            await health_servicer.set(service_name, status)  # type: ignore[attr-defined]
         except Exception:
             pass
     else:
         try:
-            health_servicer.set('', serving)  # type: ignore[attr-defined]
-            health_servicer.set(service_name, serving)  # type: ignore[attr-defined]
+            health_servicer.set('', status)  # type: ignore[attr-defined]
+            health_servicer.set(service_name, status)  # type: ignore[attr-defined]
         except Exception:
             pass
 
     # Conditionally enable server reflection for grpcurl and tooling
-    logger = logging.getLogger("grpc_server")
+    # Default: disabled (set ENABLE_GRPC_REFLECTION=true to enable)
     enable_reflection = os.getenv("ENABLE_GRPC_REFLECTION", "false").lower() in {"1", "true", "yes"}
     if enable_reflection:
         try:
