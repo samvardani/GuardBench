@@ -199,6 +199,13 @@ app.add_middleware(
 # Session support (for CSRF tokens on policy page, etc.)
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET", "dev-not-secret"))
 
+# Include monitoring router if available
+try:
+    from seval.monitoring.routes import router as monitor_router
+    app.include_router(monitor_router)
+    logger.info("Monitoring dashboard enabled at /ui/monitor")
+except Exception as e:
+    logger.warning(f"Monitoring dashboard not available: {e}")
 
 # Policy metadata middleware - injects version and checksum headers
 @app.middleware("http")
@@ -1407,6 +1414,21 @@ async def score_endpoint(request: ScoreRequest, ctx: Optional[AuthContext] = Dep
             else:
                 outcome_label = str(prediction).strip().lower() or "unknown"
             SCORE_RESULT_COUNTER.labels(guard=request.guard, outcome=outcome_label).inc()
+
+            # Record metrics for monitoring dashboard
+            try:
+                from seval.monitoring.metrics import get_global_collector
+                collector = get_global_collector()
+                blocked = result.get("blocked", False) or (isinstance(prediction, bool) and prediction)
+                collector.record_request(
+                    category=request.category or "unknown",
+                    language=request.language or "en",
+                    score=score_value,
+                    blocked=blocked,
+                    latency_ms=latency_ms
+                )
+            except Exception as monitor_exc:
+                logger.debug(f"Failed to record monitoring metrics: {monitor_exc}")
 
             db.create_audit_event(
                 ctx.tenant_id,

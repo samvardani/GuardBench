@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoring Dashboard - Safety Eval</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f7fa;
+            color: #2c3e50;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .header .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .metric-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        }
+        
+        .metric-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #7f8c8d;
+            font-weight: 600;
+        }
+        
+        .metric-value {
+            font-size: 36px;
+            font-weight: bold;
+            margin: 10px 0;
+            color: #2c3e50;
+        }
+        
+        .metric-change {
+            font-size: 12px;
+            color: #27ae60;
+        }
+        
+        .metric-change.negative {
+            color: #e74c3c;
+        }
+        
+        .chart-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+        
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .category-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .category-card.warning {
+            border-left-color: #f39c12;
+            background: #fef5e7;
+        }
+        
+        .category-card.danger {
+            border-left-color: #e74c3c;
+            background: #fadbd8;
+        }
+        
+        .category-name {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .category-stat {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin: 4px 0;
+        }
+        
+        .category-stat strong {
+            color: #2c3e50;
+        }
+        
+        .refresh-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            transition: transform 0.2s;
+        }
+        
+        .refresh-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .refresh-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .auto-refresh {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            background: white;
+            border-radius: 8px;
+            padding: 10px 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            font-size: 12px;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 5px;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-indicator.active {
+            background: #27ae60;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 Real-time Monitoring Dashboard</h1>
+        <div class="subtitle">Last {{ window_minutes }} minutes | Auto-refresh: ON</div>
+    </div>
+    
+    <div class="container">
+        <!-- Key Metrics -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-label">Total Requests</div>
+                <div class="metric-value" id="total-requests">{{ summary.total_requests }}</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-label">QPS</div>
+                <div class="metric-value" id="qps">{{ summary.qps }}</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-label">Blocked Rate</div>
+                <div class="metric-value" id="blocked-rate">{{ "%.1f"|format(summary.blocked_rate * 100) }}%</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-label">Latency P50</div>
+                <div class="metric-value" id="latency-p50">{{ summary.latency_p50 }}ms</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-label">Latency P95</div>
+                <div class="metric-value" id="latency-p95">{{ summary.latency_p95 }}ms</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-label">Latency P99</div>
+                <div class="metric-value" id="latency-p99">{{ summary.latency_p99 }}ms</div>
+            </div>
+        </div>
+        
+        <!-- QPS Chart -->
+        <div class="chart-section">
+            <div class="chart-title">Requests Per Second</div>
+            <div class="chart-container">
+                <canvas id="qps-chart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Latency Chart -->
+        <div class="chart-section">
+            <div class="chart-title">Latency Percentiles</div>
+            <div class="chart-container">
+                <canvas id="latency-chart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Blocked Rate Chart -->
+        <div class="chart-section">
+            <div class="chart-title">Blocked Rate Over Time</div>
+            <div class="chart-container">
+                <canvas id="blocked-chart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Category Breakdown -->
+        <div class="chart-section">
+            <div class="chart-title">Category Breakdown</div>
+            <div class="category-grid">
+                {% for category, stats in summary.categories.items() %}
+                <div class="category-card {% if stats.blocked_rate > 0.7 %}danger{% elif stats.blocked_rate > 0.5 %}warning{% endif %}">
+                    <div class="category-name">{{ category }}</div>
+                    <div class="category-stat"><strong>{{ stats.count }}</strong> requests</div>
+                    <div class="category-stat"><strong>{{ stats.blocked }}</strong> blocked ({{ "%.1f"|format(stats.blocked_rate * 100) }}%)</div>
+                    <div class="category-stat">Avg Score: <strong>{{ "%.2f"|format(stats.avg_score) }}</strong></div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <button class="refresh-btn" onclick="refreshData()" title="Refresh Data">↻</button>
+    
+    <div class="auto-refresh">
+        <span class="status-indicator active"></span>
+        Auto-refresh: 30s
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        let qpsChart, latencyChart, blockedChart;
+        
+        function initCharts() {
+            const chartConfig = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'minute'
+                        }
+                    }
+                }
+            };
+            
+            // QPS Chart
+            const qpsCtx = document.getElementById('qps-chart').getContext('2d');
+            qpsChart = new Chart(qpsCtx, {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: 'QPS',
+                        data: [],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: chartConfig
+            });
+            
+            // Latency Chart
+            const latencyCtx = document.getElementById('latency-chart').getContext('2d');
+            latencyChart = new Chart(latencyCtx, {
+                type: 'line',
+                data: {
+                    datasets: [
+                        {
+                            label: 'P50',
+                            data: [],
+                            borderColor: '#27ae60',
+                            backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                            fill: false,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'P95',
+                            data: [],
+                            borderColor: '#f39c12',
+                            backgroundColor: 'rgba(243, 156, 18, 0.1)',
+                            fill: false,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: chartConfig
+            });
+            
+            // Blocked Rate Chart
+            const blockedCtx = document.getElementById('blocked-chart').getContext('2d');
+            blockedChart = new Chart(blockedCtx, {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: 'Blocked Rate',
+                        data: [],
+                        borderColor: '#e74c3c',
+                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    ...chartConfig,
+                    scales: {
+                        ...chartConfig.scales,
+                        y: {
+                            min: 0,
+                            max: 1,
+                            ticks: {
+                                format: {
+                                    style: 'percent'
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        async function updateCharts() {
+            try {
+                const response = await fetch('/ui/monitor/api/timeseries?window_seconds=900&bucket_seconds=60');
+                const data = await response.json();
+                
+                // Convert timestamps to Date objects
+                const timestamps = data.timestamps.map(ts => new Date(ts));
+                
+                // Update QPS chart
+                qpsChart.data.labels = timestamps;
+                qpsChart.data.datasets[0].data = data.qps;
+                qpsChart.update('none');
+                
+                // Update latency chart
+                latencyChart.data.labels = timestamps;
+                latencyChart.data.datasets[0].data = data.latency_p50;
+                latencyChart.data.datasets[1].data = data.latency_p95;
+                latencyChart.update('none');
+                
+                // Update blocked rate chart
+                blockedChart.data.labels = timestamps;
+                blockedChart.data.datasets[0].data = data.blocked_rate;
+                blockedChart.update('none');
+            } catch (e) {
+                console.error('Failed to update charts:', e);
+            }
+        }
+        
+        async function updateMetrics() {
+            try {
+                const response = await fetch('/ui/monitor/api/metrics?window_seconds=900');
+                const data = await response.json();
+                
+                document.getElementById('total-requests').textContent = data.total_requests;
+                document.getElementById('qps').textContent = data.qps;
+                document.getElementById('blocked-rate').textContent = (data.blocked_rate * 100).toFixed(1) + '%';
+                document.getElementById('latency-p50').textContent = data.latency_p50 + 'ms';
+                document.getElementById('latency-p95').textContent = data.latency_p95 + 'ms';
+                document.getElementById('latency-p99').textContent = data.latency_p99 + 'ms';
+            } catch (e) {
+                console.error('Failed to update metrics:', e);
+            }
+        }
+        
+        async function refreshData() {
+            await Promise.all([updateMetrics(), updateCharts()]);
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            updateCharts();
+            
+            // Auto-refresh every 30 seconds
+            setInterval(refreshData, 30000);
+        });
+    </script>
+</body>
+</html>
+

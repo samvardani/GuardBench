@@ -210,3 +210,19 @@ grpc-smoke:
 	@echo "Testing gRPC server..."
 	@grpcurl -plaintext 127.0.0.1:50051 list || echo "❌ Reflection not enabled. Use: ENABLE_GRPC_REFLECTION=true make run-grpc"
 	@grpcurl -plaintext -d '{"text":"hello","category":"violence","language":"en"}' 127.0.0.1:50051 seval.ScoreService/Score || echo "❌ gRPC server not running. Run: make run-grpc"
+
+# Monitoring Dashboard
+monitor-run:
+	@echo "Starting service with monitoring on http://localhost:8001/ui/monitor"
+	PYTHONPATH=src uvicorn service.api:app --host 0.0.0.0 --port 8001 --reload
+
+monitor-test:
+	@echo "Running monitoring tests..."
+	pytest tests/test_monitoring.py -v
+
+monitor-smoke:
+	@echo "Monitoring smoke test..."
+	@echo "Ensure service is running on port 8001"
+	@curl -sf http://127.0.0.1:8001/ui/monitor/ > /dev/null && echo "✓ Dashboard loads" || echo "❌ Start service first"
+	@curl -sf http://127.0.0.1:8001/metrics > /dev/null && echo "✓ Prometheus /metrics works" || echo "❌ Metrics endpoint failed"
+	@curl -sf http://127.0.0.1:8001/ui/monitor/api/metrics > /dev/null && echo "✓ Metrics API works" || echo "❌ API failed"
