@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ main, release/*, hardening/* ]
+    branches: [ main, release/*, hardening/*, improve/* ]
   pull_request:
 
 jobs:
@@ -35,16 +35,16 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('requirements.txt', 'requirements-dev.txt') }}
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('pyproject.toml') }}
           restore-keys: |
             ${{ runner.os }}-pip-
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt -r requirements-dev.txt -r requirements-ci.txt
-          # Safety net if requirement files drift
-          pip install fastapi uvicorn "uvicorn[standard]" python-multipart jinja2 prometheus-client httpx anyio pytest pytest-asyncio
+          pip install -e ".[dev]"
+          # Ensure gRPC tools are available
+          pip install grpcio-tools
 
       - name: Generate gRPC stubs
         run: |
@@ -52,15 +52,15 @@ jobs:
 
       - name: Start gRPC server (background)
         env:
-          PYTHONPATH: src
+          PYTHONPATH: ${{ github.workspace }}/src
         run: |
-          nohup python src/grpc_service/server.py > grpc_server.log 2>&1 &
+          nohup python -m grpc_service.server > grpc_server.log 2>&1 &
           sleep 3
-          echo "gRPC server started (PID: $!)"
+          echo "gRPC server started"
 
       - name: Run standard tests
         env:
-          PYTHONPATH: src
+          PYTHONPATH: ${{ github.workspace }}/src
           RATE_LIMIT_ENABLED: 'false'
         run: pytest tests/ -k "not hardening" -q
         continue-on-error: false
@@ -94,7 +94,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt -r requirements-dev.txt -r requirements-ci.txt
+          pip install -e ".[dev]"
+          pip install grpcio-tools
 
       - name: Generate gRPC stubs
         run: |
@@ -102,14 +103,14 @@ jobs:
 
       - name: Start gRPC server
         env:
-          PYTHONPATH: src
+          PYTHONPATH: ${{ github.workspace }}/src
         run: |
-          nohup python src/grpc_service/server.py > grpc_server.log 2>&1 &
+          nohup python -m grpc_service.server > grpc_server.log 2>&1 &
           sleep 3
 
       - name: Run hardening gates
         env:
-          PYTHONPATH: src
+          PYTHONPATH: ${{ github.workspace }}/src
           OVERDEFENSE_TARGET: ${{ env.OVERDEFENSE_TARGET }}
         run: |
           python tests/run_hardening.py
