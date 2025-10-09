@@ -106,3 +106,55 @@ async def test_stream_trailing_metadata(grpc_address: str = "127.0.0.1:50051") -
         assert "x-policy-checksum" in d, "x-policy-checksum not in trailing metadata"
         assert len(d["x-policy-checksum"]) >= 8, "x-policy-checksum should be at least 8 chars"
 
+
+@pytest.mark.asyncio
+async def test_stream_early_cancel(grpc_address: str = "127.0.0.1:50051") -> None:
+    """Test that canceling stream early doesn't crash server and trailers are handled gracefully."""
+    async with grpc.aio.insecure_channel(grpc_address) as ch:
+        stub = score_pb2_grpc.ScoreServiceStub(ch)
+        
+        # Create a batch request with multiple items
+        items = [
+            score_pb2.ScoreRequest(text=f"item_{i}", category="violence", language="en")
+            for i in range(5)
+        ]
+        req = score_pb2.BatchScoreRequest(items=items)
+        
+        # Make the streaming call
+        call = stub.BatchScoreStream(req)
+        
+        # Consume only the first item, then cancel
+        first_item = None
+        async for item in call:
+            first_item = item
+            # Cancel after first item
+            call.cancel()
+            break
+        
+        # Verify we got the first item
+        assert first_item is not None, "Should have received first item"
+        assert first_item.index == 0, "First item should have index 0"
+        
+        # Check if call was cancelled
+        assert call.cancelled(), "Call should be cancelled"
+        
+        # Try to get trailing metadata - may or may not be available after cancel
+        # but server should not crash
+        try:
+            trailers = await call.trailing_metadata()
+            if trailers:
+                d = {k: v for k, v in trailers}
+                # If trailers are present, verify they're valid
+                if "x-policy-version" in d:
+                    assert d["x-policy-version"] != "n/a", "x-policy-version should be valid"
+                if "x-policy-checksum" in d:
+                    assert len(d["x-policy-checksum"]) >= 8, "x-policy-checksum should be valid"
+        except grpc.RpcError:
+            # Cancellation may prevent trailing metadata, which is acceptable
+            pass
+        
+        # Most importantly: verify server is still responsive by making another call
+        health_req = score_pb2.ScoreRequest(text="health_check", category="violence", language="en")
+        health_resp = await stub.Score(health_req)
+        assert health_resp.score is not None, "Server should still be responsive after cancel"
+
