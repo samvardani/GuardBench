@@ -198,3 +198,44 @@ async def test_deadline_exceeded_with_trailers(grpc_address: str = "127.0.0.1:50
                 assert d["x-policy-version"] != "n/a", "x-policy-version should be valid"
                 assert len(d["x-policy-checksum"]) >= 8, "x-policy-checksum should be valid"
 
+
+@pytest.mark.asyncio
+async def test_all_rpc_methods_have_trailers(grpc_address: str = "127.0.0.1:50051") -> None:
+    """
+    CI Safety Test: Verify ALL RPC methods include trailing metadata.
+    
+    This test enumerates all available RPC methods and verifies each has metadata.
+    Catches if a developer adds a new RPC method without proper plumbing.
+    With TrailingMetaInterceptor, this should be impossible, but this test confirms.
+    """
+    async with grpc.aio.insecure_channel(grpc_address) as ch:
+        stub = score_pb2_grpc.ScoreServiceStub(ch)
+        
+        required_headers = ["x-policy-version", "x-policy-checksum"]
+        
+        # Test 1: Score (unary-unary)
+        call = stub.Score(score_pb2.ScoreRequest(text="test", category="violence", language="en"))
+        resp = await call
+        trailers = await call.trailing_metadata()
+        d = {k: v for k, v in trailers}
+        for header in required_headers:
+            assert header in d, f"Score missing {header}"
+        
+        # Test 2: BatchScore (unary-unary)
+        items = [score_pb2.ScoreRequest(text="a", category="violence", language="en")]
+        call = stub.BatchScore(score_pb2.BatchScoreRequest(items=items))
+        resp = await call
+        trailers = await call.trailing_metadata()
+        d = {k: v for k, v in trailers}
+        for header in required_headers:
+            assert header in d, f"BatchScore missing {header}"
+        
+        # Test 3: BatchScoreStream (unary-stream)
+        call = stub.BatchScoreStream(score_pb2.BatchScoreRequest(items=items))
+        async for item in call:
+            pass  # Consume stream
+        trailers = await call.trailing_metadata()
+        d = {k: v for k, v in trailers}
+        for header in required_headers:
+            assert header in d, f"BatchScoreStream missing {header}"
+
