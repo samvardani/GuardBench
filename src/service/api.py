@@ -1937,6 +1937,23 @@ def autopatch_rollback(
     }
 
 
+# Slack Integration
+try:
+    from integrations.slack_app import get_slack_handler
+    slack_handler = get_slack_handler()
+    if slack_handler:
+        @app.post("/slack/events")
+        async def slack_events(request: Request):
+            """Handle Slack events and slash commands."""
+            return await slack_handler.handle(request)
+        
+        logging.getLogger("service.api").info("Slack integration enabled at /slack/events")
+    else:
+        logging.getLogger("service.api").info("Slack integration disabled (missing config or slack-bolt)")
+except ImportError:
+    logging.getLogger("service.api").warning("slack-bolt not installed. Slack integration unavailable.")
+
+
 @app.get("/metrics")
 def metrics_endpoint() -> Response:
     payload = generate_latest()
