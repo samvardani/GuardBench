@@ -199,6 +199,14 @@ app.add_middleware(
 # Session support (for CSRF tokens on policy page, etc.)
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET", "dev-not-secret"))
 
+# Include UI router if available - import here to avoid circular dependency
+try:
+    from seval.ui.routes import router as ui_router
+    app.include_router(ui_router)
+    logger.info("Policy Management UI enabled at /ui")
+except Exception as e:
+    logger.warning(f"UI module not available: {e}")
+
 
 # Policy metadata middleware - injects version and checksum headers
 @app.middleware("http")

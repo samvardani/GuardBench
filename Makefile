@@ -1,4 +1,4 @@
-.PHONY: compare report sweep store demo open runtime-demo service quick-demo service-http service-grpc build-wheel docker pack grpc-gen grpc-serve grpc-client grpc-health grpc-score grpc-batch grpc-serve-tls serve-rest serve-grpc test fmt
+.PHONY: compare report sweep store demo open runtime-demo service quick-demo service-http service-grpc build-wheel docker pack grpc-gen grpc-serve grpc-client grpc-health grpc-score grpc-batch grpc-serve-tls serve-rest serve-grpc test fmt ui-run ui-test
 
 compare:
 	python -m src.runner.run_compare
@@ -210,3 +210,12 @@ grpc-smoke:
 	@echo "Testing gRPC server..."
 	@grpcurl -plaintext 127.0.0.1:50051 list || echo "❌ Reflection not enabled. Use: ENABLE_GRPC_REFLECTION=true make run-grpc"
 	@grpcurl -plaintext -d '{"text":"hello","category":"violence","language":"en"}' 127.0.0.1:50051 seval.ScoreService/Score || echo "❌ gRPC server not running. Run: make run-grpc"
+
+# Policy Management UI
+ui-run:
+	@echo "Starting Policy Management UI on http://localhost:8001/ui"
+	PYTHONPATH=src uvicorn service.api:app --host 0.0.0.0 --port 8001 --reload
+
+ui-test:
+	@echo "Running UI tests..."
+	pytest tests/test_ui_routes.py tests/test_ui_e2e.py -v --cov=src/seval/ui --cov-report=term-missing

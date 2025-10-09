@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from typing import Any, Dict, Iterable, List, Mapping, Optional
 
-from service.api import _resolve_guard, _wrap_guard_sync
-
 
 def predict(text: str, category: str, language: str, *, guard: str = "candidate") -> Dict[str, Any]:
+    # Lazy import to avoid circular dependency
+    from service.api import _resolve_guard, _wrap_guard_sync
+    
     spec = _resolve_guard(guard)
     fn = _wrap_guard_sync(guard, spec)
     result = fn(text, category, language)
@@ -13,6 +14,9 @@ def predict(text: str, category: str, language: str, *, guard: str = "candidate"
 
 
 def batch_predict(rows: Iterable[Mapping[str, str]], *, guard: str = "candidate") -> List[Dict[str, Any]]:
+    # Lazy import to avoid circular dependency
+    from service.api import _resolve_guard, _wrap_guard_sync
+    
     spec = _resolve_guard(guard)
     fn = _wrap_guard_sync(guard, spec)
     out: List[Dict[str, Any]] = []

@@ -174,6 +174,75 @@ curl -sf -X POST http://127.0.0.1:8001/score \
 
 - Gate: tuned per-slice thresholds in `config.yaml`; stricter overrides in `gate.json`.
 
+## Policy UI
+
+A modern web-based Policy Management UI for CRUD operations on YAML policies with real-time validation and test runner.
+
+### Features
+
+- **Visual Editor**: Edit YAML policies with syntax highlighting and real-time validation
+- **Instant Validation**: Catch YAML syntax errors and schema violations before saving
+- **Git Integration**: Automatic versioning with git commit on every policy update
+- **Test Runner**: Interactive test interface to validate policies with sample inputs
+- **Multi-language Support**: Test policies across different languages (en, es, fr, fa)
+- **Real-time Feedback**: See policy scores, blocking decisions, and latency metrics instantly
+
+### Quick Start
+
+```bash
+# Start the UI (includes full API server)
+make ui-run
+
+# Open in browser
+open http://localhost:8001/ui
+```
+
+### Usage
+
+1. **Edit Policies**: Navigate to `http://localhost:8001/ui` to edit the policy YAML
+2. **Validate**: Click "Validate Only" to check syntax without saving
+3. **Save**: Click "Save Policy" to persist changes and commit to git
+4. **Test**: Click "Test Policy" or navigate to `http://localhost:8001/ui/test` to test with sample inputs
+
+### Keyboard Shortcuts
+
+- `Ctrl+S` / `Cmd+S`: Save policy (from editor page)
+
+### Screenshots
+
+![Policy Editor](docs/assets/policy_ui_editor.png)
+*Policy editor with real-time validation and git versioning*
+
+![Test Runner](docs/assets/policy_ui_test.png)
+*Interactive test runner with example prompts and detailed results*
+
+### API Endpoints
+
+The Policy UI exposes the following REST endpoints:
+
+- `GET /ui/` - Main policy editor interface
+- `GET /ui/policies` - Retrieve current policy as JSON
+- `POST /ui/policies` - Update policy (validates and commits to git)
+- `GET /ui/test` - Test runner interface
+- `POST /ui/test` - Run a test with current policy
+
+### Testing
+
+```bash
+# Run UI tests
+make ui-test
+
+# Run all tests including UI
+PYTHONPATH=src pytest -q --cov=src/seval/ui
+```
+
+### Requirements
+
+- FastAPI >=0.110.0
+- Pydantic >=2.7.0
+- Jinja2 >=3.1.0
+- PyYAML >=6.0.0
+
 ## Documentation
 
 - [Getting Started](docs/GETTING_STARTED.md): environment setup, validation flow, serving reports, CI expectations.
