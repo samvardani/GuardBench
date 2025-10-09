@@ -2,6 +2,7 @@ name: CI
 
 on:
   push:
+    branches: [ main, release/*, hardening/* ]
   pull_request:
 
 jobs:
@@ -11,6 +12,16 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.11", "3.12", "3.13"]
+    
+    services:
+      grpc:
+        image: python:3.13-slim
+        options: >-
+          --health-cmd "python -c 'import socket'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -28,10 +39,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
-      - name: Install deps
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt -r requirements-dev.txt
+          pip install -r requirements.txt -r requirements-dev.txt -r requirements-ci.txt
           # Safety net if requirement files drift
           pip install fastapi uvicorn "uvicorn[standard]" python-multipart jinja2 prometheus-client httpx anyio pytest pytest-asyncio
 
@@ -39,13 +50,22 @@ jobs:
         run: |
           python -m grpc_tools.protoc -I src/grpc --python_out=src/grpc_generated --grpc_python_out=src/grpc_generated src/grpc/score.proto
 
-      - name: Run tests
+      - name: Start gRPC server (background)
         env:
           PYTHONPATH: src
-        run: pytest -q
+        run: |
+          nohup python src/grpc/server.py > grpc_server.log 2>&1 &
+          sleep 3
+          echo "gRPC server started (PID: $!)"
+
+      - name: Run standard tests
+        env:
+          PYTHONPATH: src
+          RATE_LIMIT_ENABLED: 'false'
+        run: pytest tests/ -k "not hardening" -q
         continue-on-error: false
 
-      - name: Upload pytest cache on failure
+      - name: Upload test artifacts on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
@@ -54,6 +74,61 @@ jobs:
             .pytest_cache
             .coverage
             reports/**
+            grpc_server.log
+
+  hardening:
+    runs-on: ubuntu-latest
+    needs: tests
+    env:
+      OVERDEFENSE_TARGET: "1.0"
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-dev.txt -r requirements-ci.txt
+
+      - name: Generate gRPC stubs
+        run: |
+          python -m grpc_tools.protoc -I src/grpc --python_out=src/grpc_generated --grpc_python_out=src/grpc_generated src/grpc/score.proto
+
+      - name: Start gRPC server
+        env:
+          PYTHONPATH: src
+        run: |
+          nohup python src/grpc/server.py > grpc_server.log 2>&1 &
+          sleep 3
+
+      - name: Run hardening gates
+        env:
+          PYTHONPATH: src
+          OVERDEFENSE_TARGET: ${{ env.OVERDEFENSE_TARGET }}
+        run: |
+          python tests/run_hardening.py
+        continue-on-error: false
+
+      - name: Upload hardening report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hardening-report
+          path: |
+            docs/HARDENING_REPORT.md
+            grpc_server.log
+
+      - name: Fail if gates not passed
+        if: failure()
+        run: |
+          echo "❌ Hardening gates failed! See HARDENING_REPORT.md for details."
+          exit 1
 
   lint:
     runs-on: ubuntu-latest
@@ -87,44 +162,22 @@ jobs:
       - name: mypy
         run: mypy --ignore-missing-imports src || true
 
-name: CI
-
-on:
-  push:
-    branches: [ main, SeaRai.V.03 ]
-  pull_request:
-
-jobs:
-  build-test:
+  build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ['3.11', '3.13']
+    needs: [tests, hardening]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install deps
+          python-version: "3.13"
+      - name: Install build tools
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install mypy ruff build
-      - name: Lint (ruff)
-        run: |
-          ruff check src tests || true
-      - name: Type-check (mypy)
-        run: |
-          mypy --ignore-missing-imports src || true
-      - name: Tests
-        env:
-          PYTHONPATH: src
-          RATE_LIMIT_ENABLED: 'false'
-        run: |
-          pytest -q
+          pip install build
       - name: Build wheels
-        run: |
-          python -m build
-      - name: Install wheel
-        run: |
-          pip install dist/*.whl
+        run: python -m build
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-packages
+          path: dist/*
