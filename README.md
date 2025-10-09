@@ -174,6 +174,28 @@ curl -sf -X POST http://127.0.0.1:8001/score \
 
 - Gate: tuned per-slice thresholds in `config.yaml`; stricter overrides in `gate.json`.
 
+## Multi-Model Moderation
+
+Plug multiple moderation providers (local, OpenAI, Azure) with ensemble strategies.
+
+See `config.adapters.example.yaml` for configuration examples.
+
+**Adapters**: Local (built-in), OpenAI Moderation API, Azure Content Safety  
+**Strategies**: ANY (most restrictive), ALL (most permissive), WEIGHTED (custom scoring)  
+**Features**: Per-category config, hot-reload, metrics, audit trail, parallel execution
+
+```python
+from seval.moderator import Moderator
+
+config = {"moderation": {"adapters": ["local", "openai"], "strategy": "any"}}
+moderator = Moderator(config)
+result = moderator.moderate("test", "violence", "en")
+```
+
+**Environment Variables**: `OPENAI_API_KEY`, `AZURE_CONTENT_SAFETY_ENDPOINT`, `AZURE_CONTENT_SAFETY_KEY`
+
+**Tests**: 66 tests pass - `pytest tests/test_adapters*.py tests/test_strategies.py tests/test_moderator.py -v`
+
 ## Documentation
 
 - [Getting Started](docs/GETTING_STARTED.md): environment setup, validation flow, serving reports, CI expectations.

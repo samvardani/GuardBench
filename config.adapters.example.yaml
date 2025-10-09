@@ -1,0 +1,142 @@
+# Example configuration for multi-model moderation adapters
+
+dataset_path: ./dataset/sample.csv
+privacy_mode: off
+
+# Multi-Model Moderation Configuration
+moderation:
+  # Default adapters (used if no category override)
+  adapters:
+    - local
+  
+  # Default ensemble strategy: any|all|weighted
+  strategy: any
+  
+  # Strategy configuration
+  strategy_config:
+    threshold: 2.5  # For weighted strategy
+    weights:  # Adapter weights for weighted strategy
+      local: 1.0
+      openai: 1.5
+      azure: 1.2
+    default_weight: 1.0
+  
+  # Per-category overrides
+  categories:
+    violence:
+      adapters:
+        - local
+        - openai
+      strategy: any
+    
+    self_harm:
+      adapters:
+        - local
+        - azure
+      strategy: all
+    
+    hate:
+      adapters:
+        - local
+        - openai
+        - azure
+      strategy: weighted
+      strategy_config:
+        threshold: 3.0
+        weights:
+          local: 1.0
+          openai: 1.5
+          azure: 1.2
+  
+  # Adapter-specific configurations
+  adapter_configs:
+    openai:
+      # API key can be set via OPENAI_API_KEY env var
+      # Or specified here (not recommended)
+      # api_key: "sk-..."
+      timeout: 5.0
+    
+    azure:
+      # Endpoint and key can be set via env vars:
+      # AZURE_CONTENT_SAFETY_ENDPOINT
+      # AZURE_CONTENT_SAFETY_KEY or AZURE_KEY
+      # Or specified here (not recommended)
+      # endpoint: "https://your-resource.cognitiveservices.azure.com/"
+      # api_key: "your-key"
+      timeout: 5.0
+    
+    local:
+      # No additional config needed for local adapter
+      pass
+
+# Existing configuration
+engines:
+  baseline:
+    name: rules-v1
+    retries: 1
+    timeout_ms: 800
+  candidate:
+    name: candidate-v1
+    retries: 1
+    timeout_ms: 800
+
+policy_version: v0.1
+
+risk_weights:
+  benign: 0
+  crime: 6
+  extremism: 8
+  hate: 6
+  malware: 6
+  medical_legal: 4
+  minors: 10
+  pii: 5
+  self_harm: 7
+  violence: 6
+
+slice_thresholds:
+  benign:
+    en: 1.0
+    fa: 1.0
+  crime:
+    en: 5.0
+    es: 5.0
+  malware:
+    en: 5.0
+    es: 5.0
+  pii:
+    en: 5.0
+    es: 5.0
+  self_harm:
+    en: 5.0
+    es: 5.0
+  violence:
+    en: 5.0
+    fa: 5.0
+    es: 5.0
+    fr: 5.0
+
+notifications:
+  enabled: true
+  log_path: notifications.log
+  channels:
+    - type: webhook
+      name: local_mock
+      url: http://127.0.0.1:8799/notify
+  thresholds:
+    fnr: 0.05
+    runtime_margin: 0.1
+
+thresholds:
+  crime: 5.0
+  default: 5.0
+  extremism: 5.0
+  malware: 5.0
+  pii: 5.0
+  self_harm: 5.0
+  violence: 5.0
+
+tenants:
+  default:
+    autopatch_canary: true
+
