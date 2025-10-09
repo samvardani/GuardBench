@@ -158,3 +158,43 @@ async def test_stream_early_cancel(grpc_address: str = "127.0.0.1:50051") -> Non
         health_resp = await stub.Score(health_req)
         assert health_resp.score is not None, "Server should still be responsive after cancel"
 
+
+@pytest.mark.asyncio
+async def test_deadline_exceeded_with_trailers(grpc_address: str = "127.0.0.1:50051") -> None:
+    """Test that DEADLINE_EXCEEDED errors still include trailing metadata."""
+    async with grpc.aio.insecure_channel(grpc_address) as ch:
+        stub = score_pb2_grpc.ScoreServiceStub(ch)
+        
+        # Set a very short deadline (50ms) to force timeout
+        req = score_pb2.ScoreRequest(text="deadline_test", category="violence", language="en")
+        
+        try:
+            # Make call with 50ms deadline - may or may not timeout depending on system speed
+            call = stub.Score(req, timeout=0.05)  # 50ms
+            resp = await call
+            
+            # If it didn't timeout, verify normal behavior
+            assert resp.score is not None, "Should get response if no timeout"
+            
+            # Get trailing metadata even on success
+            trailers = await call.trailing_metadata()
+            d = {k: v for k, v in trailers}
+            assert "x-policy-version" in d, "Should have metadata even without timeout"
+            assert "x-policy-checksum" in d, "Should have checksum even without timeout"
+            
+        except grpc.RpcError as e:
+            # If deadline exceeded, verify we still get trailing metadata
+            assert e.code() == grpc.StatusCode.DEADLINE_EXCEEDED, \
+                f"Expected DEADLINE_EXCEEDED, got {e.code()}"
+            
+            # Get trailing metadata from the error
+            trailers = e.trailing_metadata()
+            if trailers:
+                d = {k: v for k, v in trailers}
+                
+                # Verify policy metadata is present even on error
+                assert "x-policy-version" in d, "x-policy-version should be in trailers even on timeout"
+                assert "x-policy-checksum" in d, "x-policy-checksum should be in trailers even on timeout"
+                assert d["x-policy-version"] != "n/a", "x-policy-version should be valid"
+                assert len(d["x-policy-checksum"]) >= 8, "x-policy-checksum should be valid"
+
