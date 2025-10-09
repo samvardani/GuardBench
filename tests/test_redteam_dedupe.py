@@ -1,4 +1,4 @@
-from src.redteam.dedupe import TextDeduper
+from redteam.dedupe import TextDeduper
 
 
 def test_dedupe_threshold_behavior():

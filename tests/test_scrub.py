@@ -1,8 +1,8 @@
 import importlib
 from unittest import mock
 
-from src.utils import scrub
-from src.utils.scrub import scrub_text, scrub_record, privacy_mode_for
+from utils import scrub
+from utils.scrub import scrub_text, scrub_record, privacy_mode_for
 
 
 def test_scrub_off_redacts_pii():

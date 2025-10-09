@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 from typing import Iterable
 
-from src.autopatch import candidates as autopatch_candidates
+from autopatch import candidates as autopatch_candidates
 
 from .dedupe import TextDeduper
 from .search import SwarmSearch, load_seed_rows

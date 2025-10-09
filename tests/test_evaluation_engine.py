@@ -1,4 +1,4 @@
-from src.evaluation import evaluate
+from evaluation import evaluate
 
 
 def test_evaluate_produces_metrics_and_risk():

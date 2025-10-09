@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Iterable, List, Sequence
 
-from src.guards.candidate import predict as candidate_predict
+from guards.candidate import predict as candidate_predict
 
 DEFAULT_LANGS = ["en", "fa", "es"]
 TARGET_DELTA = 0.05

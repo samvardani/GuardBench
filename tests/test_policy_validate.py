@@ -1,7 +1,7 @@
 import pytest
 
-from src.policy.schema import validate_policy, PolicyValidationError
-from src.policy.compiler import compile_policy
+from policy.schema import validate_policy, PolicyValidationError
+from policy.compiler import compile_policy
 
 
 def test_validate_policy_success():

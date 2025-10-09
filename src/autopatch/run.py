@@ -12,8 +12,8 @@ from typing import Dict
 
 import yaml
 
-from src.autopatch import ab_eval, candidates, pr_bot
-from src.utils.io_utils import load_config
+from . import ab_eval, candidates, pr_bot
+from utils.io_utils import load_config
 
 CANARY_PATH = Path("tuned_thresholds_canary.yaml")
 

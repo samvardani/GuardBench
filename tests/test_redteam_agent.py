@@ -2,9 +2,9 @@ import json
 import random
 from pathlib import Path
 
-from src.redteam.agents import AgentInput, AgentOutput, BaseAgent
-from src.redteam.redteam_agent import RedTeamAgent
-from src.redteam.search import SeedRow
+from redteam.agents import AgentInput, AgentOutput, BaseAgent
+from redteam.redteam_agent import RedTeamAgent
+from redteam.search import SeedRow
 
 
 class AlwaysSuccessAgent(BaseAgent):

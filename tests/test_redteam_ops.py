@@ -1,4 +1,4 @@
-from src.redteam import operators
+from redteam import operators
 
 
 def test_basic_operators_preserve_signal():

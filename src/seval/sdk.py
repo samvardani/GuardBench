@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, Iterable, List, Mapping
 
-from src.service.api import _resolve_guard, _wrap_guard_sync
+from service.api import _resolve_guard, _wrap_guard_sync
 
 
 def predict(text: str, category: str, language: str, *, guard: str = "candidate") -> Dict[str, Any]:

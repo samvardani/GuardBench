@@ -10,9 +10,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Dict, Iterable, List, Mapping, Sequence, Tuple
 
-from src.guards.candidate import predict as candidate_predict
-from src.policy.compiler import load_compiled_policy
-from src.obfuscation.operators import (
+from guards.candidate import predict as candidate_predict
+from policy.compiler import load_compiled_policy
+from obfuscation.operators import (
     leet_speak,
     insert_zero_width,
     swap_homoglyphs,

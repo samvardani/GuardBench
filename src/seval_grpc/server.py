@@ -6,8 +6,8 @@ import os
 import grpc  # type: ignore
 
 from seval import sdk
-from src.grpc_generated import score_pb2, score_pb2_grpc  # type: ignore
-from src.service.api import POLICY_VERSION
+from grpc_generated import score_pb2, score_pb2_grpc  # type: ignore
+from service.api import POLICY_VERSION
 
 
 class ScoreService(score_pb2_grpc.ScoreServiceServicer):  # type: ignore

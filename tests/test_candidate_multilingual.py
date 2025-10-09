@@ -1,4 +1,4 @@
-from src.guards.candidate import predict
+from guards.candidate import predict
 
 
 def test_spanish_violence_rule_flags_prompt():

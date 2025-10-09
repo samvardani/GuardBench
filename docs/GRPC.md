@@ -3,7 +3,7 @@
 ## Generate Python stubs
 
 ```bash
-python -m grpc_tools.protoc -I src/grpc --python_out=src/grpc_generated --grpc_python_out=src/grpc_generated src/grpc/score.proto
+python -m grpc_tools.protoc -I src/grpc_service --python_out=src/grpc_generated --grpc_python_out=src/grpc_generated src/grpc_service/score.proto
 ```
 
 ## Run the server

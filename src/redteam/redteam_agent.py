@@ -9,12 +9,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Mapping, Optional, Sequence
 
-from src.guards.candidate import _normalize_aggressive, predict as candidate_predict
-from src.redteam.agents import AGENTS, AgentInput, BaseAgent
-from src.redteam.dedupe import TextDeduper
-from src.redteam.search import SeedRow, load_seed_rows
-from src.redteam.store import CaseStore, StoredCase
-from src.utils.io_utils import load_config
+from guards.candidate import _normalize_aggressive, predict as candidate_predict
+from redteam.agents import AGENTS, AgentInput, BaseAgent
+from redteam.dedupe import TextDeduper
+from redteam.search import SeedRow, load_seed_rows
+from redteam.store import CaseStore, StoredCase
+from utils.io_utils import load_config
 
 
 @dataclass

@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from src.dataset.sampler import load_runtime_samples, build_dataset
+from dataset.sampler import load_runtime_samples, build_dataset
 
 
 def test_load_runtime_samples_and_build_dataset(tmp_path):

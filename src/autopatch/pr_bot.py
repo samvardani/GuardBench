@@ -7,7 +7,7 @@ import textwrap
 from pathlib import Path
 from typing import Dict, Iterable, List
 
-from src.autopatch import candidates as candidate_utils
+from . import candidates as candidate_utils
 
 
 AUTOPATCH_DIR = Path(".autopatch")

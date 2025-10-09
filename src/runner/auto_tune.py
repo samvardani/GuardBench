@@ -1,8 +1,8 @@
 import csv, json
 from pathlib import Path
 from collections import defaultdict
-from src.utils.io_utils import load_config, resolve_dataset_path
-from src.guards.candidate import predict as predict_candidate
+from utils.io_utils import load_config, resolve_dataset_path
+from guards.candidate import predict as predict_candidate
 
 TARGET_FPR = 0.01  # change via --fpr later if you want
 

@@ -1,5 +1,5 @@
 from pathlib import Path
-from src.policy import policy_cache
+from policy import policy_cache
 
 
 def test_policy_cache_loads_once(tmp_path, monkeypatch):

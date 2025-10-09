@@ -7,7 +7,7 @@ import pytest
 from runtime.python.sentinel_sdk import SentinelClient, TelemetryExporter
 from runtime.python.sentinel_sdk.exporter import log_telemetry
 from runtime.python.sentinel_sdk.middleware import SentinelASGIMiddleware
-from src.utils.scrub import scrub_text
+from utils.scrub import scrub_text
 
 
 def test_client_logs(tmp_path):

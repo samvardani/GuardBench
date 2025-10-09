@@ -112,10 +112,10 @@ except Exception:  # pragma: no cover
     OTLPSpanExporter = None  # type: ignore
 
 from . import db
-from src.evaluation import evaluate
-from src.guards.baseline import predict as baseline_predict
-from src.guards.candidate import predict as candidate_predict
-from src.report.build_report import (
+from evaluation import evaluate
+from guards.baseline import predict as baseline_predict
+from guards.candidate import predict as candidate_predict
+from report.build_report import (
     cluster_failures,
     histogram,
     load_incident_reports,
@@ -124,17 +124,17 @@ from src.report.build_report import (
     load_runtime_telemetry,
     slice_failure_patterns,
 )
-from src.autopatch.candidates import apply_threshold_patch_to_tuned
+from autopatch.candidates import apply_threshold_patch_to_tuned
 from .settings import get_settings
-from src.utils.io_utils import load_config, git_commit
-from src.utils.scrub import privacy_mode_for, scrub_text
+from utils.io_utils import load_config, git_commit
+from utils.scrub import privacy_mode_for, scrub_text
 from jinja2 import Environment, FileSystemLoader
-from src.utils.json import orjson_dumps, orjson_loads
-from src.policy.compiler import load_compiled_policy, POLICY_PATH
-from src.policy import policy_cache as policy_cache
+from utils.json import orjson_dumps, orjson_loads
+from policy.compiler import load_compiled_policy, POLICY_PATH
+from policy import policy_cache as policy_cache
 import hashlib
 import secrets
-from src.utils.seed import seed_all_from_env
+from utils.seed import seed_all_from_env
 
 
 try:

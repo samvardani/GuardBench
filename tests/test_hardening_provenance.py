@@ -10,8 +10,8 @@ import pytest
 import asyncio
 import grpc
 from fastapi.testclient import TestClient
-from src.service.api import app
-from src.grpc_generated import score_pb2, score_pb2_grpc
+from service.api import app
+from grpc_generated import score_pb2, score_pb2_grpc
 
 
 class TestProvenanceCoverage:

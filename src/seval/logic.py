@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Dict
 
-from src.seval import sdk
+from . import sdk
 
 
 def score_once(text: str, category: str, language: str, guard: str = "candidate") -> Dict[str, Any]:

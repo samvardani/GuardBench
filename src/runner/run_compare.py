@@ -1,8 +1,8 @@
 import csv, pathlib
-from src.guards.baseline import predict as predict_baseline
-from src.guards.candidate import predict as predict_candidate
-from src.utils.io_utils import load_config, resolve_dataset_path
-from src.evaluation import evaluate
+from guards.baseline import predict as predict_baseline
+from guards.candidate import predict as predict_candidate
+from utils.io_utils import load_config, resolve_dataset_path
+from evaluation import evaluate
 
 def load_cfg_and_data():
     cfg = load_config()

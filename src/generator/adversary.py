@@ -13,7 +13,7 @@ import yaml
 import random
 import re
 
-from src.report.build_report import get_text
+from report.build_report import get_text
 
 
 

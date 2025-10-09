@@ -48,13 +48,13 @@ jobs:
 
       - name: Generate gRPC stubs
         run: |
-          python -m grpc_tools.protoc -I src/grpc --python_out=src/grpc_generated --grpc_python_out=src/grpc_generated src/grpc/score.proto
+          python -m grpc_tools.protoc -I src/grpc_service --python_out=src/grpc_generated --grpc_python_out=src/grpc_generated src/grpc_service/score.proto
 
       - name: Start gRPC server (background)
         env:
           PYTHONPATH: src
         run: |
-          nohup python src/grpc/server.py > grpc_server.log 2>&1 &
+          nohup python src/grpc_service/server.py > grpc_server.log 2>&1 &
           sleep 3
           echo "gRPC server started (PID: $!)"
 
@@ -98,13 +98,13 @@ jobs:
 
       - name: Generate gRPC stubs
         run: |
-          python -m grpc_tools.protoc -I src/grpc --python_out=src/grpc_generated --grpc_python_out=src/grpc_generated src/grpc/score.proto
+          python -m grpc_tools.protoc -I src/grpc_service --python_out=src/grpc_generated --grpc_python_out=src/grpc_generated src/grpc_service/score.proto
 
       - name: Start gRPC server
         env:
           PYTHONPATH: src
         run: |
-          nohup python src/grpc/server.py > grpc_server.log 2>&1 &
+          nohup python src/grpc_service/server.py > grpc_server.log 2>&1 &
           sleep 3
 
       - name: Run hardening gates

@@ -11,7 +11,7 @@ from typing import Dict, List, Mapping, Optional
 
 import yaml
 
-from src.guards.candidate import predict as candidate_predict
+from guards.candidate import predict as candidate_predict
 
 MANIPULATIVE_PATTERNS = [
     r"ignore\s+(all\s+)?(the\s+)?rules",

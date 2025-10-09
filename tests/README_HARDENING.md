@@ -177,7 +177,7 @@ Update `HARDENING_GATES` in `tests/run_hardening.py`
 ### gRPC Server Not Running
 ```bash
 # Start server manually
-PYTHONPATH=src python src/grpc/server.py
+PYTHONPATH=src python src/grpc_service/server.py
 ```
 
 ### Trace ID All Zeros

@@ -6,7 +6,7 @@ import random
 import re
 from typing import Callable, List
 
-from src.redteam.operators import (
+from redteam.operators import (
     leet_speak,
     insert_zero_width,
     swap_homoglyphs,

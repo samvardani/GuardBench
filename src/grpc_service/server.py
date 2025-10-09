@@ -8,16 +8,16 @@ from typing import List
 
 import grpc  # type: ignore
 
-from src.seval import sdk
-from src.seval.logic import score_once
+from seval import sdk
+from seval.logic import score_once
 from grpc_health.v1 import health, health_pb2, health_pb2_grpc  # type: ignore
 from grpc_reflection.v1alpha import reflection  # type: ignore
-from src.grpc_generated import score_pb2, score_pb2_grpc  # type: ignore
-from src.seval.settings import POLICY_VERSION, POLICY_CHECKSUM
-from src.policy.compiler import POLICY_PATH
-from src.grpc.interceptors import TrailingMetaInterceptor
+from grpc_generated import score_pb2, score_pb2_grpc  # type: ignore
+from seval.settings import POLICY_VERSION, POLICY_CHECKSUM
+from policy.compiler import POLICY_PATH
+from grpc_service.interceptors import TrailingMetaInterceptor
 import logging
-from src.grpc import metrics as grpc_metrics
+from . import metrics as grpc_metrics
 
 # Context variable to track if we're in batch context
 _batch_context: contextvars.ContextVar[bool] = contextvars.ContextVar("batch_context", default=False)
@@ -105,7 +105,7 @@ async def serve_async():
     
     # Check 1: Verify policy can be loaded
     try:
-        from src.policy.compiler import load_compiled_policy
+        from policy.compiler import load_compiled_policy
         policy = load_compiled_policy(POLICY_PATH)
         logger.info("Health check: Policy loaded successfully (%d slices)", len(policy.slices))
     except Exception as e:

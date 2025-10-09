@@ -1,7 +1,7 @@
 import csv, pathlib, yaml
 from collections import Counter
-from src.guards.baseline import predict as predict_baseline
-from src.guards.candidate import predict as predict_candidate
+from guards.baseline import predict as predict_baseline
+from guards.candidate import predict as predict_candidate
 
 def load_cfg_and_data():
     root = pathlib.Path(__file__).resolve().parents[2]

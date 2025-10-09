@@ -12,7 +12,7 @@ from typing import Dict, Iterable, List, Mapping, MutableMapping, Optional, Sequ
 
 import yaml
 
-from src.guards.candidate import _normalize_aggressive, predict as candidate_predict
+from guards.candidate import _normalize_aggressive, predict as candidate_predict
 
 from .agents import AGENTS, AgentInput, AgentOutput, BaseAgent
 from .dedupe import TextDeduper
