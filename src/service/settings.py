@@ -1,9 +1,20 @@
+"""Service settings (deprecated - use config.py instead).
+
+This module is kept for backward compatibility.
+New code should use config.get_config() instead.
+"""
+
 from __future__ import annotations
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+# Import central config
+from config import get_config as get_app_config, AppConfig
+
 
 class Settings(BaseSettings):
+    """Deprecated: Use AppConfig from config.py instead."""
+    
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", case_sensitive=False)
 
     # Networking / Uvicorn
@@ -33,8 +44,14 @@ class Settings(BaseSettings):
 
 
 def get_settings() -> Settings:
+    """Get settings (deprecated - use config.get_config() instead)."""
     return Settings()  # type: ignore[call-arg]
 
 
-__all__ = ["Settings", "get_settings"]
+def get_config() -> AppConfig:
+    """Get centralized config (recommended)."""
+    return get_app_config()
+
+
+__all__ = ["Settings", "get_settings", "get_config"]
 
