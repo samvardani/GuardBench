@@ -199,6 +199,13 @@ app.add_middleware(
 # Session support (for CSRF tokens on policy page, etc.)
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET", "dev-not-secret"))
 
+# Secure metrics endpoint
+try:
+    from monitoring.routes import router as metrics_router
+    app.include_router(metrics_router)
+    logger.info("Secure metrics endpoint enabled at /metrics")
+except Exception as e:
+    logger.warning(f"Metrics endpoint not available: {e}")
 
 # Policy metadata middleware - injects version and checksum headers
 @app.middleware("http")
