@@ -1,0 +1,217 @@
+# Default values for safety-eval-mini Helm chart
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 2
+
+image:
+  repository: safety-eval-mini
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "8001"
+  prometheus.io/path: "/metrics"
+
+podLabels:
+  app: safety-eval-mini
+  tier: api
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: false
+  runAsNonRoot: true
+  runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 8001
+  targetPort: 8001
+  annotations: {}
+
+# gRPC service (optional)
+grpcService:
+  enabled: true
+  type: ClusterIP
+  port: 50051
+  targetPort: 50051
+
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  hosts:
+    - host: safety-eval.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: safety-eval-tls
+      hosts:
+        - safety-eval.example.com
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 30
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /healthz
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# Additional volumes on the output Deployment definition.
+volumes: []
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts: []
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - safety-eval-mini
+          topologyKey: kubernetes.io/hostname
+
+# Application configuration
+config:
+  # Privacy mode: on|off
+  privacyMode: "off"
+  
+  # Policy version
+  policyVersion: "v0.1"
+  
+  # Log level: DEBUG|INFO|WARNING|ERROR
+  logLevel: "INFO"
+  
+  # CORS origins (comma-separated)
+  corsAllowOrigins: "*"
+  
+  # Rate limiting
+  rateLimitEnabled: "true"
+  
+  # Thresholds
+  thresholds:
+    crime: 5.0
+    default: 5.0
+    extremism: 5.0
+    malware: 5.0
+    pii: 5.0
+    self_harm: 5.0
+    violence: 5.0
+
+# Policy ConfigMap
+policy:
+  # Mount existing policy ConfigMap
+  existingConfigMap: ""
+  # Or provide inline policy
+  data: |
+    version: 1
+    metadata:
+      name: safety-eval-mini
+      description: Default policy
+    slices:
+      - id: violence_en
+        category: violence
+        language: en
+        threshold: 0.99
+        rules:
+          - id: violence_keywords
+            weight: 1.0
+            action: block
+            match:
+              regex:
+                - "\\bkill\\b"
+                - "\\bpoison\\b"
+
+# Secrets (use Kubernetes Secrets)
+secrets:
+  # OpenAI API key for multi-model moderation
+  openaiApiKey: ""
+  # Azure Content Safety credentials
+  azureEndpoint: ""
+  azureKey: ""
+  # Slack webhook for alerts
+  slackWebhookUrl: ""
+  # Session secret
+  sessionSecret: ""
+
+# Prometheus ServiceMonitor (requires Prometheus Operator)
+serviceMonitor:
+  enabled: false
+  interval: 30s
+  scrapeTimeout: 10s
+  labels: {}
+
+# Environment variables
+env:
+  - name: PYTHONPATH
+    value: "src"
+  - name: ENABLE_IMAGE
+    value: "0"
+  - name: ENABLE_GRPC_REFLECTION
+    value: "false"
+
+# Additional environment variables from secrets
+envFrom: []
+

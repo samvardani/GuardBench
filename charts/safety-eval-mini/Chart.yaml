@@ -1,0 +1,19 @@
+apiVersion: v2
+name: safety-eval-mini
+description: Enterprise AI safety evaluation platform with REST/gRPC APIs and governance
+type: application
+version: 0.3.1
+appVersion: "0.3.1"
+keywords:
+  - ai-safety
+  - content-moderation
+  - mlops
+  - guardrails
+home: https://github.com/samvardani/safety-eval-mini
+sources:
+  - https://github.com/samvardani/safety-eval-mini
+maintainers:
+  - name: Saeed M. Vardani
+    email: saeed@seatechone.com
+icon: https://raw.githubusercontent.com/samvardani/safety-eval-mini/main/docs/assets/icon.png
+

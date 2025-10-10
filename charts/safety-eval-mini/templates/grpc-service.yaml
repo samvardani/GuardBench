@@ -1,0 +1,19 @@
+{{- if .Values.grpcService.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "safety-eval-mini.fullname" . }}-grpc
+  labels:
+    {{- include "safety-eval-mini.labels" . | nindent 4 }}
+    service-type: grpc
+spec:
+  type: {{ .Values.grpcService.type }}
+  ports:
+    - port: {{ .Values.grpcService.port }}
+      targetPort: grpc
+      protocol: TCP
+      name: grpc
+  selector:
+    {{- include "safety-eval-mini.selectorLabels" . | nindent 4 }}
+{{- end }}
+

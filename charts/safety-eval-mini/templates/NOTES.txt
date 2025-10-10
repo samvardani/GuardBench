@@ -1,0 +1,57 @@
+Thank you for installing {{ .Chart.Name }}!
+
+Your release is named {{ .Release.Name }}.
+
+To learn more about the release, try:
+
+  $ helm status {{ .Release.Name }}
+  $ helm get all {{ .Release.Name }}
+
+===================================================================
+
+1. Get the application URL:
+
+{{- if .Values.ingress.enabled }}
+  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ (index .Values.ingress.hosts 0).host }}
+{{- else if contains "NodePort" .Values.service.type }}
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "safety-eval-mini.fullname" . }})
+  export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+  echo "http://$NODE_IP:$NODE_PORT"
+{{- else if contains "LoadBalancer" .Values.service.type }}
+  NOTE: It may take a few minutes for the LoadBalancer IP to be available.
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "safety-eval-mini.fullname" . }} --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+  echo "http://$SERVICE_IP:{{ .Values.service.port }}"
+{{- else if contains "ClusterIP" .Values.service.type }}
+  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "safety-eval-mini.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
+  export CONTAINER_PORT=$(kubectl get pod --namespace {{ .Release.Namespace }} $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
+  echo "Visit http://127.0.0.1:8001 to use your application"
+  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8001:$CONTAINER_PORT
+{{- end }}
+
+2. Check application health:
+
+  kubectl --namespace {{ .Release.Namespace }} exec -it deploy/{{ include "safety-eval-mini.fullname" . }} -- curl -s http://localhost:8001/healthz
+
+3. View logs:
+
+  kubectl --namespace {{ .Release.Namespace }} logs -f deploy/{{ include "safety-eval-mini.fullname" . }}
+
+4. Test the safety scoring API:
+
+  kubectl --namespace {{ .Release.Namespace }} exec -it deploy/{{ include "safety-eval-mini.fullname" . }} -- curl -s -X POST http://localhost:8001/score \
+    -H 'Content-Type: application/json' \
+    -d '{"text":"hello","category":"violence","language":"en","guard":"candidate"}'
+
+{{- if .Values.serviceMonitor.enabled }}
+
+5. Prometheus metrics are being scraped via ServiceMonitor.
+
+  Check Prometheus UI for metrics: safety_eval_*
+{{- end }}
+
+===================================================================
+
+For more information, visit:
+  - Documentation: https://github.com/samvardani/safety-eval-mini/tree/main/docs
+  - Issues: https://github.com/samvardani/safety-eval-mini/issues
+

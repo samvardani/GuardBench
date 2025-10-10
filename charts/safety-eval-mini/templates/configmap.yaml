@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "safety-eval-mini.fullname" . }}-config
+  labels:
+    {{- include "safety-eval-mini.labels" . | nindent 4 }}
+data:
+  config.yaml: |
+    dataset_path: ./dataset/sample.csv
+    privacy_mode: {{ .Values.config.privacyMode }}
+    policy_version: {{ .Values.config.policyVersion }}
+    
+    engines:
+      baseline:
+        name: rules-v1
+        retries: 1
+        timeout_ms: 800
+      candidate:
+        name: candidate-v1
+        retries: 1
+        timeout_ms: 800
+    
+    thresholds:
+      {{- range $key, $value := .Values.config.thresholds }}
+      {{ $key }}: {{ $value }}
+      {{- end }}
+    
+    notifications:
+      enabled: true
+      log_path: /dev/stdout
+

@@ -233,6 +233,8 @@ mkdocs serve
 
 ## Containerisation & Deployment
 
+### Docker Compose
+
 Build the production image (Gunicorn + Uvicorn workers) and run the API, background worker, and static dashboard via Docker Compose:
 
 ```bash
@@ -251,7 +253,33 @@ docker compose ps
 
 The API exposes `/healthz` for liveness/readiness and `/metrics` for Prometheus scraping. The `report/` and `dist/` directories are mounted as volumes so reports and tarballs persist on the host.
 
-Each service mounts the `report/` and `dist/` directories so scorecards and artefacts persist on the host. The worker currently emits heartbeats and is the recommended hook for future scheduled jobs (red-team sweeps, telemetry sync, etc.).
+### Kubernetes (Helm)
+
+Deploy to Kubernetes with the included Helm chart:
+
+```bash
+# Install from local chart
+helm install my-safety-eval ./charts/safety-eval-mini
+
+# With custom values
+helm install my-safety-eval ./charts/safety-eval-mini -f values.yaml
+
+# Verify deployment
+kubectl get pods -l app.kubernetes.io/name=safety-eval-mini
+kubectl port-forward svc/my-safety-eval-safety-eval-mini 8001:8001
+curl http://localhost:8001/healthz
+```
+
+**Features**:
+- Production-ready with health probes
+- Horizontal Pod Autoscaler (HPA) support
+- Ingress with TLS
+- ConfigMap for policy mounting
+- Secret management for API keys
+- ServiceMonitor for Prometheus Operator
+- Anti-affinity for HA
+
+See [charts/safety-eval-mini/README.md](charts/safety-eval-mini/README.md) for detailed documentation.
 
 ## Working with the dataset
 

@@ -1,0 +1,12 @@
+{{- if not .Values.policy.existingConfigMap }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "safety-eval-mini.fullname" . }}-policy
+  labels:
+    {{- include "safety-eval-mini.labels" . | nindent 4 }}
+data:
+  policy.yaml: |
+    {{- .Values.policy.data | nindent 4 }}
+{{- end }}
+

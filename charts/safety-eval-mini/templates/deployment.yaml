@@ -1,0 +1,140 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "safety-eval-mini.fullname" . }}
+  labels:
+    {{- include "safety-eval-mini.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "safety-eval-mini.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/policy: {{ include (print $.Template.BasePath "/policy-configmap.yaml") . | sha256sum }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "safety-eval-mini.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "safety-eval-mini.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: {{ .Chart.Name }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: 8001
+          protocol: TCP
+        {{- if .Values.grpcService.enabled }}
+        - name: grpc
+          containerPort: 50051
+          protocol: TCP
+        {{- end }}
+        env:
+        {{- range .Values.env }}
+        - name: {{ .name }}
+          value: {{ .value | quote }}
+        {{- end }}
+        - name: LOG_LEVEL
+          value: {{ .Values.config.logLevel | quote }}
+        - name: CORS_ALLOW_ORIGINS
+          value: {{ .Values.config.corsAllowOrigins | quote }}
+        - name: RATE_LIMIT_ENABLED
+          value: {{ .Values.config.rateLimitEnabled | quote }}
+        {{- if .Values.secrets.sessionSecret }}
+        - name: SESSION_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "safety-eval-mini.fullname" . }}
+              key: session-secret
+        {{- end }}
+        {{- if .Values.secrets.openaiApiKey }}
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "safety-eval-mini.fullname" . }}
+              key: openai-api-key
+        {{- end }}
+        {{- if .Values.secrets.azureEndpoint }}
+        - name: AZURE_CONTENT_SAFETY_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "safety-eval-mini.fullname" . }}
+              key: azure-endpoint
+        {{- end }}
+        {{- if .Values.secrets.azureKey }}
+        - name: AZURE_CONTENT_SAFETY_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "safety-eval-mini.fullname" . }}
+              key: azure-key
+        {{- end }}
+        {{- if .Values.secrets.slackWebhookUrl }}
+        - name: SLACK_WEBHOOK_URL
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "safety-eval-mini.fullname" . }}
+              key: slack-webhook-url
+        {{- end }}
+        {{- with .Values.envFrom }}
+        envFrom:
+          {{- toYaml . | nindent 12 }}
+        {{- end }}
+        livenessProbe:
+          {{- toYaml .Values.livenessProbe | nindent 12 }}
+        readinessProbe:
+          {{- toYaml .Values.readinessProbe | nindent 12 }}
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+        volumeMounts:
+        - name: config
+          mountPath: /app/config.yaml
+          subPath: config.yaml
+          readOnly: true
+        - name: policy
+          mountPath: /app/policy/policy.yaml
+          subPath: policy.yaml
+          readOnly: true
+        {{- with .Values.volumeMounts }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      volumes:
+      - name: config
+        configMap:
+          name: {{ include "safety-eval-mini.fullname" . }}-config
+      - name: policy
+        configMap:
+          name: {{ include "safety-eval-mini.fullname" . }}-policy
+      {{- with .Values.volumes }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
