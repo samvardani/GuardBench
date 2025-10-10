@@ -199,6 +199,13 @@ app.add_middleware(
 # Session support (for CSRF tokens on policy page, etc.)
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET", "dev-not-secret"))
 
+# Usage quota tracking middleware
+try:
+    from seval.quotas import UsageTrackingMiddleware
+    app.add_middleware(UsageTrackingMiddleware)
+    logger.info("Usage quota tracking enabled")
+except Exception as e:
+    logger.warning(f"Usage quota tracking not available: {e}")
 
 # Policy metadata middleware - injects version and checksum headers
 @app.middleware("http")
@@ -1004,6 +1011,18 @@ GUARD_REGISTRY = _guard_catalogue()
 async def _startup() -> None:
     _configure_tracing()
     db.ensure_schema()
+    
+    # Initialize usage quota tables
+    try:
+        from seval.quotas import init_usage_tables
+        import sqlite3
+        conn = sqlite3.connect("history.db")
+        init_usage_tables(conn)
+        conn.close()
+        logger.info("Usage quota tables initialized")
+    except Exception as e:
+        logger.warning(f"Failed to initialize usage quota tables: {e}")
+    
     logger.info("Safety service initialised with multi-tenant schema")
 
 
