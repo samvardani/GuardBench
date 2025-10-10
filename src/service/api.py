@@ -199,6 +199,20 @@ app.add_middleware(
 # Session support (for CSRF tokens on policy page, etc.)
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET", "dev-not-secret"))
 
+# OIDC authentication middleware
+try:
+    from seval.auth.middleware import OIDCMiddleware
+    from seval.auth.oidc import get_oidc_auth
+    
+    oidc_auth = get_oidc_auth()
+    if oidc_auth.is_configured():
+        app.add_middleware(OIDCMiddleware)
+        logger.info("OIDC middleware enabled (routes protected)")
+    else:
+        logger.info("OIDC not configured (public access mode)")
+except Exception as e:
+    logger.warning(f"OIDC middleware not available: {e}")
+
 
 # Policy metadata middleware - injects version and checksum headers
 @app.middleware("http")

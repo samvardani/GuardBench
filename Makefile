@@ -210,3 +210,14 @@ grpc-smoke:
 	@echo "Testing gRPC server..."
 	@grpcurl -plaintext 127.0.0.1:50051 list || echo "❌ Reflection not enabled. Use: ENABLE_GRPC_REFLECTION=true make run-grpc"
 	@grpcurl -plaintext -d '{"text":"hello","category":"violence","language":"en"}' 127.0.0.1:50051 seval.ScoreService/Score || echo "❌ gRPC server not running. Run: make run-grpc"
+
+# OIDC SSO Development
+sso-dev:
+	@echo "Starting service with OIDC SSO (public mode if not configured)"
+	@echo "Set OIDC_ISSUER, OIDC_CLIENT_ID, OIDC_CLIENT_SECRET to enable auth"
+	@echo "Service: http://localhost:8001"
+	PYTHONPATH=src uvicorn service.api:app --host 0.0.0.0 --port 8001 --reload
+
+sso-test:
+	@echo "Running OIDC tests..."
+	pytest tests/test_oidc*.py -v
