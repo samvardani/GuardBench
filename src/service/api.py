@@ -199,6 +199,13 @@ app.add_middleware(
 # Session support (for CSRF tokens on policy page, etc.)
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET", "dev-not-secret"))
 
+# Safety Copilot assistant routes
+try:
+    from assistant.routes import router as assistant_router
+    app.include_router(assistant_router)
+    logger.info("Safety Copilot enabled at /assistant/*")
+except Exception as e:
+    logger.warning(f"Safety Copilot not available: {e}")
 
 # Policy metadata middleware - injects version and checksum headers
 @app.middleware("http")

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safety Copilot - AI Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .chat-area {
+            height: 500px;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        
+        .message {
+            margin-bottom: 20px;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message.user {
+            text-align: right;
+        }
+        
+        .message-content {
+            display: inline-block;
+            max-width: 70%;
+            padding: 15px 20px;
+            border-radius: 18px;
+            line-height: 1.5;
+        }
+        
+        .user .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .assistant .message-content {
+            background: white;
+            border: 1px solid #e0e0e0;
+            color: #333;
+        }
+        
+        .message-meta {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+        
+        .input-area {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .input-form {
+            display: flex;
+            gap: 10px;
+        }
+        
+        input[type="text"] {
+            flex: 1;
+            padding: 15px 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus {
+            border-color: #667eea;
+        }
+        
+        button {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+        }
+        
+        .error {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c33;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+        
+        .suggestions {
+            padding: 20px;
+            border-top: 1px solid #e0e0e0;
+            background: #fafafa;
+        }
+        
+        .suggestions h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .suggestion-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .pill {
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .pill:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .run-id-input {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 10px;
+        }
+        
+        .run-id-input label {
+            display: block;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .run-id-input input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Safety Copilot</h1>
+            <p>AI Assistant for Safety Evaluation Analysis</p>
+        </div>
+        
+        <div class="chat-area" id="chatArea">
+            <div class="message assistant">
+                <div class="message-content">
+                    <strong>👋 Hello!</strong> I'm Safety Copilot, your AI assistant for understanding content safety evaluations.
+                    <br><br>
+                    Ask me questions like:
+                    <ul style="margin-top: 10px; padding-left: 20px;">
+                        <li>What categories does the system detect?</li>
+                        <li>Why was this content flagged?</li>
+                        <li>How can I improve precision?</li>
+                        <li>Explain false positive rate</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="suggestions">
+            <h3>💡 Try asking:</h3>
+            <div class="suggestion-pills">
+                <span class="pill" onclick="askQuestion('What categories of content does Safety-Eval-Mini detect?')">
+                    What categories are detected?
+                </span>
+                <span class="pill" onclick="askQuestion('Explain precision and recall metrics')">
+                    Explain metrics
+                </span>
+                <span class="pill" onclick="askQuestion('How can I reduce false positives?')">
+                    Reduce false positives
+                </span>
+                <span class="pill" onclick="askQuestion('What languages are supported?')">
+                    Supported languages
+                </span>
+            </div>
+        </div>
+        
+        <div class="input-area">
+            <div class="run-id-input">
+                <label for="runId">Optional: Run ID for specific evaluation context</label>
+                <input type="text" id="runId" placeholder="e.g., abc123...">
+            </div>
+            
+            <form class="input-form" onsubmit="sendQuery(event)">
+                <input type="text" id="questionInput" placeholder="Ask me about safety evaluations..." autocomplete="off" required>
+                <button type="submit" id="sendBtn">Send</button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        const chatArea = document.getElementById('chatArea');
+        const questionInput = document.getElementById('questionInput');
+        const runIdInput = document.getElementById('runId');
+        const sendBtn = document.getElementById('sendBtn');
+        
+        function addMessage(text, isUser = false) {
+            const message = document.createElement('div');
+            message.className = `message ${isUser ? 'user' : 'assistant'}`;
+            
+            const content = document.createElement('div');
+            content.className = 'message-content';
+            
+            if (isUser) {
+                content.textContent = text;
+            } else {
+                // Support basic markdown-like formatting
+                content.innerHTML = formatResponse(text);
+            }
+            
+            message.appendChild(content);
+            
+            const meta = document.createElement('div');
+            meta.className = 'message-meta';
+            meta.textContent = new Date().toLocaleTimeString();
+            message.appendChild(meta);
+            
+            chatArea.appendChild(message);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+        
+        function formatResponse(text) {
+            // Simple markdown-like formatting
+            let formatted = text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/`(.*?)`/g, '<code style="background: #f0f0f0; padding: 2px 6px; border-radius: 3px;">$1</code>')
+                .replace(/\n/g, '<br>');
+            return formatted;
+        }
+        
+        function addLoading() {
+            const loading = document.createElement('div');
+            loading.className = 'loading';
+            loading.id = 'loadingIndicator';
+            loading.innerHTML = '💭 Thinking...';
+            chatArea.appendChild(loading);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+        
+        function removeLoading() {
+            const loading = document.getElementById('loadingIndicator');
+            if (loading) {
+                loading.remove();
+            }
+        }
+        
+        function showError(message) {
+            const error = document.createElement('div');
+            error.className = 'error';
+            error.textContent = '❌ ' + message;
+            chatArea.appendChild(error);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
+        
+        async function sendQuery(event) {
+            event.preventDefault();
+            
+            const question = questionInput.value.trim();
+            if (!question) return;
+            
+            const runId = runIdInput.value.trim() || null;
+            
+            // Add user message
+            addMessage(question, true);
+            questionInput.value = '';
+            
+            // Show loading
+            addLoading();
+            sendBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/assistant/query', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        question: question,
+                        run_id: runId,
+                    }),
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Request failed');
+                }
+                
+                const data = await response.json();
+                
+                removeLoading();
+                addMessage(data.answer, false);
+                
+                // Log metrics
+                console.log(`Response in ${data.latency_ms}ms, ${data.tokens_used || 0} tokens`);
+                
+            } catch (error) {
+                removeLoading();
+                showError(error.message);
+            } finally {
+                sendBtn.disabled = false;
+                questionInput.focus();
+            }
+        }
+        
+        function askQuestion(question) {
+            questionInput.value = question;
+            questionInput.focus();
+        }
+        
+        // Focus on input on load
+        window.onload = () => {
+            questionInput.focus();
+        };
+    </script>
+</body>
+</html>
+
