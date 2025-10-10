@@ -23,6 +23,7 @@ grpcio-health-checking
 grpcio-reflection
 pytest-asyncio
 itsdangerous
+cryptography
 
 jinja2
 MarkupSafe

@@ -199,6 +199,13 @@ app.add_middleware(
 # Session support (for CSRF tokens on policy page, etc.)
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET", "dev-not-secret"))
 
+# Slack OAuth integration routes
+try:
+    from integrations.slack_oauth import router as slack_router
+    app.include_router(slack_router)
+    logger.info("Slack OAuth integration enabled at /slack/*")
+except Exception as e:
+    logger.warning(f"Slack OAuth not available: {e}")
 
 # Policy metadata middleware - injects version and checksum headers
 @app.middleware("http")
@@ -1004,6 +1011,26 @@ GUARD_REGISTRY = _guard_catalogue()
 async def _startup() -> None:
     _configure_tracing()
     db.ensure_schema()
+    
+    # Initialize Slack installation tables
+    try:
+        from db.slack_installations import init_slack_tables
+        import sqlite3
+        conn = sqlite3.connect("history.db")
+        init_slack_tables(conn)
+        conn.close()
+        logger.info("Slack installation tables initialized")
+    except Exception as e:
+        logger.warning(f"Failed to initialize Slack tables: {e}")
+    
+    # Install token redaction filter
+    try:
+        from security.redaction import install_redaction_filter
+        install_redaction_filter()
+        logger.info("Token redaction filter installed")
+    except Exception as e:
+        logger.warning(f"Token redaction filter not installed: {e}")
+    
     logger.info("Safety service initialised with multi-tenant schema")
 
 
