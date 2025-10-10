@@ -1,8 +1,9 @@
 version: "3.9"
 
 services:
-  api:
+  searai-api:
     build: .
+    container_name: searai-api
     environment:
       - PYTHONUNBUFFERED=1
       - PYTHONPATH=/app/src

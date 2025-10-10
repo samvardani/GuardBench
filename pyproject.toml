@@ -1,7 +1,7 @@
 [project]
-name = "safety-eval-mini"
+name = "searai"
 version = "0.3.1"
-description = "Enterprise AI safety evaluation platform with REST/gRPC APIs, red-team automation, and governance"
+description = "SeaRai by SeaTechOne LLC - Enterprise AI safety evaluation platform with REST/gRPC APIs, red-team automation, and governance"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.110.0",
