@@ -199,6 +199,13 @@ app.add_middleware(
 # Session support (for CSRF tokens on policy page, etc.)
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET", "dev-not-secret"))
 
+# Analytics and usage statistics routes
+try:
+    from analytics.routes import router as analytics_router
+    app.include_router(analytics_router)
+    logger.info("Analytics and usage statistics enabled at /analytics/*")
+except Exception as e:
+    logger.warning(f"Analytics not available: {e}")
 
 # Policy metadata middleware - injects version and checksum headers
 @app.middleware("http")
@@ -1004,6 +1011,28 @@ GUARD_REGISTRY = _guard_catalogue()
 async def _startup() -> None:
     _configure_tracing()
     db.ensure_schema()
+    
+    # Start federated telemetry background sender
+    try:
+        from telemetry import get_telemetry_client
+        client = get_telemetry_client()
+        if client.enabled:
+            await client.start_background_sender()
+            logger.info("Federated telemetry background sender started")
+    except Exception as e:
+        logger.warning(f"Federated telemetry not available: {e}")
+    
+    # Initialize analytics tables
+    try:
+        from analytics.schema import init_analytics_tables
+        import sqlite3
+        conn = sqlite3.connect("history.db")
+        init_analytics_tables(conn)
+        conn.close()
+        logger.info("Analytics tables initialized")
+    except Exception as e:
+        logger.warning(f"Failed to initialize analytics tables: {e}")
+    
     logger.info("Safety service initialised with multi-tenant schema")
 
 
