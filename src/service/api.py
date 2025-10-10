@@ -221,6 +221,14 @@ SCORECARD_ROOT = Path("dist/scorecards")
 SCORECARD_ROOT.mkdir(parents=True, exist_ok=True)
 app.mount("/scorecards", StaticFiles(directory=SCORECARD_ROOT), name="scorecards")
 
+# Include export router
+try:
+    from seval.export.routes import router as export_router
+    app.include_router(export_router)
+    logger.info("Export endpoints enabled at /export/*")
+except Exception as e:
+    logger.warning(f"Export endpoints not available: {e}")
+
 CONFIG_FILE = Path("config.yaml")
 AUTOPATCH_THRESHOLD_PATH = Path("tuned_thresholds.yaml")
 AUTOPATCH_CANARY_PATH = Path("tuned_thresholds_canary.yaml")
