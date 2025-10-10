@@ -1,0 +1,96 @@
+# Example configuration for image moderation
+
+# Enable image moderation via environment variable:
+# export ENABLE_IMAGE=1
+
+image_moderation:
+  # Model configuration
+  model_name: "Falconsai/nsfw_image_detection"
+  cache_dir: "~/.cache/seval-image-models"
+  
+  # Category thresholds (0.0 - 1.0)
+  # Block if category score >= threshold
+  thresholds:
+    nsfw: 0.5
+    violence: 0.7
+    suggestive: 0.6
+    normal: 1.0  # Never block normal content
+  
+  # Performance settings
+  batch_size: 1
+  max_image_size_mb: 10
+
+# Existing configuration below...
+dataset_path: ./dataset/sample.csv
+privacy_mode: off
+
+engines:
+  baseline:
+    name: rules-v1
+    retries: 1
+    timeout_ms: 800
+  candidate:
+    name: candidate-v1
+    retries: 1
+    timeout_ms: 800
+
+policy_version: v0.1
+
+risk_weights:
+  benign: 0
+  crime: 6
+  extremism: 8
+  hate: 6
+  malware: 6
+  medical_legal: 4
+  minors: 10
+  pii: 5
+  self_harm: 7
+  violence: 6
+
+slice_thresholds:
+  benign:
+    en: 1.0
+    fa: 1.0
+  crime:
+    en: 5.0
+    es: 5.0
+  malware:
+    en: 5.0
+    es: 5.0
+  pii:
+    en: 5.0
+    es: 5.0
+  self_harm:
+    en: 5.0
+    es: 5.0
+  violence:
+    en: 5.0
+    fa: 5.0
+    es: 5.0
+    fr: 5.0
+
+notifications:
+  enabled: true
+  log_path: notifications.log
+  channels:
+    - type: webhook
+      name: local_mock
+      url: http://127.0.0.1:8799/notify
+  thresholds:
+    fnr: 0.05
+    runtime_margin: 0.1
+
+thresholds:
+  crime: 5.0
+  default: 5.0
+  extremism: 5.0
+  malware: 5.0
+  pii: 5.0
+  self_harm: 5.0
+  violence: 5.0
+
+tenants:
+  default:
+    autopatch_canary: true
+

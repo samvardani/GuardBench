@@ -199,6 +199,17 @@ app.add_middleware(
 # Session support (for CSRF tokens on policy page, etc.)
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET", "dev-not-secret"))
 
+# Include image moderation router if enabled
+try:
+    from seval.image_moderation import is_enabled as image_enabled
+    if image_enabled():
+        from seval.image_moderation.routes import router as image_router
+        app.include_router(image_router)
+        logger.info("Image moderation enabled at /score-image")
+    else:
+        logger.info("Image moderation disabled (set ENABLE_IMAGE=1 to enable)")
+except Exception as e:
+    logger.warning(f"Image moderation not available: {e}")
 
 # Policy metadata middleware - injects version and checksum headers
 @app.middleware("http")

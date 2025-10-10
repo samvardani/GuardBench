@@ -174,6 +174,28 @@ curl -sf -X POST http://127.0.0.1:8001/score \
 
 - Gate: tuned per-slice thresholds in `config.yaml`; stricter overrides in `gate.json`.
 
+## Image Moderation (Optional)
+
+**Enable**: `export ENABLE_IMAGE=1` • **Endpoint**: `POST /score-image` • **Model**: HuggingFace NSFW classifier
+
+```bash
+# Enable and start
+export ENABLE_IMAGE=1
+PYTHONPATH=src uvicorn service.api:app --port 8001
+
+# Score image
+curl -X POST http://localhost:8001/score-image -F "file=@image.jpg"
+# or
+curl -X POST http://localhost:8001/score-image -F "url=https://example.com/image.jpg"
+```
+
+**Categories**: nsfw, violence, suggestive, normal  
+**Thresholds**: Configurable in `config.yaml` (default: nsfw=0.5, violence=0.7)  
+**Model**: Lazy download (~500MB), cached locally  
+**Hardware**: CPU works, GPU recommended (10x faster)
+
+See [IMAGE_MODERATION.md](docs/IMAGE_MODERATION.md) for details.
+
 ## Documentation
 
 - [Getting Started](docs/GETTING_STARTED.md): environment setup, validation flow, serving reports, CI expectations.
