@@ -1004,6 +1004,17 @@ GUARD_REGISTRY = _guard_catalogue()
 async def _startup() -> None:
     _configure_tracing()
     db.ensure_schema()
+    
+    # Start federated telemetry background sender
+    try:
+        from telemetry import get_telemetry_client
+        client = get_telemetry_client()
+        if client.enabled:
+            await client.start_background_sender()
+            logger.info("Federated telemetry background sender started")
+    except Exception as e:
+        logger.warning(f"Federated telemetry not available: {e}")
+    
     logger.info("Safety service initialised with multi-tenant schema")
 
 
