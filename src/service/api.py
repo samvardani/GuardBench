@@ -1004,6 +1004,23 @@ GUARD_REGISTRY = _guard_catalogue()
 async def _startup() -> None:
     _configure_tracing()
     db.ensure_schema()
+    
+    # Start anomaly detection monitoring
+    try:
+        from analytics import get_anomaly_detector, create_alert_system
+        
+        detector = get_anomaly_detector()
+        alert_system = create_alert_system()
+        
+        # Register alert callback
+        detector.register_alert_callback(alert_system.send_alert)
+        
+        # Start monitoring
+        await detector.start_monitoring()
+        logger.info("Anomaly detection monitoring started")
+    except Exception as e:
+        logger.warning(f"Anomaly detection not available: {e}")
+    
     logger.info("Safety service initialised with multi-tenant schema")
 
 
