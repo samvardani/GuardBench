@@ -199,6 +199,13 @@ app.add_middleware(
 # Session support (for CSRF tokens on policy page, etc.)
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET", "dev-not-secret"))
 
+# Billing routes (unified pricing)
+try:
+    from billing.routes import router as billing_router
+    app.include_router(billing_router)
+    logger.info("Unified billing enabled at /billing/*")
+except Exception as e:
+    logger.warning(f"Billing not available: {e}")
 
 # Policy metadata middleware - injects version and checksum headers
 @app.middleware("http")
