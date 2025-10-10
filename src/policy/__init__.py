@@ -1,6 +1,13 @@
-"""Policy loader and compiler interface."""
+"""Policy management with write locking."""
 
-from .schema import validate_policy
-from .compiler import load_compiled_policy, CompiledPolicy
+from __future__ import annotations
 
-__all__ = ["validate_policy", "load_compiled_policy", "CompiledPolicy"]
+from .locking import PolicyWriteLock, with_policy_lock
+from .store import save_policy_with_lock, PolicyConflictError
+
+__all__ = [
+    "PolicyWriteLock",
+    "with_policy_lock",
+    "save_policy_with_lock",
+    "PolicyConflictError",
+]
