@@ -1,0 +1,76 @@
+name: SeaRai CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: 
+      - improve/2025-10-seval
+      - main
+
+jobs:
+  test:
+    name: Test Suite
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip wheel
+          pip install -r requirements.txt -r requirements-dev.txt
+      
+      - name: Run linting (ruff)
+        run: |
+          ruff check src/ tests/ || echo "Linting issues found"
+      
+      - name: Run type checking (mypy)
+        continue-on-error: true
+        run: |
+          mypy src/ --ignore-missing-imports || echo "Type issues found"
+      
+      - name: Run tests with coverage
+        run: |
+          MPLBACKEND=Agg pytest tests/ -v --cov=src --cov-report=xml --cov-report=term --tb=short
+      
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        continue-on-error: true
+        with:
+          files: ./coverage.xml
+          fail_ci_if_error: false
+      
+      - name: Check coverage threshold (40% minimum)
+        run: |
+          coverage report --fail-under=40
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Run Snyk security scan
+        uses: snyk/actions/python@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        continue-on-error: true
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'table'
+
