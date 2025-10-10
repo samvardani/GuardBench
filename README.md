@@ -66,17 +66,27 @@ Actual throughput and latency vary by hardware, guard configuration, and workloa
 
 ### How to test
 
-- Unit/API
-  - `MPLBACKEND=Agg PYTHONPATH=src pytest -q`
-- REST smoke
+**Quick Test**: `PYTHONPATH=src MPLBACKEND=Agg pytest -q`
+
+**With Coverage**: `pytest --cov=src --cov-report=html` → `open htmlcov/index.html`
+
+**Quality Gates**: `pre-commit run --all-files` (ruff, mypy, tests)
+
+See [TESTING.md](docs/TESTING.md) for comprehensive guide, coverage requirements, and CI configuration.
+
+- **Unit/API**: `MPLBACKEND=Agg PYTHONPATH=src pytest -q`
+- **Coverage**: `pytest --cov=src --cov-fail-under=70`
+- **Linting**: `ruff check src/ tests/`
+- **Type Check**: `mypy src/ --ignore-missing-imports`
+- **REST Smoke**:
   - `curl -sf http://127.0.0.1:8011/healthz`
   - `curl -s -X POST http://127.0.0.1:8011/score -H 'Content-Type: application/json' -d '{"text":"hello","category":"violence","language":"en"}'`
   - `curl -sf http://127.0.0.1:8011/metrics | head`
-- gRPC smoke (no reflection)
+- **gRPC Smoke**:
   - `grpcurl -plaintext -import-path src/grpc -proto google/grpc/health/v1/health.proto -d '{}' 127.0.0.1:50051 grpc.health.v1.Health/Check`
   - `grpcurl -plaintext -import-path src/grpc -proto score.proto -d '{"text":"hello","category":"violence","language":"en","guard":"candidate"}' 127.0.0.1:50051 seval.ScoreService/Score`
-- Load
-  - REST: `export RATE_LIMIT_ENABLED=false` then run your load tool (e.g., hey) against `/score`
+- **Load**:
+  - REST: `export RATE_LIMIT_ENABLED=false` then run your load tool against `/score`
   - gRPC: `make load-grpc`
 
 ### Architecture

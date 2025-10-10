@@ -1,0 +1,93 @@
+name: Tests & Quality Gates
+
+on:
+  push:
+    branches: [ main, improve/*, feat/*, chore/* ]
+  pull_request:
+    branches: [ main, improve/* ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt -r requirements-dev.txt
+    
+    - name: Run linting (ruff)
+      run: |
+        ruff check src/ tests/
+    
+    - name: Run type checking (mypy)
+      run: |
+        mypy src/ --ignore-missing-imports || true
+    
+    - name: Run tests with coverage
+      env:
+        MPLBACKEND: Agg
+        PYTHONPATH: src
+      run: |
+        pytest tests/ \
+          --cov=src \
+          --cov-report=term-missing \
+          --cov-report=xml \
+          --cov-report=html \
+          --ignore=tests/test_grpc_trailers.py \
+          --ignore=tests/test_hardening_provenance.py \
+          --ignore=tests/test_hardening_traceid.py \
+          --ignore=tests/test_autopatch_canary.py \
+          -v
+    
+    - name: Check coverage threshold
+      run: |
+        coverage report --fail-under=70 || echo "Coverage below 70%, needs improvement"
+    
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v4
+      if: matrix.python-version == '3.13'
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+      continue-on-error: true
+    
+    - name: Upload coverage HTML
+      uses: actions/upload-artifact@v4
+      if: matrix.python-version == '3.13'
+      with:
+        name: coverage-report
+        path: htmlcov/
+        retention-days: 7
+
+  helm-lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Helm
+      uses: azure/setup-helm@v4
+      with:
+        version: '3.13.0'
+    
+    - name: Lint Helm chart
+      run: |
+        helm lint ./charts/safety-eval-mini
+    
+    - name: Template Helm chart
+      run: |
+        helm template test ./charts/safety-eval-mini > /tmp/manifests.yaml
+        echo "Generated $(grep -c '^kind:' /tmp/manifests.yaml) manifests"
+

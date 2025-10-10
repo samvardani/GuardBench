@@ -1,0 +1,37 @@
+[run]
+source = src
+omit =
+    */tests/*
+    */test_*.py
+    */__pycache__/*
+    */site-packages/*
+    */grpc_generated/*
+    */grpc_service/score_pb2*.py
+    src/seval/version.py
+    src/*/hello.py
+
+[report]
+precision = 2
+show_missing = True
+skip_covered = False
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    raise AssertionError
+    raise NotImplementedError
+    if __name__ == .__main__.:
+    if TYPE_CHECKING:
+    @abstractmethod
+    pass
+    \.\.\.
+
+[html]
+directory = htmlcov
+
+[json]
+output = coverage.json
+
+[paths]
+source =
+    src/
+
