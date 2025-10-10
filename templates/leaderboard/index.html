@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Benchmark Leaderboard - Safety-Eval-Mini</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+        
+        .controls {
+            padding: 30px 40px;
+            border-bottom: 2px solid #f0f0f0;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .control-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .control-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        select, button {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s;
+        }
+        
+        select:focus {
+            border-color: #667eea;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .leaderboard {
+            padding: 40px;
+        }
+        
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+        
+        .leaderboard-table thead tr {
+            background: #f8f9fa;
+        }
+        
+        .leaderboard-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #666;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .leaderboard-table tbody tr {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .leaderboard-table tbody tr:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .leaderboard-table td {
+            padding: 20px 15px;
+        }
+        
+        .rank {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+            width: 60px;
+            text-align: center;
+        }
+        
+        .rank-1 { color: #FFD700; }
+        .rank-2 { color: #C0C0C0; }
+        .rank-3 { color: #CD7F32; }
+        
+        .guard-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .guard-version {
+            font-size: 13px;
+            color: #999;
+            margin-top: 4px;
+        }
+        
+        .metric {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .metric-good { color: #28a745; }
+        .metric-medium { color: #ffc107; }
+        .metric-poor { color: #dc3545; }
+        
+        .metric-small {
+            font-size: 13px;
+            color: #666;
+            margin-top: 4px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .badge-official {
+            background: #667eea;
+            color: white;
+        }
+        
+        .badge-public {
+            background: #28a745;
+            color: white;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        
+        .empty-state h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #667eea;
+            font-size: 18px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 13px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .refresh-time {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏆 Benchmark Leaderboard</h1>
+            <p>Compare safety guard performance on standard benchmarks</p>
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label for="datasetSelect">📊 Benchmark Dataset</label>
+                <select id="datasetSelect" onchange="loadLeaderboard()">
+                    <option value="">All Datasets</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label for="metricSelect">📈 Rank By</label>
+                <select id="metricSelect" onchange="loadLeaderboard()">
+                    <option value="f1_score">F1 Score</option>
+                    <option value="precision">Precision</option>
+                    <option value="recall">Recall</option>
+                    <option value="fpr">FPR (lower is better)</option>
+                    <option value="fnr">FNR (lower is better)</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <button onclick="loadLeaderboard()">🔄 Refresh</button>
+            </div>
+        </div>
+        
+        <div class="leaderboard" id="leaderboardContainer">
+            <div class="loading">📊 Loading leaderboard...</div>
+        </div>
+    </div>
+    
+    <script>
+        let currentData = null;
+        
+        async function loadDatasets() {
+            try {
+                const response = await fetch('/leaderboard/datasets');
+                const data = await response.json();
+                
+                const select = document.getElementById('datasetSelect');
+                select.innerHTML = '<option value="">All Datasets</option>';
+                
+                data.datasets.forEach(dataset => {
+                    const option = document.createElement('option');
+                    option.value = dataset.dataset_name;
+                    option.textContent = dataset.dataset_name;
+                    if (dataset.description) {
+                        option.title = dataset.description;
+                    }
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading datasets:', error);
+            }
+        }
+        
+        async function loadLeaderboard() {
+            const dataset = document.getElementById('datasetSelect').value;
+            const metric = document.getElementById('metricSelect').value;
+            const container = document.getElementById('leaderboardContainer');
+            
+            container.innerHTML = '<div class="loading">📊 Loading leaderboard...</div>';
+            
+            try {
+                let url = `/leaderboard?metric=${metric}&limit=100`;
+                if (dataset) {
+                    url += `&dataset=${dataset}`;
+                }
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                currentData = data;
+                renderLeaderboard(data);
+            } catch (error) {
+                container.innerHTML = `<div class="empty-state"><h3>❌ Error</h3><p>${error.message}</p></div>`;
+            }
+        }
+        
+        function renderLeaderboard(data) {
+            const container = document.getElementById('leaderboardContainer');
+            
+            if (data.entries.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>📊 No Benchmark Results</h3>
+                        <p>Run evaluations with a benchmark dataset to see results here.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Calculate stats
+            const avgF1 = data.entries.reduce((sum, e) => sum + e.result.f1_score, 0) / data.entries.length;
+            const topF1 = Math.max(...data.entries.map(e => e.result.f1_score));
+            const avgLatency = data.entries.reduce((sum, e) => sum + e.result.avg_latency_ms, 0) / data.entries.length;
+            
+            let html = `
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-value">${data.count}</div>
+                        <div class="stat-label">Total Entries</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${topF1.toFixed(3)}</div>
+                        <div class="stat-label">Top F1 Score</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${avgF1.toFixed(3)}</div>
+                        <div class="stat-label">Avg F1 Score</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${Math.round(avgLatency)}ms</div>
+                        <div class="stat-label">Avg Latency</div>
+                    </div>
+                </div>
+                
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Guard</th>
+                            <th>Precision</th>
+                            <th>Recall</th>
+                            <th>F1 Score</th>
+                            <th>FNR</th>
+                            <th>FPR</th>
+                            <th>Latency</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            data.entries.forEach(entry => {
+                const r = entry.result;
+                const rankClass = `rank-${entry.rank}`;
+                
+                html += `
+                    <tr>
+                        <td><div class="rank ${entry.rank <= 3 ? rankClass : ''}">#${entry.rank}</div></td>
+                        <td>
+                            <div class="guard-name">${r.guard_name}</div>
+                            ${r.guard_version ? `<div class="guard-version">v${r.guard_version}</div>` : ''}
+                            ${r.is_public ? '<span class="badge badge-public">Public</span>' : ''}
+                        </td>
+                        <td><div class="metric ${getMetricClass(r.precision)}">${r.precision.toFixed(3)}</div></td>
+                        <td><div class="metric ${getMetricClass(r.recall)}">${r.recall.toFixed(3)}</div></td>
+                        <td><div class="metric ${getMetricClass(r.f1_score)}">${r.f1_score.toFixed(3)}</div></td>
+                        <td><div class="metric ${getMetricClass(1 - r.fnr)}">${r.fnr.toFixed(3)}</div></td>
+                        <td><div class="metric ${getMetricClass(1 - r.fpr)}">${r.fpr.toFixed(3)}</div></td>
+                        <td>
+                            <div class="metric-small">${r.avg_latency_ms}ms</div>
+                            <div class="metric-small">p90: ${r.p90_latency_ms}ms</div>
+                        </td>
+                        <td><div class="metric-small">${formatDate(r.created_at)}</div></td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                    </tbody>
+                </table>
+                
+                <div class="refresh-time">
+                    Last updated: ${new Date().toLocaleString()}
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+        
+        function getMetricClass(value) {
+            if (value >= 0.95) return 'metric-good';
+            if (value >= 0.80) return 'metric-medium';
+            return 'metric-poor';
+        }
+        
+        function formatDate(dateStr) {
+            if (!dateStr) return 'N/A';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+        
+        // Initialize
+        window.onload = async () => {
+            await loadDatasets();
+            await loadLeaderboard();
+            
+            // Auto-refresh every 60 seconds
+            setInterval(loadLeaderboard, 60000);
+        };
+    </script>
+</body>
+</html>
+

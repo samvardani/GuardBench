@@ -199,6 +199,13 @@ app.add_middleware(
 # Session support (for CSRF tokens on policy page, etc.)
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET", "dev-not-secret"))
 
+# Benchmark leaderboard routes
+try:
+    from analytics.routes import router as leaderboard_router
+    app.include_router(leaderboard_router)
+    logger.info("Benchmark leaderboard enabled at /leaderboard/*")
+except Exception as e:
+    logger.warning(f"Benchmark leaderboard not available: {e}")
 
 # Policy metadata middleware - injects version and checksum headers
 @app.middleware("http")
@@ -1004,6 +1011,18 @@ GUARD_REGISTRY = _guard_catalogue()
 async def _startup() -> None:
     _configure_tracing()
     db.ensure_schema()
+    
+    # Initialize benchmark leaderboard tables
+    try:
+        from analytics.schema import init_benchmark_tables
+        import sqlite3
+        conn = sqlite3.connect("history.db")
+        init_benchmark_tables(conn)
+        conn.close()
+        logger.info("Benchmark leaderboard tables initialized")
+    except Exception as e:
+        logger.warning(f"Failed to initialize benchmark leaderboard tables: {e}")
+    
     logger.info("Safety service initialised with multi-tenant schema")
 
 
