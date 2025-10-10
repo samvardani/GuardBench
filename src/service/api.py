@@ -221,6 +221,14 @@ SCORECARD_ROOT = Path("dist/scorecards")
 SCORECARD_ROOT.mkdir(parents=True, exist_ok=True)
 app.mount("/scorecards", StaticFiles(directory=SCORECARD_ROOT), name="scorecards")
 
+# Include Slack OAuth router
+try:
+    from integrations.slack_routes import router as slack_oauth_router
+    app.include_router(slack_oauth_router)
+    logger.info("Slack OAuth endpoints enabled at /slack/*")
+except Exception as e:
+    logger.warning(f"Slack OAuth not available: {e}")
+
 CONFIG_FILE = Path("config.yaml")
 AUTOPATCH_THRESHOLD_PATH = Path("tuned_thresholds.yaml")
 AUTOPATCH_CANARY_PATH = Path("tuned_thresholds_canary.yaml")
