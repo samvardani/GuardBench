@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cost Visibility - Safety-Eval-Mini</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 36px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .cost-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            margin-bottom: 20px;
+        }
+        
+        .cost-display {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .cost-amount {
+            font-size: 72px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+        
+        .cost-label {
+            font-size: 18px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .usage-section {
+            margin-bottom: 30px;
+        }
+        
+        .usage-bar-container {
+            background: #f0f0f0;
+            border-radius: 10px;
+            height: 30px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        .usage-bar {
+            background: linear-gradient(90deg, #28a745 0%, #ffc107 70%, #dc3545 90%);
+            height: 100%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .usage-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .stat-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .pricing-info {
+            background: #e7f3ff;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 30px;
+        }
+        
+        .pricing-info h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .pricing-details {
+            color: #666;
+            line-height: 1.8;
+        }
+        
+        .tier-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: white;
+            font-size: 18px;
+        }
+        
+        .refresh-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 20px;
+        }
+        
+        .refresh-button:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💳 Cost Visibility</h1>
+            <p>Real-time usage and cost tracking</p>
+        </div>
+        
+        <div id="costContainer">
+            <div class="loading">💰 Loading cost information...</div>
+        </div>
+    </div>
+    
+    <script>
+        async function loadCostData() {
+            try {
+                // Load cost, usage, and pricing data
+                const [costRes, usageRes, pricingRes] = await Promise.all([
+                    fetch('/billing/cost?tenant_id=public'),
+                    fetch('/billing/usage?tenant_id=public'),
+                    fetch('/billing/pricing?tenant_id=public')
+                ]);
+                
+                const cost = await costRes.json();
+                const usage = await usageRes.json();
+                const pricing = await pricingRes.json();
+                
+                renderDashboard(cost, usage, pricing);
+            } catch (error) {
+                document.getElementById('costContainer').innerHTML = 
+                    `<div class="loading">❌ Error loading cost data: ${error.message}</div>`;
+            }
+        }
+        
+        function renderDashboard(cost, usage, pricing) {
+            const container = document.getElementById('costContainer');
+            
+            // Determine alert type
+            let alert = '';
+            if (usage.is_over_limit) {
+                alert = `
+                    <div class="alert alert-warning">
+                        ⚠️ <strong>Over Free Tier Limit!</strong> 
+                        You've exceeded your free tier limit of ${usage.free_tier_limit.toLocaleString()} evaluations. 
+                        Additional usage is being billed at ${pricing.price_formatted} per evaluation.
+                    </div>
+                `;
+            } else if (usage.percentage >= 80) {
+                alert = `
+                    <div class="alert alert-warning">
+                        ⚠️ <strong>Approaching Limit!</strong> 
+                        You've used ${usage.percentage.toFixed(1)}% of your free tier. 
+                        ${usage.remaining.toLocaleString()} evaluations remaining this month.
+                    </div>
+                `;
+            } else {
+                alert = `
+                    <div class="alert alert-success">
+                        ✅ <strong>Within Free Tier!</strong> 
+                        You're using the free tier. ${usage.remaining.toLocaleString()} evaluations remaining.
+                    </div>
+                `;
+            }
+            
+            let html = `
+                <div class="cost-card">
+                    ${alert}
+                    
+                    <div class="cost-display">
+                        <div class="cost-amount">${cost.cost_formatted}</div>
+                        <div class="cost-label">Current Month Cost</div>
+                        <div class="tier-badge">${pricing.pricing_tier} tier</div>
+                    </div>
+                    
+                    <div class="usage-section">
+                        <h3>Usage This Month</h3>
+                        <div class="usage-bar-container">
+                            <div class="usage-bar" id="usageBar" style="width: 0%"></div>
+                        </div>
+                        
+                        <div class="usage-stats">
+                            <div class="stat-box">
+                                <div class="stat-value">${cost.total_usage.toLocaleString()}</div>
+                                <div class="stat-label">Total Evaluations</div>
+                            </div>
+                            
+                            <div class="stat-box">
+                                <div class="stat-value">${cost.free_tier_usage.toLocaleString()}</div>
+                                <div class="stat-label">Free Tier Used</div>
+                            </div>
+                            
+                            <div class="stat-box">
+                                <div class="stat-value">${cost.billable_usage.toLocaleString()}</div>
+                                <div class="stat-label">Billable Usage</div>
+                            </div>
+                            
+                            <div class="stat-box">
+                                <div class="stat-value">${usage.remaining.toLocaleString()}</div>
+                                <div class="stat-label">Free Tier Remaining</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="pricing-info">
+                        <h3>📋 Pricing Details</h3>
+                        <div class="pricing-details">
+                            <strong>Tier:</strong> ${pricing.pricing_tier}<br>
+                            <strong>Price per Evaluation:</strong> ${pricing.price_formatted}<br>
+                            <strong>Free Tier Limit:</strong> ${usage.free_tier_limit.toLocaleString()} evaluations/month<br>
+                            <strong>Monthly Minimum:</strong> ${pricing.monthly_minimum_formatted}
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center;">
+                        <button class="refresh-button" onclick="loadCostData()">🔄 Refresh</button>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+            
+            // Animate usage bar
+            setTimeout(() => {
+                const usageBar = document.getElementById('usageBar');
+                const percentage = Math.min(100, usage.percentage);
+                usageBar.style.width = percentage + '%';
+                usageBar.textContent = percentage.toFixed(1) + '%';
+            }, 100);
+        }
+        
+        // Load on page load
+        window.onload = loadCostData;
+        
+        // Auto-refresh every 60 seconds
+        setInterval(loadCostData, 60000);
+    </script>
+</body>
+</html>
+
