@@ -1,6 +1,8 @@
-## SafetyEval — real-time safety scoring with REST, gRPC, shadow telemetry, chaos drills, evidence packs
+## SeaRai — real-time safety scoring with REST, gRPC, shadow telemetry, chaos drills, evidence packs
 
-SafetyEval is an embeddable AI safety engine. It provides low-latency safety scoring via REST and gRPC, operational telemetry for shadow traffic, chaos/incident drills, and signed evidence packs for governance.
+**by SeaTechOne LLC**
+
+SeaRai is an embeddable AI safety engine. It provides low-latency safety scoring via REST and gRPC, operational telemetry for shadow traffic, chaos/incident drills, and signed evidence packs for governance.
 
 ### Quickstart (one screen)
 
@@ -133,13 +135,15 @@ Actual throughput and latency vary by hardware, guard configuration, and workloa
 - CI workflow (pytest, lint, typecheck) with gRPC stub generation
 - Evidence: SBOM generation and signed manifests (verification subcommand)
 
-### License & contact
+### License & Contact
 
 Licensed under the MIT License. See `LICENSE`.
 
-Made by SeaTechOne LLC — Developed by Saeed M. Vardani
+**Made by SeaTechOne LLC**  
+Developed by Saeed M. Vardani  
+Product: SeaRai
 
-# Safety Eval Mini
+# SeaRai
 
 One-screen harness to compare a Baseline vs. Candidate safety guard.
 

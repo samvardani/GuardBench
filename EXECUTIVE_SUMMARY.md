@@ -1,6 +1,7 @@
-# SafetyEval Mini - Executive Summary
+# SeaRai - Executive Summary
 ## Platform Evaluation & Path to Industry Leadership
 
+**Company:** SeaTechOne LLC  
 **Date:** October 10, 2025  
 **Version:** 0.3.1  
 **Assessment Grade:** B+ (83/100) → Target: A+ (95+)  
@@ -26,7 +27,7 @@
 
 ## ✅ Core Strengths
 
-### What SafetyEval Does Better Than Anyone
+### What SeaRai Does Better Than Anyone
 
 1. **Policy-as-Code** ⭐⭐⭐⭐⭐
    - Unique YAML DSL for safety rules
@@ -38,7 +39,7 @@
    - Ed25519 signed manifests
    - SBOM generation
    - Governance & compliance ready
-   - **Unique to SafetyEval**
+   - **Unique to SeaRai**
 
 3. **Red-Team Automation** ⭐⭐⭐⭐⭐
    - Adaptive agent swarm (UCB bandit)
@@ -99,7 +100,7 @@
 | **OpenAI** | 90 | 95 | 95 | 85 | **91/100** |
 | **Azure** | 95 | 98 | 98 | 80 | **93/100** |
 | **Anthropic** | 88 | 92 | 85 | 95 | **90/100** |
-| **SafetyEval** | 85 | 65 | 60 | 85 | **74/100** |
+| **SeaRai** | 85 | 65 | 60 | 85 | **74/100** |
 
 **Gap to Leader (Azure):** 19 points  
 **Time to Close:** 6-9 months with recommended roadmap  
@@ -246,7 +247,7 @@ Day 29-30: Review and plan Month 2
 
 ## 💡 Unique Value Propositions
 
-### Why Enterprises Will Choose SafetyEval
+### Why Enterprises Will Choose SeaRai
 
 1. **Governance-First** 🏛️
    - Evidence packs for auditors
@@ -397,7 +398,7 @@ This evaluation consists of **3 comprehensive documents**:
 > "The Enterprise AI Safety Platform for Regulated Industries with Governance-First Architecture"
 
 **Elevator Pitch:**
-> SafetyEval is the only AI safety platform built for regulated industries that need compliance evidence, data sovereignty, and proactive security. Unlike cloud-only competitors, we offer self-hosted deployment with evidence packs, automated red-teaming, and policy-as-code—all while delivering industry-leading 2.4ms latency. SOC2-certified, multi-region ready, and trusted by enterprises who can't compromise on governance.
+> SeaRai by SeaTechOne LLC is the only AI safety platform built for regulated industries that need compliance evidence, data sovereignty, and proactive security. Unlike cloud-only competitors, we offer self-hosted deployment with evidence packs, automated red-teaming, and policy-as-code—all while delivering industry-leading 2.4ms latency. SOC2-certified, multi-region ready, and trusted by enterprises who can't compromise on governance.
 
 ---
 
@@ -471,7 +472,7 @@ This evaluation consists of **3 comprehensive documents**:
 
 ## 🌟 Final Verdict
 
-**SafetyEval has the technical foundation and unique features to become the industry-leading AI safety platform.**
+**SeaRai has the technical foundation and unique features to become the industry-leading AI safety platform.**
 
 **What's Missing:** Enterprise hygiene (SOC2, SLA, scale)  
 **What's Strong:** Innovation, performance, governance  
@@ -482,7 +483,7 @@ This evaluation consists of **3 comprehensive documents**:
 
 The platform's unique governance focus, combined with self-hosting capabilities and automated red-teaming, positions it perfectly for regulated industries where current cloud-only solutions fall short.
 
-**With disciplined execution of the strategic roadmap, SafetyEval will achieve industry-leading status within 12 months.**
+**With disciplined execution of the strategic roadmap, SeaRai will achieve industry-leading status within 12 months.**
 
 ---
 
