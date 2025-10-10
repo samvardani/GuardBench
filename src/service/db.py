@@ -119,6 +119,44 @@ def create_tenant(name: str, *, slug: Optional[str] = None, metadata: Optional[D
     }
 
 
+def get_user_by_email(tenant_id: str, email: str) -> Optional[Dict[str, Any]]:
+    """Get user by email.
+    
+    Args:
+        tenant_id: Tenant ID
+        email: User email (case-insensitive)
+        
+    Returns:
+        User dictionary or None
+    """
+    ensure_schema()
+    email_lower = email.lower().strip()
+    with db_conn(commit=False) as con:
+        row = con.execute(
+            "SELECT * FROM users WHERE tenant_id = ? AND LOWER(email) = ? AND status = 'active'",
+            (tenant_id, email_lower)
+        ).fetchone()
+    if not row:
+        return None
+    return dict(row)
+
+
+def create_token(tenant_id: str, user_id: str, *, role: str = "viewer", label: Optional[str] = None, ttl_minutes: Optional[int] = None) -> Dict[str, Any]:
+    """Create API token for user.
+    
+    Args:
+        tenant_id: Tenant ID
+        user_id: User ID
+        role: User role
+        label: Optional token label
+        ttl_minutes: Optional TTL in minutes
+        
+    Returns:
+        Token dictionary with 'token' key
+    """
+    return issue_token(user_id, tenant_id, label=label, ttl_minutes=ttl_minutes)
+
+
 def create_user(
     tenant_id: str,
     email: str,

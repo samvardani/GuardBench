@@ -199,6 +199,13 @@ app.add_middleware(
 # Session support (for CSRF tokens on policy page, etc.)
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET", "dev-not-secret"))
 
+# SAML authentication routes
+try:
+    from auth.saml_routes import router as saml_router
+    app.include_router(saml_router)
+    logger.info("SAML authentication enabled at /auth/saml/*")
+except Exception as e:
+    logger.warning(f"SAML authentication not available: {e}")
 
 # Policy metadata middleware - injects version and checksum headers
 @app.middleware("http")
@@ -1004,6 +1011,18 @@ GUARD_REGISTRY = _guard_catalogue()
 async def _startup() -> None:
     _configure_tracing()
     db.ensure_schema()
+    
+    # Initialize SAML configuration tables
+    try:
+        from auth.saml_config import init_saml_config_table
+        import sqlite3
+        conn = sqlite3.connect("history.db")
+        init_saml_config_table(conn)
+        conn.close()
+        logger.info("SAML configuration table initialized")
+    except Exception as e:
+        logger.warning(f"Failed to initialize SAML configuration table: {e}")
+    
     logger.info("Safety service initialised with multi-tenant schema")
 
 
