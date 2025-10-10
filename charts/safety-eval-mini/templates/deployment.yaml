@@ -1,0 +1,177 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "safety-eval-mini.fullname" . }}
+  labels:
+    {{- include "safety-eval-mini.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "safety-eval-mini.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "safety-eval-mini.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "safety-eval-mini.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: {{ .Chart.Name }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: 8001
+          protocol: TCP
+        - name: grpc
+          containerPort: 50051
+          protocol: TCP
+        {{- if .Values.metrics.enabled }}
+        - name: metrics
+          containerPort: {{ .Values.metrics.port }}
+          protocol: TCP
+        {{- end }}
+        
+        # Health probes - bypass auth middleware
+        livenessProbe:
+          {{- if .Values.healthCheck.liveness.enabled }}
+          httpGet:
+            path: {{ .Values.healthCheck.liveness.path }}
+            port: http
+            # Probes should NOT require auth
+          initialDelaySeconds: {{ .Values.healthCheck.liveness.initialDelaySeconds }}
+          periodSeconds: {{ .Values.healthCheck.liveness.periodSeconds }}
+          timeoutSeconds: {{ .Values.healthCheck.liveness.timeoutSeconds }}
+          failureThreshold: {{ .Values.healthCheck.liveness.failureThreshold }}
+          {{- end }}
+        
+        readinessProbe:
+          {{- if .Values.healthCheck.readiness.enabled }}
+          httpGet:
+            path: {{ .Values.healthCheck.readiness.path }}
+            port: http
+            # Probes should NOT require auth
+          initialDelaySeconds: {{ .Values.healthCheck.readiness.initialDelaySeconds }}
+          periodSeconds: {{ .Values.healthCheck.readiness.periodSeconds }}
+          timeoutSeconds: {{ .Values.healthCheck.readiness.timeoutSeconds }}
+          failureThreshold: {{ .Values.healthCheck.readiness.failureThreshold }}
+          {{- end }}
+        
+        # Environment variables
+        env:
+        # Non-sensitive config from ConfigMap
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "safety-eval-mini.fullname" . }}
+              key: LOG_LEVEL
+        - name: ENABLE_IMAGE
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "safety-eval-mini.fullname" . }}
+              key: ENABLE_IMAGE
+        - name: TEST_MODE
+          valueFrom:
+            configMapKeyRef:
+              name: {{ include "safety-eval-mini.fullname" . }}
+              key: TEST_MODE
+        
+        # OIDC secrets (if enabled)
+        {{- if .Values.secrets.oidc.enabled }}
+        - name: OIDC_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secrets.oidc.secretName }}
+              key: {{ .Values.secrets.oidc.clientIdKey }}
+        - name: OIDC_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secrets.oidc.secretName }}
+              key: {{ .Values.secrets.oidc.clientSecretKey }}
+        {{- end }}
+        
+        # SAML secrets (if enabled)
+        {{- if .Values.secrets.saml.enabled }}
+        - name: SAML_IDP_CERT
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secrets.saml.secretName }}
+              key: {{ .Values.secrets.saml.idpCertKey }}
+        - name: SAML_IDP_CERT_FINGERPRINT
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secrets.saml.secretName }}
+              key: {{ .Values.secrets.saml.idpCertFingerprintKey }}
+        {{- end }}
+        
+        # Slack secrets (if enabled)
+        {{- if .Values.secrets.slack.enabled }}
+        - name: SLACK_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secrets.slack.secretName }}
+              key: {{ .Values.secrets.slack.clientIdKey }}
+        - name: SLACK_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secrets.slack.secretName }}
+              key: {{ .Values.secrets.slack.clientSecretKey }}
+        - name: SLACK_SIGNING_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secrets.slack.secretName }}
+              key: {{ .Values.secrets.slack.signingSecretKey }}
+        {{- end }}
+        
+        # Metrics auth token (if enabled)
+        {{- if and .Values.metrics.enabled .Values.metrics.auth.enabled }}
+        - name: METRICS_AUTH_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.metrics.auth.secretName }}
+              key: {{ .Values.metrics.auth.tokenKey }}
+        {{- end }}
+        
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+        
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+        - name: cache
+          mountPath: /app/.cache
+      
+      volumes:
+      - name: tmp
+        emptyDir: {}
+      - name: cache
+        emptyDir: {}
+      
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+

@@ -1,0 +1,109 @@
+# Production values for safety-eval-mini
+
+replicaCount: 3
+
+image:
+  repository: ghcr.io/your-org/safety-eval-mini
+  pullPolicy: IfNotPresent
+  tag: "0.3.1"
+
+# Enable secrets from external Kubernetes Secrets
+secrets:
+  oidc:
+    enabled: true
+    secretName: "safety-eval-oidc"
+  
+  saml:
+    enabled: true
+    secretName: "safety-eval-saml"
+  
+  slack:
+    enabled: true
+    secretName: "safety-eval-slack"
+
+# Enable metrics with authentication
+metrics:
+  enabled: true
+  port: 8000
+  path: /metrics
+  
+  auth:
+    enabled: true
+    type: "token"
+    secretName: "safety-eval-metrics-auth"
+    tokenKey: "token"
+  
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+    scrapeTimeout: 10s
+    labels:
+      prometheus: kube-prometheus
+
+# Health checks (public, no auth)
+healthCheck:
+  liveness:
+    enabled: true
+    path: /healthz
+    initialDelaySeconds: 15
+    periodSeconds: 10
+  readiness:
+    enabled: true
+    path: /healthz
+    initialDelaySeconds: 10
+    periodSeconds: 10
+
+# Ingress
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  hosts:
+    - host: safety-eval.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: safety-eval-tls
+      hosts:
+        - safety-eval.example.com
+
+# Resources
+resources:
+  limits:
+    cpu: 2000m
+    memory: 2Gi
+  requests:
+    cpu: 1000m
+    memory: 1Gi
+
+# Autoscaling
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 20
+  targetCPUUtilizationPercentage: 70
+
+# Security
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+
+# Environment
+env:
+  LOG_LEVEL: "info"
+  ENABLE_IMAGE: "1"
+  TEST_MODE: "0"
+

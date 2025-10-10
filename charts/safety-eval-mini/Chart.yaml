@@ -1,0 +1,14 @@
+apiVersion: v2
+name: safety-eval-mini
+description: Enterprise AI safety evaluation platform with REST/gRPC APIs
+type: application
+version: 0.3.1
+appVersion: "0.3.1"
+keywords:
+  - ai-safety
+  - llm
+  - moderation
+  - governance
+maintainers:
+  - name: Safety Eval Team
+

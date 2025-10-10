@@ -1,0 +1,27 @@
+{{- if and .Values.metrics.enabled .Values.metrics.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "safety-eval-mini.fullname" . }}
+  labels:
+    {{- include "safety-eval-mini.labels" . | nindent 4 }}
+    {{- with .Values.metrics.serviceMonitor.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "safety-eval-mini.selectorLabels" . | nindent 6 }}
+  endpoints:
+  - port: metrics
+    path: {{ .Values.metrics.path }}
+    interval: {{ .Values.metrics.serviceMonitor.interval }}
+    scrapeTimeout: {{ .Values.metrics.serviceMonitor.scrapeTimeout }}
+    {{- if and .Values.metrics.auth.enabled (eq .Values.metrics.auth.type "token") }}
+    # Add Authorization header for token-based auth
+    bearerTokenSecret:
+      name: {{ .Values.metrics.auth.secretName }}
+      key: {{ .Values.metrics.auth.tokenKey }}
+    {{- end }}
+{{- end }}
+

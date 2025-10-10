@@ -1,0 +1,143 @@
+# Default values for safety-eval-mini
+
+replicaCount: 2
+
+image:
+  repository: safety-eval-mini
+  pullPolicy: IfNotPresent
+  tag: "0.3.1"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+
+service:
+  type: ClusterIP
+  port: 8001
+  grpcPort: 50051
+
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations: {}
+  hosts:
+    - host: safety-eval.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+  requests:
+    cpu: 500m
+    memory: 512Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+
+# Health check configuration
+healthCheck:
+  liveness:
+    enabled: true
+    path: /healthz
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readiness:
+    enabled: true
+    path: /healthz
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+# Secrets configuration
+# Reference external Kubernetes Secrets instead of plain values
+secrets:
+  # OIDC/OAuth configuration
+  oidc:
+    # If enabled, mount from existing Secret
+    enabled: false
+    # Name of existing Secret containing OIDC credentials
+    secretName: "safety-eval-oidc"
+    # Keys in Secret
+    clientIdKey: "client-id"
+    clientSecretKey: "client-secret"
+  
+  # SAML configuration
+  saml:
+    enabled: false
+    secretName: "safety-eval-saml"
+    # Keys in Secret
+    idpCertKey: "idp-cert"
+    idpCertFingerprintKey: "idp-cert-fingerprint"
+  
+  # Slack OAuth
+  slack:
+    enabled: false
+    secretName: "safety-eval-slack"
+    # Keys in Secret
+    clientIdKey: "client-id"
+    clientSecretKey: "client-secret"
+    signingSecretKey: "signing-secret"
+
+# Metrics configuration
+metrics:
+  enabled: true
+  port: 8000
+  path: /metrics
+  
+  # Authentication for metrics endpoint
+  auth:
+    enabled: false
+    # Options: "token", "basic", "none"
+    type: "token"
+    # If type=token, reference Secret for bearer token
+    secretName: "safety-eval-metrics-auth"
+    tokenKey: "token"
+  
+  # Prometheus ServiceMonitor
+  serviceMonitor:
+    enabled: false
+    interval: 30s
+    scrapeTimeout: 10s
+    labels: {}
+
+# Environment variables (non-sensitive)
+env:
+  LOG_LEVEL: "info"
+  ENABLE_IMAGE: "0"
+  TEST_MODE: "0"
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+

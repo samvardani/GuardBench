@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "safety-eval-mini.fullname" . }}
+  labels:
+    {{- include "safety-eval-mini.labels" . | nindent 4 }}
+data:
+  # Non-sensitive configuration only
+  LOG_LEVEL: {{ .Values.env.LOG_LEVEL | quote }}
+  ENABLE_IMAGE: {{ .Values.env.ENABLE_IMAGE | quote }}
+  TEST_MODE: {{ .Values.env.TEST_MODE | quote }}
+
