@@ -1,0 +1,14 @@
+# SeaRai Code Ownership
+
+# Critical paths
+/src/guards/*         @samvardani
+/src/policy/*         @samvardani
+/src/service/api.py   @samvardani
+
+# All tests
+/tests/*              @samvardani
+
+# Documentation
+/docs/*               @samvardani
+/*.md                 @samvardani
+
