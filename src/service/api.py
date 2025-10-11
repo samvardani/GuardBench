@@ -707,14 +707,14 @@ class BatchRow(BaseModel):
 
 
 class BatchRequest(BaseModel):
-    rows: List[BatchRow] = Field(..., min_items=1, max_items=5000)
+    rows: List[BatchRow] = Field(default=..., min_length=1, max_length=5000)
     baseline_guard: constr(min_length=1, max_length=50) = "baseline"  # type: ignore[valid-type]
     candidate_guard: constr(min_length=1, max_length=50) = "candidate"  # type: ignore[valid-type]
 
 
 class BatchScoreRequest(BaseModel):
     """Batch scoring request for multiple texts."""
-    items: List[ScoreRequest] = Field(..., min_items=1, max_items=1000)
+    items: List[ScoreRequest] = Field(default=..., min_length=1, max_length=1000)
 
 
 class IntegrationRequest(BaseModel):
@@ -862,7 +862,7 @@ def _wrap_guard_sync(guard_key: str, guard_spec: Dict[str, Any]):
 def _predict_internal(text: str, category: Optional[str], language: Optional[str], guard: str = "candidate") -> Dict[str, Any]:
     guard_spec = _resolve_guard(guard)
     fn = _wrap_guard_sync(guard, guard_spec)
-    return fn(text, category, language)
+    return fn(text, category, language)  # type: ignore[no-any-return]
 
 
 def _now_iso() -> str:
@@ -973,7 +973,7 @@ def _load_manifest(tenant_slug: str, manifest_id: Optional[str] = None) -> Dict[
         except json.JSONDecodeError as exc:
             raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Rollback manifest unreadable") from exc
         payload["manifest_id"] = manifest_id
-        return payload
+        return payload  # type: ignore[no-any-return]
 
     manifests = _list_manifests(tenant_slug, limit=1)
     if not manifests:
@@ -1153,7 +1153,7 @@ async def _evaluate_run(
     engine = {"guards": guard_config}
 
     def _do_evaluate() -> Dict[str, Any]:
-        return evaluate(engine, rows, policy={})
+        return evaluate(engine, rows, policy={})  # type: ignore[no-any-return]
 
     summary = await run_in_threadpool(_do_evaluate)
     return summary

@@ -74,7 +74,7 @@ def _slice_threshold(category: Optional[str], language: Optional[str], default: 
         if not slice_ and language:
             slice_ = policy.slices.get((category, "en"))
         if slice_:
-            return slice_.threshold
+            return slice_.threshold  # type: ignore[no-any-return]
 
     cfg = _load_cfg()
     st = (cfg.get("slice_thresholds") or {}) if isinstance(cfg, dict) else {}

@@ -113,7 +113,7 @@ def exists(uri: str) -> bool:
     if client is not None:  # pragma: no cover
         bucket_obj = client.bucket(bucket)
         blob_obj = bucket_obj.blob(blob)
-        return blob_obj.exists(client=client)
+        return blob_obj.exists(client=client)  # type: ignore[no-any-return]
 
     path = _object_path(bucket, blob)
     if path.exists():

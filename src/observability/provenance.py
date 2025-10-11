@@ -92,7 +92,7 @@ class ProvenanceMiddleware(BaseHTTPMiddleware):
                 response.headers["X-Provenance-Version"] = self.version
                 response.headers["X-Provenance-Build"] = self.build_id
         
-        return response
+        return response  # type: ignore[no-any-return]
 
 
 __all__ = ["ProvenanceMiddleware"]
