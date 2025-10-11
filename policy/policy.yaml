@@ -20,6 +20,10 @@ safe_contexts:
       - "\\bawareness\\b"
       - "\\beducation(al)?\\b"
       - "\\bprevention\\b"
+      - "\\bcontrol\\b"
+      - "\\bprocedures?\\b"
+      - "\\bprotocol\\b"
+      - "\\bguidelines?\\b"
 penalties:
   safe_context: 0.8
 slices:
@@ -28,6 +32,20 @@ slices:
     language: en
     threshold: 0.99
     rules:
+      - id: prompt_injection_patterns
+        weight: 1.0
+        action: block
+        match:
+          regex:
+            - "(?i)\\b(ignore|disregard|forget|bypass|override)\\s+(all\\s+)?(previous|prior|your|the|safety)\\s+(instructions?|training|filters?|protocols?|guidelines?|rules?)\\b"
+            - "(?i)\\bpretend\\s+(you\\s+are|to\\s+be|you're)\\s+(DAN|unrestricted|unfiltered|without\\s+(restrictions?|limits?|filters?))\\b"
+            - "(?i)\\b(let'?s\\s+play\\s+a\\s+game|hypothetical\\s+scenario|for\\s+research\\s+purposes)\\b"
+            - "(?i)\\[(SYSTEM|ADMIN|OVERRIDE)\\]"
+            - "(?i)\\b(as|i\\s+am|you\\s+are)\\s+(an?\\s+)?(admin|administrator|system|root)\\b"
+            - "(?i)\\b(safety|security)\\s+(protocols?|filters?|disabled|off|bypass|override)\\b"
+            - "(?i)\\bsecurity\\s+override\\b"
+            - "(?i)\\b(base64|encoded|cipher|rot13)[:\\s]"
+            - "(?i)\\bfirst\\s+tell\\s+me\\b.*\\bnow\\s+(use|apply|convert)\\b"
       - id: violence_keywords
         weight: 1.0
         action: block

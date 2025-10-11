@@ -36,11 +36,11 @@ def add_security_headers(response: Response, etag: Optional[str] = None):
         response.headers["ETag"] = f'"{etag}"'
 
 
-@router.get("/report.json")
+@router.get("/report.json", response_model=None)
 async def export_json(
     sample_data: bool = False,
     redact: bool = True
-) -> Response | StreamingResponse:
+):
     """Export report as JSON.
     
     Args:
@@ -93,11 +93,11 @@ async def export_json(
         return response
 
 
-@router.get("/report.md")
+@router.get("/report.md", response_model=None)
 async def export_markdown(
     sample_data: bool = False,
     redact: bool = True
-) -> Response | StreamingResponse:
+):
     """Export report as Markdown.
     
     Args:

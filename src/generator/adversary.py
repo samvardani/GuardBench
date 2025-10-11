@@ -435,7 +435,7 @@ def run(
     max_cases_per_category: int = 8,
     k_per_case: int = 12,
     target_per_category: int = 20,
-) -> Dict[str, int]:
+) -> Dict[str, Any]:
     """Generate red-team variants and append them to the configured dataset.
 
     Args:
@@ -477,7 +477,7 @@ def run(
     global_seen: set[str] = {r.text for r in rows}
 
     if not any(picked_by_category.values()):
-        return {  # type: ignore[dict-item]
+        return {
             "picked": 0,
             "generated": 0,
             "by_category": {},
@@ -562,7 +562,7 @@ def run(
         encoding="utf-8",
     )
 
-    return {  # type: ignore[dict-item]
+    return {
         "picked": record["picked"],
         "generated": record["generated"],
         "by_category": record["by_category"],
