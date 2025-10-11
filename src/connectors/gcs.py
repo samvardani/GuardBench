@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
-from typing import Iterable, List, Tuple
+from typing import Iterable, List, Tuple, Any
 
 try:  # pragma: no cover - optional dependency
     from google.cloud import storage  # type: ignore
