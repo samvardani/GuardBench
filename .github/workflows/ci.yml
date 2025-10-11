@@ -56,9 +56,13 @@ jobs:
 
       - name: Start gRPC server (background)
         run: |
-          python -m src.grpc_service.server > grpc_server.log 2>&1 &
+          python -m grpc_service.server > grpc_server.log 2>&1 &
           echo $! > grpc_server.pid
-          sleep 2
+          sleep 3
+          # Verify server is running
+          python -c "import socket, time; s = socket.socket(); s.settimeout(1); \
+                     [(time.sleep(0.5), s.close(), s := socket.socket()) for _ in range(10) if s.connect_ex(('127.0.0.1', 50051)) != 0]; \
+                     exit(0 if s.connect_ex(('127.0.0.1', 50051)) == 0 else 1)"
 
       - name: Run tests
         run: |
