@@ -14,8 +14,8 @@ src_path = Path(__file__).resolve().parents[1]
 if str(src_path) not in sys.path:
     sys.path.insert(0, str(src_path))
 
-from seval.settings import POLICY_VERSION, POLICY_CHECKSUM
-from observability.trace import get_or_create_trace_id, clear_trace_id
+from seval.settings import POLICY_VERSION, POLICY_CHECKSUM  # noqa: E402
+from observability.trace import get_or_create_trace_id, clear_trace_id  # noqa: E402
 
 # Get tracer for this module
 tracer = trace.get_tracer(__name__)

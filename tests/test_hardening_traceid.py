@@ -23,7 +23,7 @@ class TestTraceIdValidation:
             )
             
             call = stub.Score(req)
-            resp = await call
+            resp = await call  # noqa: F841
             
             assert resp is not None
             trailers = await call.trailing_metadata()
@@ -51,7 +51,7 @@ class TestTraceIdValidation:
             req = score_pb2.BatchScoreRequest(items=items)
             
             call = stub.BatchScore(req)
-            resp = await call
+            _ = await call
             
             trailers = await call.trailing_metadata()
             trailer_dict = {k: v for k, v in trailers}
@@ -103,7 +103,7 @@ class TestTraceIdValidation:
                 )
                 
                 call = stub.Score(req)
-                resp = await call
+                _ = await call
                 trailers = await call.trailing_metadata()
                 trailer_dict = {k: v for k, v in trailers}
                 
@@ -134,7 +134,7 @@ class TestTraceIdValidation:
                 )
                 
                 call = stub.Score(req)
-                resp = await call
+                _ = await call
                 trailers = await call.trailing_metadata()
                 trailer_dict = {k: v for k, v in trailers}
                 

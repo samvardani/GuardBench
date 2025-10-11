@@ -471,20 +471,17 @@ def main(argv: Optional[Iterable[str]] = None):
     cfg = load_config()
     notifier = NotificationManager(cfg.get("notifications"))
 
-    dataset_display: str
     ds_sha: str
     dataset_rows: List[dict]
 
     if args.input_uri:
         remote_records = _read_remote_jsonl(args.input_uri)
         dataset_rows = _normalize_records(remote_records)
-        dataset_display = args.input_uri
         serialized = json.dumps(dataset_rows, sort_keys=True).encode("utf-8")
         ds_sha = hashlib.sha256(serialized).hexdigest()
     else:
         dataset_path = resolve_dataset_path(cfg)
         dataset_rows = load_rows(dataset_path)
-        dataset_display = str(dataset_path)
         ds_sha = sha256_file(dataset_path)
 
     rows = dataset_rows
@@ -589,7 +586,7 @@ def main(argv: Optional[Iterable[str]] = None):
     obfuscation_summary, obfuscation_chart = load_obfuscation_summary(OUT_DIR / "obfuscation.json", REPORT_ASSETS)
     parity_summary = load_parity_summary(OUT_DIR / "parity.json")
     parity_chart = render_parity_chart(parity_summary, REPORT_ASSETS)
-    parity_actions = load_parity_actions(OUT_DIR / "parity_actions.json")
+    _ = load_parity_actions(OUT_DIR / "parity_actions.json")  # Load for validation
     incident_summary = load_incident_reports(OUT_DIR)
     failures = (
         [{"id":r["id"],"fail_type":"FN","model":"Baseline", **r} for r in b_fn] +
