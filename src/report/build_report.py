@@ -205,7 +205,7 @@ def load_redteam_summary(path: Path, max_clusters: int = 6, max_examples: int = 
 
 def load_runtime_telemetry(path: Path, assets_root: Path, offline_slices: dict):
     if not path.exists():
-        return [], None
+        return [], None, {}
     telemetry = []
     with path.open("r", encoding="utf-8") as handle:
         for line in handle:
@@ -216,7 +216,7 @@ def load_runtime_telemetry(path: Path, assets_root: Path, offline_slices: dict):
             if isinstance(payload, dict):
                 telemetry.append(payload)
     if not telemetry:
-        return [], None
+        return [], None, {}
 
     by_slice = defaultdict(list)
     modality_counts = defaultdict(int)
