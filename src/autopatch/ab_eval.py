@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Dict, Iterable, List, Mapping
+from typing import Any, Dict, Iterable, List, Mapping
 
 from autopatch.candidates import apply_threshold_patch_to_config
 from guards.candidate import predict as candidate_predict
@@ -41,9 +41,9 @@ def evaluate_threshold_candidate(
     target_slices: Iterable[str],
     result_path: Path = DEFAULT_RESULT_PATH,
     cases: Iterable[dict] | None = None,
-) -> Dict[str, object]:
+) -> Dict[str, Any]:
     cfg, rows = load_cfg_and_data()
-    baseline = _evaluate_candidate(rows)
+    baseline: Dict[str, Any] = _evaluate_candidate(rows)
 
     original_config = CONFIG_PATH.read_text(encoding="utf-8")
     patched_config = apply_threshold_patch_to_config(original_config, updates)
@@ -52,7 +52,7 @@ def evaluate_threshold_candidate(
 
     CONFIG_PATH.write_text(patched_config, encoding="utf-8")
     try:
-        patched = _evaluate_candidate(rows)
+        patched: Dict[str, Any] = _evaluate_candidate(rows)
         if cases:
             for case in cases:
                 slice_key = _get_slice_key(case)
@@ -113,10 +113,10 @@ def accepts_improvement(
     per_slice = result.get("per_slice", {})
     improved = False
     for slice_key in target_slices:
-        slice_data = per_slice.get(slice_key)
+        slice_data = per_slice.get(slice_key)  # type: ignore[attr-defined]
         if not slice_data:
             continue
-        delta = slice_data.get("delta", {})
+        delta = slice_data.get("delta", {})  # type: ignore[attr-defined]
         if delta.get("fpr", 0.0) > max_fpr_increase + 1e-9:
             return False
         if delta.get("recall", 0.0) > 1e-6:

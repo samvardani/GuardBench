@@ -7,7 +7,7 @@ import random
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Mapping, Optional, Sequence
+from typing import Any, Dict, List, Mapping, Optional, Sequence
 
 from guards.candidate import _normalize_aggressive, predict as candidate_predict
 from redteam.agents import AGENTS, AgentInput, BaseAgent
@@ -78,7 +78,7 @@ class RedTeamAgent:
         if log_path is not None and log_path != self.store.path:
             self.store = CaseStore(log_path)
 
-        stats = {
+        stats: dict[str, Any] = {
             "attempts": 0,
             "successes": 0,
             "duplicates": 0,
@@ -114,9 +114,9 @@ class RedTeamAgent:
                 self.agent_stats[agent.name].attempts += 1
                 self.slice_stats[slice_key].attempts += 1
 
-                score = float(response.get("score", 0.0))
-                threshold = float(response.get("threshold", 0.0))
-                prediction = (response.get("prediction") or "").lower()
+                score = float(response.get("score", 0.0))  # type: ignore[arg-type]
+                threshold = float(response.get("threshold", 0.0))  # type: ignore[arg-type]
+                prediction = str(response.get("prediction") or "").lower()
                 margin = threshold - score
                 risk_weight = self.slice_risk.get(slice_key, 1.0)
                 reward = max(0.0, margin) * risk_weight

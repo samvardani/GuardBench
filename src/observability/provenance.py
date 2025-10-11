@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 import os
-from typing import Callable
+from typing import Callable, Optional
 
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -34,7 +34,7 @@ class ProvenanceMiddleware(BaseHTTPMiddleware):
         app: ASGIApp,
         service_name: str = "searei",
         version: str = "0.3.1",
-        build_id: str = None,
+        build_id: Optional[str] = None,
     ):
         """Initialize provenance middleware.
         

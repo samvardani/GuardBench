@@ -5,7 +5,7 @@ import grpc
 import score_pb2 as score__pb2
 
 GRPC_GENERATED_VERSION = '1.75.1'
-GRPC_VERSION = grpc.__version__
+GRPC_VERSION = grpc.__version__  # type: ignore[attr-defined]
 _version_not_supported = False
 
 try:

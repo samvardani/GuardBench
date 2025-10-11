@@ -118,7 +118,7 @@ def cluster_failures(rows, preds, mode: str = "strict"):
             "examples": examples,
         })
     # FN first (riskier), then most frequent
-    out.sort(key=lambda x: (0 if x["fail_type"]=="FN" else 1, -x["count"]))
+    out.sort(key=lambda x: (0 if str(x.get("fail_type"))=="FN" else 1, -int(x.get("count", 0) or 0)))  # type: ignore[arg-type]
     return out[:5]
 
 

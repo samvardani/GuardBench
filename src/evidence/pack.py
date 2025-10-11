@@ -8,7 +8,7 @@ import json
 import os
 import tarfile
 from pathlib import Path
-from typing import Dict, List
+from typing import Any, Dict, List
 
 from utils.io_utils import git_commit
 
@@ -36,7 +36,7 @@ def _file_hash(path: Path) -> str:
     return h.hexdigest()
 
 
-def build_manifest(paths: List[Path], commit: str) -> Dict[str, object]:
+def build_manifest(paths: List[Path], commit: str) -> Dict[str, Any]:
     entries = []
     for path in paths:
         if path.exists():

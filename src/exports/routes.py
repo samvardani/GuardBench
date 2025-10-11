@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 from fastapi import APIRouter, Response
 from fastapi.responses import StreamingResponse
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/exports", tags=["exports"])
 
 
-def add_security_headers(response: Response, etag: str = None):
+def add_security_headers(response: Response, etag: Optional[str] = None):
     """Add security headers to response.
     
     Args:

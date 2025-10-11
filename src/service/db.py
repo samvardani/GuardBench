@@ -423,7 +423,7 @@ def record_run(
         insert_cols = [c for c in base_cols if c in cols]
         values = [run_id, created, tenant_id, status]
         # Align values with insert_cols ordering
-        col_to_value = {
+        col_to_value: Dict[str, Any] = {
             "run_id": run_id,
             "created_at": created,
             "tenant_id": tenant_id,
