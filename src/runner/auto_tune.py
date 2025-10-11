@@ -1,4 +1,5 @@
-import csv, json
+import csv
+import json
 from pathlib import Path
 from collections import defaultdict
 from utils.io_utils import load_config, resolve_dataset_path

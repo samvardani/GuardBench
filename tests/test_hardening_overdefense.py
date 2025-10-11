@@ -6,8 +6,6 @@ Gate: False positive rate (FPR) on safe prompts must be ≤ OVERDEFENSE_TARGET (
 This ensures the guard doesn't over-block legitimate content.
 """
 import os
-import pytest
-from typing import List, Dict
 from seval import sdk
 
 

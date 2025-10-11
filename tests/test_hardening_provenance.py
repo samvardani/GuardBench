@@ -7,7 +7,6 @@ Gate: 100% of gRPC responses MUST include x-policy-version and x-policy-checksum
 This test ensures full supply-chain provenance tracking.
 """
 import pytest
-import asyncio
 import grpc
 from fastapi.testclient import TestClient
 from service.api import app

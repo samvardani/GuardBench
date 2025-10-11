@@ -41,6 +41,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response, ORJSONResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
+from observability.provenance import ProvenanceMiddleware
 import yaml
 try:
     from prometheus_client import Counter, Histogram, CONTENT_TYPE_LATEST, generate_latest, REGISTRY
@@ -132,7 +133,6 @@ from jinja2 import Environment, FileSystemLoader
 from utils.json import orjson_dumps, orjson_loads
 from policy.compiler import load_compiled_policy, POLICY_PATH
 from policy import policy_cache as policy_cache
-import hashlib
 import secrets
 from utils.seed import seed_all_from_env
 
@@ -200,8 +200,6 @@ app.add_middleware(
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET", "dev-not-secret"))
 
 # Provenance headers for governance and audit trails
-from observability.provenance import ProvenanceMiddleware
-
 app.add_middleware(
     ProvenanceMiddleware,
     service_name="searei",
@@ -527,7 +525,7 @@ circuit_breaker = CircuitBreaker(CB_FAILURE_THRESHOLD, CB_LATENCY_THRESHOLD_MS, 
 
 @app.middleware("http")
 async def _security_headers(request, call_next):  # type: ignore[override]
-    import uuid, time as _time
+    import time as _time
     start = _time.perf_counter()
     # Inject/propagate X-Request-ID
     rid = request.headers.get("X-Request-ID") or str(uuid.uuid4())
@@ -1657,7 +1655,7 @@ async def batch_endpoint(request: BatchRequest, ctx: AuthContext = Depends(requi
     except HTTPException as exc:
         status_label = str(exc.status_code)
         raise
-    except Exception as exc:
+    except Exception:
         status_label = "500"
         raise
     finally:
@@ -1739,7 +1737,7 @@ async def run_socket(websocket: WebSocket, run_id: str) -> None:
         await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
         return
     try:
-        ctx = _auth_from_token(token)
+        _auth_from_token(token)  # Verify auth, we don't need the context
     except HTTPException:
         await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
         return

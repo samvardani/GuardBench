@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import grpc  # type: ignore
-import time
 from opentelemetry import trace
 
 import sys

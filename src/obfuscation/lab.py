@@ -8,7 +8,7 @@ import json
 import random
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, Dict, Iterable, List, Mapping, Sequence, Tuple
+from typing import Callable, Dict, List, Sequence
 
 from guards.candidate import predict as candidate_predict
 from policy.compiler import load_compiled_policy

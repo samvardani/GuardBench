@@ -4,16 +4,14 @@ import asyncio
 import contextvars
 import os
 import signal
-from typing import List
 
 import grpc  # type: ignore
 
-from seval import sdk
 from seval.logic import score_once
 from grpc_health.v1 import health, health_pb2, health_pb2_grpc  # type: ignore
 from grpc_reflection.v1alpha import reflection  # type: ignore
 from grpc_generated import score_pb2, score_pb2_grpc  # type: ignore
-from seval.settings import POLICY_VERSION, POLICY_CHECKSUM
+from seval.settings import POLICY_VERSION
 from policy.compiler import POLICY_PATH
 from grpc_service.interceptors import TrailingMetaInterceptor
 from grpc_service import metrics as grpc_metrics

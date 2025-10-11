@@ -1,6 +1,8 @@
 
 from __future__ import annotations
-import re, time, unicodedata
+import re
+import time
+import unicodedata
 from pathlib import Path
 from typing import Dict, Optional
 import yaml

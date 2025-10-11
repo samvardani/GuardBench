@@ -1,4 +1,7 @@
-import csv, sys, yaml, pathlib
+import csv
+import sys
+import yaml
+import pathlib
 
 def main():
     root = pathlib.Path(__file__).resolve().parents[2]

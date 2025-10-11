@@ -7,7 +7,7 @@ import os
 import random
 import time
 from pathlib import Path
-from typing import Iterable, Optional
+from typing import Optional
 
 try:  # pragma: no cover - optional dependency
     from kafka import KafkaProducer  # type: ignore

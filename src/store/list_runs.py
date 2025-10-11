@@ -1,4 +1,5 @@
-import sqlite3, pathlib, sys
+import sqlite3
+import pathlib
 DB_PATH = pathlib.Path(__file__).resolve().parents[2] / "history.db"
 
 def main():

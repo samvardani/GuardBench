@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
 from guards.candidate import predict as candidate_predict
 from policy.compiler import load_compiled_policy, POLICY_PATH

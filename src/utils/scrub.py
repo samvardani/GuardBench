@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import re
 import math
-from typing import Dict, Iterable, List, Optional
+from typing import Dict, Iterable, Optional
 
 from utils.io_utils import load_config
 

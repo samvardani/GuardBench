@@ -8,7 +8,7 @@ import json
 import random
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, Dict, Iterable, Iterator, List, Mapping, MutableMapping, Optional, Sequence
+from typing import Callable, Dict, List, Mapping, Optional, Sequence
 
 RANDOM_DEFAULT_SEED = 1337
 TEXT_KEYS = ("text", "prompt", "request", "input", "content", "message", "utterance")

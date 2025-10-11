@@ -1,4 +1,7 @@
-import yaml, hashlib, subprocess, uuid
+import yaml
+import hashlib
+import subprocess
+import uuid
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]

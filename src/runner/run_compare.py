@@ -1,4 +1,4 @@
-import csv, pathlib
+import csv
 from guards.baseline import predict as predict_baseline
 from guards.candidate import predict as predict_candidate
 from utils.io_utils import load_config, resolve_dataset_path

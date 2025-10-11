@@ -404,7 +404,6 @@ def generate_variants(
 def find_false_negatives(rows: List[Row]) -> List[Tuple[Row, int]]:
     """Return ``(row, index)`` pairs the guard classified safe despite label=1."""
     # Re-run candidate guard to label predictions; FN = label=1 and pred=0
-    from src.guards.candidate import predict as predict_candidate
     fns = []
     for i, r in enumerate(rows):
         pred = _safe_predict(r.text, r.category, r.language)

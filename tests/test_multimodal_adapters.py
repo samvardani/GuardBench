@@ -1,4 +1,3 @@
-from pathlib import Path
 
 from multimodal.adapters import ImageInput, AudioInput, score_image, score_audio, TELEMETRY_PATH
 
