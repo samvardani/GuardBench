@@ -19,6 +19,7 @@ import threading
 import time
 import uuid
 from collections import deque
+from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -151,12 +152,25 @@ except Exception:
 logging.basicConfig(level=_level)
 logger = logging.getLogger(__name__)
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Lifespan context manager for startup/shutdown."""
+    # Startup - these are defined later in this module
+    _configure_tracing()
+    db.ensure_schema()
+    logger.info("Safety service initialised with multi-tenant schema")
+    yield
+    # Shutdown (if needed in future)
+
+
 app = FastAPI(
     title="Sentinel Safety Service",
     version="2024.10",
     json_dumps=orjson_dumps,
     json_loads=orjson_loads,
     default_response_class=ORJSONResponse,
+    lifespan=lifespan,
 )
 seed_all_from_env("SEVAL_SEED")
 # Templates
@@ -538,7 +552,7 @@ async def _security_headers(request, call_next):  # type: ignore[override]
         except ValueError:
             length = 0
         if max_bytes and length and length > max_bytes:
-            return JSONResponse(status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, content={"detail": "Request entity too large"})
+            return JSONResponse(status_code=status.HTTP_413_CONTENT_TOO_LARGE, content={"detail": "Request entity too large"})
     response = await call_next(request)
     response.headers.setdefault("X-Content-Type-Options", "nosniff")
     response.headers.setdefault("X-Frame-Options", "DENY")
@@ -678,33 +692,33 @@ class TokenResponse(BaseModel):
 
 
 class ScoreRequest(BaseModel):
-    text: str
-    category: Optional[str] = None
-    language: Optional[str] = None
-    guard: str = Field(default="candidate")
+    text: constr(min_length=1, max_length=50000)  # type: ignore[valid-type]
+    category: Optional[constr(min_length=1, max_length=100)] = None  # type: ignore[valid-type]
+    language: Optional[constr(min_length=2, max_length=10)] = None  # type: ignore[valid-type]
+    guard: constr(min_length=1, max_length=50) = Field(default="candidate")  # type: ignore[valid-type]
 
 
 class BatchRow(BaseModel):
-    text: str
-    category: str
-    language: str = "en"
-    label: str = Field(default="unsafe")
+    text: constr(min_length=1, max_length=50000)  # type: ignore[valid-type]
+    category: constr(min_length=1, max_length=100)  # type: ignore[valid-type]
+    language: constr(min_length=2, max_length=10) = "en"  # type: ignore[valid-type]
+    label: constr(min_length=1, max_length=50) = Field(default="unsafe")  # type: ignore[valid-type]
 
 
 class BatchRequest(BaseModel):
-    rows: List[BatchRow]
-    baseline_guard: str = "baseline"
-    candidate_guard: str = "candidate"
+    rows: List[BatchRow] = Field(..., min_items=1, max_items=5000)
+    baseline_guard: constr(min_length=1, max_length=50) = "baseline"  # type: ignore[valid-type]
+    candidate_guard: constr(min_length=1, max_length=50) = "candidate"  # type: ignore[valid-type]
 
 
 class BatchScoreRequest(BaseModel):
     """Batch scoring request for multiple texts."""
-    items: List[ScoreRequest]
+    items: List[ScoreRequest] = Field(..., min_items=1, max_items=1000)
 
 
 class IntegrationRequest(BaseModel):
-    kind: str
-    name: Optional[str] = None
+    kind: constr(min_length=1, max_length=50)  # type: ignore[valid-type]
+    name: Optional[constr(min_length=1, max_length=200)] = None  # type: ignore[valid-type]
     config: Dict[str, Any] = Field(default_factory=dict)
     enabled: bool = True
 
@@ -716,8 +730,8 @@ class UserCreateRequest(BaseModel):
 
 
 class UserUpdateRequest(BaseModel):
-    role: Optional[str] = None
-    status: Optional[str] = None
+    role: Optional[constr(min_length=1, max_length=50)] = None  # type: ignore[valid-type]
+    status: Optional[constr(min_length=1, max_length=50)] = None  # type: ignore[valid-type]
 
 
 class RollbackRequest(BaseModel):
@@ -1011,13 +1025,6 @@ def _guard_catalogue() -> Dict[str, Dict[str, Any]]:
 
 
 GUARD_REGISTRY = _guard_catalogue()
-
-
-@app.on_event("startup")
-async def _startup() -> None:
-    _configure_tracing()
-    db.ensure_schema()
-    logger.info("Safety service initialised with multi-tenant schema")
 
 
 def _auth_from_token(token: str) -> AuthContext:

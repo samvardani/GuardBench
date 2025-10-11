@@ -47,7 +47,7 @@ class SecretRedactor:
         self.redacted_text = redacted_text
         
         # Compile patterns (case-insensitive)
-        self.compiled_patterns: List[Pattern] = [
+        self.compiled_patterns: List[Pattern[str]] = [
             re.compile(pattern, re.IGNORECASE) for pattern in self.patterns
         ]
         

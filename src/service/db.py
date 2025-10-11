@@ -15,6 +15,13 @@ from typing import Any, Dict, Optional
 
 from store import init_db
 
+try:
+    from service.settings import get_settings
+    _SETTINGS = get_settings()
+    DB_TIMEOUT = _SETTINGS.db_timeout_seconds
+except Exception:
+    DB_TIMEOUT = 5.0
+
 DB_PATH = Path(__file__).resolve().parents[2] / "history.db"
 _PBKDF2_ROUNDS = 160_000
 _TOKEN_BYTES = 32
@@ -31,8 +38,12 @@ def ensure_schema() -> None:
 
 
 def _connect() -> sqlite3.Connection:
-    con = sqlite3.connect(DB_PATH)
+    con = sqlite3.connect(DB_PATH, timeout=DB_TIMEOUT)
     con.row_factory = sqlite3.Row
+    # Enable WAL mode for better concurrent read performance
+    con.execute("PRAGMA journal_mode=WAL")
+    # Set busy timeout to handle concurrent writes
+    con.execute(f"PRAGMA busy_timeout={int(DB_TIMEOUT * 1000)}")
     return con
 
 
