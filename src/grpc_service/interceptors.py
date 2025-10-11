@@ -6,10 +6,21 @@ import grpc  # type: ignore
 import time
 from opentelemetry import trace
 
+import sys
+import logging
+from pathlib import Path
+
+# Add src to path for imports
+src_path = Path(__file__).resolve().parents[1]
+if str(src_path) not in sys.path:
+    sys.path.insert(0, str(src_path))
+
 from seval.settings import POLICY_VERSION, POLICY_CHECKSUM
+from observability.trace import get_or_create_trace_id, clear_trace_id
 
 # Get tracer for this module
 tracer = trace.get_tracer(__name__)
+logger = logging.getLogger(__name__)
 
 
 class TrailingMetaInterceptor(grpc.aio.ServerInterceptor):  # type: ignore
@@ -29,37 +40,65 @@ class TrailingMetaInterceptor(grpc.aio.ServerInterceptor):  # type: ignore
 
         # Handle unary-unary calls
         async def _wrap_unary_unary(request, context):  # type: ignore
+            # Clear any existing trace ID from previous requests
+            clear_trace_id()
+            
+            # Extract or generate trace ID from gRPC metadata
+            try:
+                metadata = context.invocation_metadata()
+                metadata_dict = {k: v for k, v in metadata}
+            except Exception as e:
+                logger.debug(f"Failed to extract gRPC metadata: {e}")
+                metadata_dict = {}
+            
+            trace_id = get_or_create_trace_id(metadata_dict)
+            logger.debug(f"Generated trace_id for gRPC unary call: {trace_id}")
+            
             with tracer.start_as_current_span("rpc", attributes={
                 "rpc.system": "grpc",
                 "rpc.service": service_name,
                 "rpc.method": method_name,
+                "trace.id": trace_id,
             }):
                 try:
                     return await handler.unary_unary(request, context)
                 finally:
-                    tid = trace.get_current_span().get_span_context().trace_id
                     context.set_trailing_metadata((
                         ("x-policy-version", POLICY_VERSION),
                         ("x-policy-checksum", POLICY_CHECKSUM),
-                        ("x-trace-id", f"{tid:032x}"),
+                        ("x-trace-id", trace_id),
                     ))
 
         # Handle unary-stream calls
         async def _wrap_unary_stream(request, context):  # type: ignore
+            # Clear any existing trace ID from previous requests
+            clear_trace_id()
+            
+            # Extract or generate trace ID from gRPC metadata
+            try:
+                metadata = context.invocation_metadata()
+                metadata_dict = {k: v for k, v in metadata}
+            except Exception as e:
+                logger.debug(f"Failed to extract gRPC metadata: {e}")
+                metadata_dict = {}
+            
+            trace_id = get_or_create_trace_id(metadata_dict)
+            logger.debug(f"Generated trace_id for gRPC stream call: {trace_id}")
+            
             with tracer.start_as_current_span("rpc_stream", attributes={
                 "rpc.system": "grpc",
                 "rpc.service": service_name,
                 "rpc.method": method_name,
+                "trace.id": trace_id,
             }):
                 try:
                     async for resp in handler.unary_stream(request, context):
                         yield resp
                 finally:
-                    tid = trace.get_current_span().get_span_context().trace_id
                     context.set_trailing_metadata((
                         ("x-policy-version", POLICY_VERSION),
                         ("x-policy-checksum", POLICY_CHECKSUM),
-                        ("x-trace-id", f"{tid:032x}"),
+                        ("x-trace-id", trace_id),
                     ))
 
         if handler and handler.unary_unary:
