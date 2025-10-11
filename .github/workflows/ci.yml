@@ -4,7 +4,9 @@ on:
   push:
     branches: ["main"]
   pull_request:
-    branches: ["main"]
+    branches:
+      - main
+      - improve/2025-10-seval
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
