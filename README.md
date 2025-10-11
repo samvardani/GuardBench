@@ -1,5 +1,7 @@
 ## SeaRei — real-time safety scoring with REST, gRPC, shadow telemetry, chaos drills, evidence packs
 
+![SeaRei CI](https://github.com/samvardani/SeaRei/actions/workflows/searei-ci.yml/badge.svg?branch=main)
+
 **by SeaTechOne LLC**
 
 SeaRei is an embeddable AI safety engine. It provides low-latency safety scoring via REST and gRPC, operational telemetry for shadow traffic, chaos/incident drills, and signed evidence packs for governance.
