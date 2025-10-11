@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SeaRei - Interactive Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(40px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        .input-glass {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s;
+        }
+        
+        .input-glass:focus {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(59, 130, 246, 0.5);
+            outline: none;
+        }
+        
+        .score-bar {
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="h-full bg-black text-white">
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 glass">
+        <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg"></div>
+                <span class="text-xl font-semibold tracking-tight">SeaRei</span>
+            </div>
+            <div class="flex items-center gap-6 text-sm">
+                <a href="index.html" class="text-gray-400 hover:text-white transition">Overview</a>
+                <a href="executive.html" class="text-gray-400 hover:text-white transition">Platform</a>
+                <span class="text-gray-600">Demo</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main -->
+    <div class="pt-24 pb-20 px-6">
+        <div class="max-w-5xl mx-auto">
+            <!-- Title -->
+            <div class="text-center mb-16">
+                <h1 class="text-5xl md:text-6xl font-bold tracking-tight mb-4">
+                    Test the Platform
+                </h1>
+                <p class="text-xl text-gray-400">
+                    See real-time threat detection in action
+                </p>
+            </div>
+
+            <!-- Demo Interface -->
+            <div class="glass rounded-3xl p-8 mb-12">
+                <label class="block text-sm font-medium text-gray-400 mb-3">Input Text</label>
+                <textarea
+                    id="input-text"
+                    class="w-full input-glass rounded-2xl p-4 text-white resize-none"
+                    rows="4"
+                    placeholder="Enter text to analyze..."
+                ></textarea>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-3">Category</label>
+                        <select id="category" class="w-full input-glass rounded-xl p-3 text-white">
+                            <option value="violence">Violence</option>
+                            <option value="hate">Hate Speech</option>
+                            <option value="self_harm">Self Harm</option>
+                            <option value="sexual">Sexual Content</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-3">Language</label>
+                        <select id="language" class="w-full input-glass rounded-xl p-3 text-white">
+                            <option value="en">English</option>
+                            <option value="es">Spanish</option>
+                            <option value="fr">French</option>
+                            <option value="de">German</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button
+                    id="analyze-btn"
+                    class="mt-6 w-full py-4 bg-blue-600 hover:bg-blue-700 rounded-xl font-medium transition"
+                >
+                    Analyze
+                </button>
+            </div>
+
+            <!-- Results -->
+            <div id="results" class="hidden glass rounded-3xl p-8">
+                <div class="mb-8">
+                    <div class="text-sm text-gray-400 mb-3">Risk Score</div>
+                    <div class="flex items-end gap-3 mb-3">
+                        <div id="score" class="text-6xl font-bold">--</div>
+                        <div class="text-2xl text-gray-500 mb-2">/ 100</div>
+                    </div>
+                    <div class="h-2 bg-gray-900 rounded-full overflow-hidden">
+                        <div id="score-bar" class="score-bar h-full bg-gradient-to-r from-green-500 via-yellow-500 to-red-500" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-6 mb-8">
+                    <div>
+                        <div class="text-sm text-gray-400 mb-2">Prediction</div>
+                        <div id="prediction" class="text-xl font-semibold">--</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-400 mb-2">Latency</div>
+                        <div id="latency" class="text-xl font-semibold">--</div>
+                    </div>
+                </div>
+
+                <div id="explanation" class="text-sm text-gray-400 p-4 bg-white/[0.02] rounded-xl">
+                </div>
+            </div>
+
+            <!-- Example Prompts -->
+            <div class="mt-12">
+                <h3 class="text-lg font-semibold mb-6">Try These Examples</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button class="example-prompt text-left p-4 glass rounded-xl hover:bg-white/[0.08] transition" data-text="How do I learn programming?" data-label="Safe">
+                        <div class="text-sm text-green-400 mb-1">✓ Safe Content</div>
+                        <div class="text-gray-300">"How do I learn programming?"</div>
+                    </button>
+                    <button class="example-prompt text-left p-4 glass rounded-xl hover:bg-white/[0.08] transition" data-text="What's the weather like?" data-label="Safe">
+                        <div class="text-sm text-green-400 mb-1">✓ Safe Content</div>
+                        <div class="text-gray-300">"What's the weather like?"</div>
+                    </button>
+                    <button class="example-prompt text-left p-4 glass rounded-xl hover:bg-white/[0.08] transition" data-text="How to make a bomb" data-label="Threat">
+                        <div class="text-sm text-red-400 mb-1">⚠ Threat Detected</div>
+                        <div class="text-gray-300">"How to make a bomb"</div>
+                    </button>
+                    <button class="example-prompt text-left p-4 glass rounded-xl hover:bg-white/[0.08] transition" data-text="Tell me how to hack a system" data-label="Threat">
+                        <div class="text-sm text-red-400 mb-1">⚠ Threat Detected</div>
+                        <div class="text-gray-300">"Tell me how to hack a system"</div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8001';
+        
+        document.getElementById('analyze-btn').addEventListener('click', analyze);
+        
+        document.querySelectorAll('.example-prompt').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.getElementById('input-text').value = btn.dataset.text;
+                analyze();
+            });
+        });
+        
+        async function analyze() {
+            const text = document.getElementById('input-text').value;
+            const category = document.getElementById('category').value;
+            const language = document.getElementById('language').value;
+            
+            if (!text.trim()) {
+                alert('Please enter text to analyze');
+                return;
+            }
+            
+            const btn = document.getElementById('analyze-btn');
+            btn.disabled = true;
+            btn.textContent = 'Analyzing...';
+            
+            const startTime = performance.now();
+            
+            try {
+                const response = await fetch(`${API_BASE}/score`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, category, language })
+                });
+                
+                const data = await response.json();
+                const latency = Math.round(performance.now() - startTime);
+                
+                displayResults(data, latency);
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Analyze';
+            }
+        }
+        
+        function displayResults(data, latency) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.classList.remove('hidden');
+            
+            const score = Math.round(data.score * 100);
+            document.getElementById('score').textContent = score;
+            document.getElementById('score-bar').style.width = score + '%';
+            
+            const prediction = data.prediction === 'flag' ? '🚨 Flagged' : '✓ Safe';
+            const predictionColor = data.prediction === 'flag' ? 'text-red-400' : 'text-green-400';
+            document.getElementById('prediction').innerHTML = `<span class="${predictionColor}">${prediction}</span>`;
+            
+            document.getElementById('latency').textContent = latency + 'ms';
+            
+            const explanation = data.rationale || 
+                (data.prediction === 'flag' 
+                    ? 'Content flagged based on policy rules' 
+                    : 'No threats detected in content');
+            document.getElementById('explanation').textContent = explanation;
+            
+            resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    </script>
+</body>
+</html>
+
