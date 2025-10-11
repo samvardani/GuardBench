@@ -22,7 +22,7 @@ Usage:
 import os
 import logging
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 try:
     from slack_bolt import App
@@ -36,7 +36,7 @@ except ImportError:
 from seval import sdk
 
 # In-memory store for recent checks (use Redis/DB in production)
-recent_checks: List[Dict] = []
+recent_checks: List[Dict[str, Any]] = []
 MAX_RECENT = 100
 
 logger = logging.getLogger(__name__)

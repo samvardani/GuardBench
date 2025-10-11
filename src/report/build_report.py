@@ -63,7 +63,7 @@ REPORT_ASSETS = OUT_DIR / "assets"
 OUT_DIR.mkdir(exist_ok=True); ASSETS.mkdir(exist_ok=True); REPORT_ASSETS.mkdir(exist_ok=True)
 
 
-def _write_local_jsonl(path: Path, records: Iterable[dict], encoding: str = "utf-8") -> None:
+def _write_local_jsonl(path: Path, records: Iterable[dict[str, Any]], encoding: str = "utf-8") -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding=encoding) as handle:
         for record in records:
@@ -88,7 +88,7 @@ def _read_remote_jsonl(uri: str) -> List[dict[str, Any]]:
     raise ValueError(f"Unsupported input URI: {uri}")
 
 
-def _write_remote_jsonl(uri: str, records: Iterable[dict]) -> None:
+def _write_remote_jsonl(uri: str, records: Iterable[dict[str, Any]]) -> None:
     if uri.startswith("s3://"):
         s3_connector.write_jsonl(uri, records)
         return
@@ -136,7 +136,7 @@ def load_rows(dataset_path: Path):
     return rows
 
 
-def _normalize_records(records: Iterable[dict]) -> List[dict[str, Any]]:
+def _normalize_records(records: Iterable[dict[str, Any]]) -> List[dict[str, Any]]:
     rows: List[dict[str, Any]] = []
     dropped = 0
     for raw in records:

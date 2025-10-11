@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+from asyncio import Queue
 import concurrent.futures
 import csv
 import datetime as dt
@@ -651,7 +652,7 @@ INTEGRATION_CATALOG: List[Dict[str, Any]] = [
     },
 ]
 
-RUN_STREAMS: Dict[str, List[asyncio.Queue]] = {}
+RUN_STREAMS: Dict[str, List[asyncio.Queue[Any]]] = {}
 RUN_EVENTS: Dict[str, List[Dict[str, Any]]] = {}
 RUN_LOCK = asyncio.Lock()
 
@@ -1073,8 +1074,8 @@ def _require_role(ctx: AuthContext, *, minimum: str = "viewer") -> None:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient role for this operation")
 
 
-async def _subscribe_run(run_id: str) -> tuple[asyncio.Queue, List[Dict[str, Any]]]:
-    queue: asyncio.Queue = asyncio.Queue(maxsize=32)
+async def _subscribe_run(run_id: str) -> tuple[asyncio.Queue[Any], List[Dict[str, Any]]]:
+    queue: asyncio.Queue[Any] = asyncio.Queue[Any](maxsize=32)
     async with RUN_LOCK:
         subscribers = RUN_STREAMS.setdefault(run_id, [])
         subscribers.append(queue)
@@ -1082,7 +1083,7 @@ async def _subscribe_run(run_id: str) -> tuple[asyncio.Queue, List[Dict[str, Any
     return queue, history
 
 
-async def _unsubscribe_run(run_id: str, queue: asyncio.Queue) -> None:
+async def _unsubscribe_run(run_id: str, queue: asyncio.Queue[Any]) -> None:
     async with RUN_LOCK:
         subscribers = RUN_STREAMS.get(run_id)
         if not subscribers:

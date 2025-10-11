@@ -90,7 +90,7 @@ def _apply_operator(name: str, text: str) -> str:
     return func(text)
 
 
-def run_lab(policy_slices: Sequence[str], out_path: Path, max_per_slice: int = 20) -> Dict[str, dict]:
+def run_lab(policy_slices: Sequence[str], out_path: Path, max_per_slice: int = 20) -> Dict[str, dict[str, Any]]:
     seeds = _collect_seed_texts(policy_slices, max_per_slice=max_per_slice)
     results: Dict[str, Dict[str, Any]] = {}
     for slice_key, cases in seeds.items():
