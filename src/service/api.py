@@ -178,6 +178,12 @@ app = FastAPI(
     json_loads=orjson_loads,
     default_response_class=ORJSONResponse,
     lifespan=lifespan,
+    swagger_ui_parameters={
+        "deepLinking": True,
+        "displayRequestDuration": True,
+        "docExpansion": "none",
+        "syntaxHighlight.theme": "monokai",
+    },
 )
 seed_all_from_env("SEVAL_SEED")
 # Templates
