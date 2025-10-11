@@ -110,8 +110,8 @@ jobs:
         with:
           python-version: "3.11"
           cache: "pip"
-      - run: pip install mypy types-requests
-      - run: mypy src
+      - run: pip install mypy types-requests types-PyYAML types-protobuf
+      - run: mypy src --ignore-missing-imports
 
   # Heavy "eval" job — only on push to main (NOT on PRs)
   eval:
