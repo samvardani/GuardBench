@@ -40,7 +40,7 @@ def add_security_headers(response: Response, etag: Optional[str] = None):
 async def export_json(
     sample_data: bool = False,
     redact: bool = True
-) -> Response:
+) -> Response | StreamingResponse:
     """Export report as JSON.
     
     Args:
@@ -97,7 +97,7 @@ async def export_json(
 async def export_markdown(
     sample_data: bool = False,
     redact: bool = True
-) -> Response:
+) -> Response | StreamingResponse:
     """Export report as Markdown.
     
     Args:

@@ -41,7 +41,7 @@ class ScoreService(seval_pb2_grpc.ScoreServiceServicer):  # type: ignore
 async def serve_async(host: str = "0.0.0.0", port: int = 50051):
     if seval_pb2_grpc is None:
         raise RuntimeError("gRPC stubs not generated; run protoc")
-    server = grpc.aio.server()
+    server = grpc.aio.server()  # type: ignore[attr-defined]
     seval_pb2_grpc.add_ScoreServiceServicer_to_server(ScoreService(), server)
     server.add_insecure_port(f"{host}:{port}")
     await server.start()

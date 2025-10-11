@@ -7,7 +7,7 @@ import math
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Sequence
+from typing import Any, Dict, List, Sequence
 
 import yaml
 
@@ -99,7 +99,7 @@ def generate_candidates(
     max_patches: int = 3,
     cases_path: Path = DEFAULT_CASES_PATH,
     config_path: Path = DEFAULT_CONFIG_PATH,
-) -> Dict[str, List[CandidatePatch]]:
+) -> Dict[str, Any]:
     cases = load_cases(cases_path)
     config = _load_config(config_path)
     thresholds = (config.get("slice_thresholds") or {}) if isinstance(config, dict) else {}

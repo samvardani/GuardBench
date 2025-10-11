@@ -158,7 +158,8 @@ def leetify(t: str, rng: random.Random | None = None) -> str:
 
 def insert_confusables(t: str, rng: random.Random | None = None) -> str:
     """Swap characters for visually similar homoglyphs with 25% probability."""
-    rng = rng or random
+    rng = rng or random  # type: ignore[assignment]
+    assert rng is not None
     out: List[str] = []
     for ch in t:
         if ch in CONFUSABLES and rng.random() < 0.25:
@@ -170,7 +171,8 @@ def insert_confusables(t: str, rng: random.Random | None = None) -> str:
 
 def insert_homoglyphs(t: str, rng: random.Random | None = None) -> str:
     """Replace characters with ASCII homoglyph tricks (e.g. m -> rn)."""
-    rng = rng or random
+    rng = rng or random  # type: ignore[assignment]
+    assert rng is not None
     out: List[str] = []
     for ch in t:
         options = HOMOGLYPHS.get(ch)
@@ -190,7 +192,8 @@ def insert_homoglyphs(t: str, rng: random.Random | None = None) -> str:
 
 def insert_zero_widths(t: str, rng: random.Random | None = None) -> str:
     """Slip zero-width characters between graphemes to disrupt tokenization."""
-    rng = rng or random
+    rng = rng or random  # type: ignore[assignment]
+    assert rng is not None
     chars = list(t)
     if not chars:
         return t
@@ -204,7 +207,8 @@ def insert_zero_widths(t: str, rng: random.Random | None = None) -> str:
 
 def punctuation_split(t: str, rng: random.Random | None = None) -> str:
     """Insert lightweight punctuation inside long tokens."""
-    rng = rng or random
+    rng = rng or random  # type: ignore[assignment]
+    assert rng is not None
     words = t.split()
     mutated: List[str] = []
     for word in words:
@@ -226,7 +230,8 @@ def punctuation_split(t: str, rng: random.Random | None = None) -> str:
 
 def jitter_spacing(t: str, rng: random.Random | None = None) -> str:
     """Insert random spaces or hyphens into long words."""
-    rng = rng or random
+    rng = rng or random  # type: ignore[assignment]
+    assert rng is not None
 
     def j(word: str) -> str:
         if len(word) < 7:
@@ -239,7 +244,8 @@ def jitter_spacing(t: str, rng: random.Random | None = None) -> str:
 
 def synonym_swap(t: str, rng: random.Random | None = None) -> str:
     """Swap curated synonym pairs bidirectionally to vary phrasing."""
-    rng = rng or random
+    rng = rng or random  # type: ignore[assignment]
+    assert rng is not None
     out = t
     for a, b in SYNONYMS:
         pattern_a = rf"\\b{re.escape(a)}\\b"
@@ -337,7 +343,7 @@ def _apply_recipe(text: str, transforms: Sequence[str], rng: random.Random) -> t
     out = text
     for name in transforms:
         transform = TRANSFORM_REGISTRY[name]
-        out = transform(out, rng=rng)
+        out = transform(out, rng=rng)  # type: ignore[call-arg]
         applied.append(name)
     return out, tuple(applied)
 
@@ -471,7 +477,7 @@ def run(
     global_seen: set[str] = {r.text for r in rows}
 
     if not any(picked_by_category.values()):
-        return {
+        return {  # type: ignore[dict-item]
             "picked": 0,
             "generated": 0,
             "by_category": {},
@@ -556,7 +562,7 @@ def run(
         encoding="utf-8",
     )
 
-    return {
+    return {  # type: ignore[dict-item]
         "picked": record["picked"],
         "generated": record["generated"],
         "by_category": record["by_category"],
