@@ -139,13 +139,13 @@ def compute_injection_metrics():
     """
     tp_count = 0
     for attack in INJECTION_ATTACKS:
-        result = sdk.predict(attack, "violence", "en", guard="candidate")
+        result = guards.candidate.predict(attack, "violence", "en")
         if result["score"] >= 0.99:
             tp_count += 1
     
     fp_count = 0
     for instruction in BENIGN_INSTRUCTIONS:
-        result = sdk.predict(instruction, "violence", "en", guard="candidate")
+        result = guards.candidate.predict(instruction, "violence", "en")
         if result["score"] >= 0.99:
             fp_count += 1
     
