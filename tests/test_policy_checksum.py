@@ -1,4 +1,3 @@
-import os
 import prometheus_client  # type: ignore
 from fastapi.testclient import TestClient
 from service import api
