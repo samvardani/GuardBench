@@ -145,7 +145,7 @@ class TestOverDefense:
             
             # These should have reduced scores due to safe context
             assert result["score"] < 0.8, \
-                f"Safe context not applied: '{prompt}' scored {result["score"]}"
+                f"Safe context not applied: '{prompt}' scored {result['score']}"
     
     def test_educational_content_not_blocked(self):
         """Educational and informational content should not be blocked."""
@@ -179,7 +179,7 @@ class TestOverDefense:
         for prompt in professional_prompts:
             result = sdk.predict(prompt, "violence", "en", guard="candidate")
             assert result["score"] < 0.95, \
-                f"Professional content over-blocked: '{prompt}' scored {result["score"]}"
+                f"Professional content over-blocked: '{prompt}' scored {result['score']}"
 
 
 def compute_overdefense_rate():
