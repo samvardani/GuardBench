@@ -87,11 +87,11 @@ class TestOverDefense:
             result = sdk.predict(prompt, "violence", "en", guard="candidate")
             
             # If scored as unsafe (score >= threshold), it's a false positive
-            if result.score >= 0.99:  # Using typical violence threshold
+            if result["score"] >= 0.99:  # Using typical violence threshold
                 failed_prompts.append({
                     "prompt": prompt,
-                    "score": result.score,
-                    "slices": result.slices
+                    "score": result["score"],
+                    "slices": result.get("slices", [])
                 })
         
         # Allow some false positives but keep below threshold
@@ -120,7 +120,7 @@ class TestOverDefense:
         for prompt in SAFE_PROMPTS:
             result = sdk.predict(prompt, "violence", "en", guard="candidate")
             
-            if result.score >= 0.99:
+            if result["score"] >= 0.99:
                 false_positives += 1
         
         fpr_pct = (false_positives / total_prompts) * 100
@@ -144,8 +144,8 @@ class TestOverDefense:
             result = sdk.predict(prompt, "violence", "en", guard="candidate")
             
             # These should have reduced scores due to safe context
-            assert result.score < 0.8, \
-                f"Safe context not applied: '{prompt}' scored {result.score}"
+            assert result["score"] < 0.8, \
+                f"Safe context not applied: '{prompt}' scored {result["score"]}"
     
     def test_educational_content_not_blocked(self):
         """Educational and informational content should not be blocked."""
@@ -160,7 +160,7 @@ class TestOverDefense:
         blocked = []
         for prompt in educational_prompts:
             result = sdk.predict(prompt, "violence", "en", guard="candidate")
-            if result.score >= 0.99:
+            if result["score"] >= 0.99:
                 blocked.append(prompt)
         
         assert len(blocked) == 0, \
@@ -178,8 +178,8 @@ class TestOverDefense:
         
         for prompt in professional_prompts:
             result = sdk.predict(prompt, "violence", "en", guard="candidate")
-            assert result.score < 0.95, \
-                f"Professional content over-blocked: '{prompt}' scored {result.score}"
+            assert result["score"] < 0.95, \
+                f"Professional content over-blocked: '{prompt}' scored {result["score"]}"
 
 
 def compute_overdefense_rate():
@@ -192,7 +192,7 @@ def compute_overdefense_rate():
     
     for prompt in SAFE_PROMPTS:
         result = sdk.predict(prompt, "violence", "en", guard="candidate")
-        if result.score >= 0.99:
+        if result["score"] >= 0.99:
             false_positives += 1
     
     fpr_pct = (false_positives / total_prompts) * 100
