@@ -17,7 +17,7 @@ exposed by an existing HTTP /metrics endpoint.
 from __future__ import annotations
 
 import time
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Any
 
 try:  # Optional dependency; when missing, we noop entirely
     from prometheus_client import Counter, Histogram, REGISTRY
