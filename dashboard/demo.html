@@ -343,13 +343,14 @@
         }
         
         function displayResults(data, clientLatency) {
-            document.getElementById('results-container').classList.add('hidden');
-            document.getElementById('results').classList.remove('hidden');
-            document.getElementById('result-timestamp').textContent = new Date().toLocaleTimeString();
-            
-            // Score
-            const score = Math.round((data.score || 0) * 100);
-            document.getElementById('score-display').textContent = score;
+            try {
+                document.getElementById('results-container').classList.add('hidden');
+                document.getElementById('results').classList.remove('hidden');
+                document.getElementById('result-timestamp').textContent = new Date().toLocaleTimeString();
+                
+                // Score
+                const score = Math.round((data.score || 0) * 100);
+                document.getElementById('score-display').textContent = score;
             
             // Score bar with color
             const scoreBar = document.getElementById('score-bar');
@@ -386,6 +387,11 @@
             
             // Raw response
             document.getElementById('raw-response').textContent = JSON.stringify(data, null, 2);
+            
+            } catch (error) {
+                console.error('Error displaying results:', error);
+                alert('Error displaying results: ' + error.message);
+            }
         }
         
         function addToHistory(text, data, latency) {
