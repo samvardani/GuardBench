@@ -1,3 +1,4 @@
+import time
 from policy import policy_cache
 
 
@@ -37,6 +38,7 @@ slices:
     assert policy_cache.load_count() == 1
 
     # Touch the file -> bump mtime -> increments on next call
+    time.sleep(1.1)  # Ensure mtime changes (some filesystems have 1s granularity)
     current = p.read_text(encoding="utf-8")
     p.write_text(current + "\n", encoding="utf-8")
     _ = policy_cache.get_compiled_policy()

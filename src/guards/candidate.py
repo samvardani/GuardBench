@@ -107,7 +107,7 @@ CONFUSABLES_REV = {
     "а":"a","е":"e","ο":"o","р":"p","с":"c","х":"x","у":"y",  # Cyrillic/Greek → Latin
     "Н":"H","Κ":"K","М":"M",
 }
-LEET_REV = str.maketrans({"4":"a","3":"e","1":"i","0":"o","5":"s","7":"t","8":"b","9":"g"})
+LEET_REV = str.maketrans({"4":"a","3":"e","1":"i","0":"o","5":"s","7":"t","8":"b","9":"g","!":"i","@":"a","$":"s"})
 
 def _normalize_aggressive(t: str) -> str:
     t = unicodedata.normalize("NFKC", t or "")

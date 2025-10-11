@@ -59,21 +59,21 @@ except Exception:  # pragma: no cover - optional dependency
         def inc(self, *args, **kwargs):  # type: ignore[no-untyped-def]
             return None
 
-    Counter = Histogram = _NoopMetric  # type: ignore[assignment]
+    Counter = Histogram = _NoopMetric  # type: ignore[assignment,misc]
     CONTENT_TYPE_LATEST = "text/plain; version=0.0.4"  # type: ignore
 
-    def generate_latest(*_, **__):  # type: ignore[no-untyped-def]
+    def generate_latest(*_, **__):  # type: ignore[no-untyped-def,misc]
         return b""
 
-    class REGISTRY:
-        _names_to_collectors = {}
+    class REGISTRY:  # type: ignore[no-redef]
+        _names_to_collectors: Dict[str, Any] = {}
 
 from pydantic import BaseModel, EmailStr, Field, constr
 
 try:  # pragma: no cover - optional dependency guard
     import email_validator  # type: ignore  # noqa: F401
 except ImportError:  # pragma: no cover
-    EmailStr = str  # type: ignore[assignment]
+    EmailStr = str  # type: ignore[assignment,misc]
 
 try:
     from opentelemetry import trace
@@ -132,7 +132,7 @@ from utils.scrub import privacy_mode_for, scrub_text
 from jinja2 import Environment, FileSystemLoader
 from utils.json import orjson_dumps, orjson_loads
 from policy.compiler import load_compiled_policy, POLICY_PATH
-from policy import policy_cache as policy_cache
+from policy import policy_cache  # type: ignore[attr-defined]
 import secrets
 from utils.seed import seed_all_from_env
 
@@ -140,7 +140,7 @@ from utils.seed import seed_all_from_env
 try:
     import redis  # type: ignore
 except Exception:  # pragma: no cover - redis is optional
-    redis = None
+    redis = None  # type: ignore[assignment]
 
 
 LOG_LEVEL = get_settings().log_level.strip().upper()
@@ -250,7 +250,7 @@ def _configure_tracing() -> None:
     try:
         insecure = os.getenv("OTEL_EXPORTER_OTLP_INSECURE", "true").lower() == "true"
         provider = TracerProvider(resource=Resource.create({"service.name": "safety-eval-service"}))
-        exporter = OTLPSpanExporter(endpoint=endpoint, insecure=insecure)
+        exporter = OTLPSpanExporter(endpoint=endpoint, insecure=insecure)  # type: ignore[call-arg]
         processor = BatchSpanProcessor(exporter)
         provider.add_span_processor(processor)
         trace.set_tracer_provider(provider)
@@ -653,15 +653,15 @@ class AuthContext:
 
 
 class SignUpRequest(BaseModel):
-    tenant_name: constr(min_length=2, max_length=80)
+    tenant_name: constr(min_length=2, max_length=80)  # type: ignore[valid-type]
     email: EmailStr
-    password: constr(min_length=8, max_length=128)
+    password: constr(min_length=8, max_length=128)  # type: ignore[valid-type]
     slug: Optional[str] = None
 
 
 class LoginRequest(BaseModel):
     email: EmailStr
-    password: constr(min_length=8, max_length=128)
+    password: constr(min_length=8, max_length=128)  # type: ignore[valid-type]
     tenant_slug: Optional[str] = None
 
 
@@ -711,7 +711,7 @@ class IntegrationRequest(BaseModel):
 
 class UserCreateRequest(BaseModel):
     email: EmailStr
-    password: constr(min_length=8, max_length=128)
+    password: constr(min_length=8, max_length=128)  # type: ignore[valid-type]
     role: str = Field(default="viewer")
 
 
@@ -1118,7 +1118,7 @@ def _prepare_metrics(summary: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
     metrics: Dict[str, Dict[str, Any]] = {}
     for guard_key, guard_view in summary.get("guards", {}).items():
         modes = guard_view.get("modes", {})
-        strict = modes.get("strict") or next(iter(modes.values()), {})
+        strict: Dict[str, Any] = modes.get("strict") or next(iter(modes.values()), {})
         confusion = strict.get("confusion", {})
         latency = guard_view.get("latency", {})
         metrics[guard_key] = {
