@@ -65,7 +65,7 @@ async def export_json(
         
         streaming_builder = StreamingReportBuilder(data, redact=redact)
         
-        response = StreamingResponse(
+        stream_response = StreamingResponse(
             streaming_builder.stream_json(),
             media_type="application/json",
             headers={
@@ -73,8 +73,8 @@ async def export_json(
             }
         )
         
-        add_security_headers(response)
-        return response
+        add_security_headers(stream_response)
+        return stream_response
     
     else:
         # Return complete report
@@ -122,7 +122,7 @@ async def export_markdown(
         
         streaming_builder = StreamingReportBuilder(data, redact=redact)
         
-        response = StreamingResponse(
+        stream_response = StreamingResponse(
             streaming_builder.stream_markdown(),
             media_type="text/markdown",
             headers={
@@ -130,8 +130,8 @@ async def export_markdown(
             }
         )
         
-        add_security_headers(response)
-        return response
+        add_security_headers(stream_response)
+        return stream_response
     
     else:
         # Return complete report
