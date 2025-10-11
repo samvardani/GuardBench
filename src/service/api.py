@@ -178,6 +178,8 @@ app = FastAPI(
     json_loads=orjson_loads,
     default_response_class=ORJSONResponse,
     lifespan=lifespan,
+    docs_url=None,  # Disable default docs
+    redoc_url=None,  # Disable redoc
     swagger_ui_parameters={
         "deepLinking": True,
         "displayRequestDuration": True,
@@ -2138,6 +2140,301 @@ except ImportError:
 def metrics_endpoint() -> Response:
     payload = generate_latest()
     return Response(content=payload, media_type=CONTENT_TYPE_LATEST)
+
+
+from fastapi.openapi.docs import get_swagger_ui_html
+from fastapi.responses import HTMLResponse
+
+@app.get("/docs", include_in_schema=False)
+async def custom_swagger_ui_html() -> HTMLResponse:
+    """Custom dark-themed Swagger UI matching SeaRei dashboard design."""
+    return HTMLResponse(content="""
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SeaRei API - Documentation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+        
+        body {
+            margin: 0;
+            background: #000;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        /* Dark theme */
+        .swagger-ui {
+            background: #000;
+            color: #fff;
+        }
+        
+        .swagger-ui .topbar {
+            background: rgba(255,255,255,0.04);
+            backdrop-filter: blur(40px);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding: 20px 0;
+        }
+        
+        .swagger-ui .topbar-wrapper {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+        
+        .swagger-ui .topbar-wrapper .link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .swagger-ui .topbar-wrapper .link::before {
+            content: '';
+            display: block;
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            border-radius: 8px;
+        }
+        
+        .swagger-ui .topbar-wrapper .link span {
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff !important;
+        }
+        
+        .swagger-ui .info {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 32px;
+            margin: 40px auto;
+            max-width: 1400px;
+        }
+        
+        .swagger-ui .info .title {
+            color: #fff !important;
+            font-size: 32px !important;
+            font-weight: 700;
+        }
+        
+        .swagger-ui .info .description {
+            color: #9ca3af !important;
+            font-size: 16px;
+            margin-top: 12px;
+        }
+        
+        .swagger-ui .scheme-container {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto 20px;
+        }
+        
+        .swagger-ui .opblock {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .swagger-ui .opblock.opblock-post { border-left: 4px solid #10b981; }
+        .swagger-ui .opblock.opblock-get { border-left: 4px solid #3b82f6; }
+        .swagger-ui .opblock.opblock-put { border-left: 4px solid #f59e0b; }
+        .swagger-ui .opblock.opblock-delete { border-left: 4px solid #ef4444; }
+        
+        .swagger-ui .opblock .opblock-summary {
+            background: transparent;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .swagger-ui .opblock .opblock-summary-path {
+            color: #e5e7eb !important;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .swagger-ui .opblock .opblock-summary-description {
+            color: #9ca3af !important;
+        }
+        
+        .swagger-ui .opblock .opblock-body {
+            background: rgba(0,0,0,0.3);
+        }
+        
+        .swagger-ui .btn {
+            background: #3b82f6 !important;
+            color: #fff !important;
+            border: none !important;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 500;
+        }
+        
+        .swagger-ui .btn:hover {
+            background: #2563eb !important;
+        }
+        
+        .swagger-ui table {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .swagger-ui table thead tr {
+            background: rgba(255,255,255,0.04);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .swagger-ui table thead tr th {
+            color: #9ca3af !important;
+            font-weight: 500;
+        }
+        
+        .swagger-ui table tbody tr {
+            color: #e5e7eb !important;
+        }
+        
+        .swagger-ui .parameter__name {
+            color: #60a5fa !important;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .swagger-ui .parameter__type {
+            color: #34d399 !important;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .swagger-ui .response-col_status {
+            color: #10b981 !important;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .swagger-ui .model-box {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 8px;
+        }
+        
+        .swagger-ui .model {
+            color: #e5e7eb !important;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .swagger-ui code {
+            background: rgba(255,255,255,0.05) !important;
+            color: #60a5fa !important;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .swagger-ui pre {
+            background: rgba(0,0,0,0.4) !important;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: #e5e7eb !important;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .swagger-ui .scheme-container .schemes > label {
+            color: #9ca3af !important;
+        }
+        
+        .swagger-ui select {
+            background: rgba(255,255,255,0.05) !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            color: #fff !important;
+            border-radius: 6px;
+        }
+        
+        .swagger-ui input[type=text],
+        .swagger-ui textarea {
+            background: rgba(255,255,255,0.05) !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            color: #fff !important;
+            border-radius: 6px;
+        }
+        
+        .swagger-ui .dialog-ux {
+            background: rgba(0,0,0,0.95) !important;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .swagger-ui .modal-ux-content {
+            background: #0a0a0a !important;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+        }
+        
+        /* Fix responses */
+        .swagger-ui .responses-inner {
+            background: transparent;
+        }
+        
+        .swagger-ui .response .response-col_description {
+            color: #e5e7eb !important;
+        }
+        
+        /* Microlight syntax (code examples) */
+        .swagger-ui .microlight {
+            background: rgba(0,0,0,0.5) !important;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+        }
+        
+        /* Tab headers */
+        .swagger-ui .tab {
+            color: #9ca3af !important;
+        }
+        
+        .swagger-ui .tab.active {
+            color: #3b82f6 !important;
+        }
+        
+        /* Version badge */
+        .swagger-ui .info .version {
+            background: rgba(59,130,246,0.2) !important;
+            color: #60a5fa !important;
+            border-radius: 6px;
+            padding: 4px 12px;
+            font-size: 13px;
+        }
+        
+        /* Improve contrast */
+        .swagger-ui .renderedMarkdown p,
+        .swagger-ui .renderedMarkdown li {
+            color: #d1d5db !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="swagger-ui"></div>
+    <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+    <script>
+        window.onload = () => {
+            window.ui = SwaggerUIBundle({
+                url: '/openapi.json',
+                dom_id: '#swagger-ui',
+                deepLinking: true,
+                displayRequestDuration: true,
+                docExpansion: 'none',
+                syntaxHighlight: {
+                    activate: true,
+                    theme: 'monokai'
+                },
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIBundle.SwaggerUIStandalonePreset
+                ],
+            });
+        };
+    </script>
+</body>
+</html>
+""")
 
 
 @app.get("/healthz", response_class=ORJSONResponse)
