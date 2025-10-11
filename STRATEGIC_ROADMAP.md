@@ -1,5 +1,5 @@
 # Strategic Roadmap to Industry Leadership
-## SeaRai → Enterprise AI Safety Platform
+## SeaRei → Enterprise AI Safety Platform
 
 **Company:** SeaTechOne LLC  
 **Target:** Apple-Grade Quality | Industry #1 Position  
@@ -696,7 +696,7 @@ Business:
 3. Innovation (AI, multi-modal) - Months 7-9
 4. Leadership (Benchmarks, ecosystem) - Months 10-12
 
-**This roadmap is aggressive but achievable. With disciplined execution, SeaRai can become the trusted standard for AI safety in enterprise environments.**
+**This roadmap is aggressive but achievable. With disciplined execution, SeaRei can become the trusted standard for AI safety in enterprise environments.**
 
 **Start immediately with the 30-day tactical plan. Every day counts toward industry leadership.**
 

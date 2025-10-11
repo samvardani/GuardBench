@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-# SeaRai by SeaTechOne LLC
+# SeaRei by SeaTechOne LLC
 # Enterprise AI Safety Evaluation Platform
 
 # ---------- Builder ----------
