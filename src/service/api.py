@@ -156,12 +156,18 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Lifespan context manager for startup/shutdown."""
-    # Startup - these are defined later in this module
+    # Startup
     _configure_tracing()
     db.ensure_schema()
     logger.info("Safety service initialised with multi-tenant schema")
+    logger.info("Service started - version=%s build=%s", app.version, BUILD_ID)
+    
     yield
-    # Shutdown (if needed in future)
+    
+    # Graceful shutdown
+    logger.info("Service shutting down gracefully...")
+    PREDICT_EXECUTOR.shutdown(wait=True, cancel_futures=False)
+    logger.info("Service shutdown complete")
 
 
 app = FastAPI(
@@ -201,17 +207,26 @@ _cors = get_settings().cors_allow_origins
 if _cors and _cors.strip():
     _origins = [o.strip() for o in _cors.split(",") if o.strip()]
 else:
-    _origins = ["*"]
+    # SECURITY: Default to localhost only, not wildcard
+    _origins = ["http://localhost:3000", "http://localhost:8000", "http://127.0.0.1:3000", "http://127.0.0.1:8000"]
+    logger.warning("CORS_ALLOW_ORIGINS not set, using localhost-only default")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
 # Session support (for CSRF tokens on policy page, etc.)
-app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET", "dev-not-secret"))
+# SECURITY: Require SESSION_SECRET in production
+_session_secret = os.getenv("SESSION_SECRET")
+if not _session_secret:
+    if os.getenv("ENV", "development") == "production":
+        raise RuntimeError("SESSION_SECRET environment variable is required in production")
+    _session_secret = "dev-insecure-secret-change-in-production"
+    logger.warning("SESSION_SECRET not set, using insecure default for development")
+app.add_middleware(SessionMiddleware, secret_key=_session_secret)
 
 # Provenance headers for governance and audit trails
 app.add_middleware(
@@ -283,9 +298,9 @@ _settings = get_settings()
 PREDICT_TIMEOUT_SECONDS = float(_settings.predict_timeout_seconds)
 PREDICT_MAX_WORKERS = int(_settings.predict_max_workers)
 
-TOKEN_RATE_LIMIT = 2
-TOKEN_RATE_WINDOW_SECONDS = 60
-RATE_LIMIT_ENABLED = os.getenv("RATE_LIMIT_ENABLED", "true").lower() == "true"
+TOKEN_RATE_LIMIT = int(_settings.token_rate_limit)
+TOKEN_RATE_WINDOW_SECONDS = int(_settings.token_rate_window_seconds)
+RATE_LIMIT_ENABLED = _settings.rate_limit_enabled
 REDIS_URL = _settings.redis_url
 
 CB_FAILURE_THRESHOLD = int(os.getenv("CB_FAILURE_THRESHOLD", "3"))
@@ -651,7 +666,7 @@ INTEGRATION_CATALOG: List[Dict[str, Any]] = [
     },
 ]
 
-RUN_STREAMS: Dict[str, List[asyncio.Queue[Any]]] = {}
+RUN_STREAMS: Dict[str, List[asyncio.Queue]] = {}
 RUN_EVENTS: Dict[str, List[Dict[str, Any]]] = {}
 RUN_LOCK = asyncio.Lock()
 
@@ -706,14 +721,14 @@ class BatchRow(BaseModel):
 
 
 class BatchRequest(BaseModel):
-    rows: List[BatchRow] = Field(default=..., min_length=1, max_length=5000)
+    rows: List[BatchRow] = Field(..., min_items=1, max_items=5000)
     baseline_guard: constr(min_length=1, max_length=50) = "baseline"  # type: ignore[valid-type]
     candidate_guard: constr(min_length=1, max_length=50) = "candidate"  # type: ignore[valid-type]
 
 
 class BatchScoreRequest(BaseModel):
     """Batch scoring request for multiple texts."""
-    items: List[ScoreRequest] = Field(default=..., min_length=1, max_length=1000)
+    items: List[ScoreRequest] = Field(..., min_items=1, max_items=1000)
 
 
 class IntegrationRequest(BaseModel):
@@ -861,7 +876,7 @@ def _wrap_guard_sync(guard_key: str, guard_spec: Dict[str, Any]):
 def _predict_internal(text: str, category: Optional[str], language: Optional[str], guard: str = "candidate") -> Dict[str, Any]:
     guard_spec = _resolve_guard(guard)
     fn = _wrap_guard_sync(guard, guard_spec)
-    return fn(text, category, language)  # type: ignore[no-any-return]
+    return fn(text, category, language)
 
 
 def _now_iso() -> str:
@@ -972,7 +987,7 @@ def _load_manifest(tenant_slug: str, manifest_id: Optional[str] = None) -> Dict[
         except json.JSONDecodeError as exc:
             raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Rollback manifest unreadable") from exc
         payload["manifest_id"] = manifest_id
-        return payload  # type: ignore[no-any-return]
+        return payload
 
     manifests = _list_manifests(tenant_slug, limit=1)
     if not manifests:
@@ -1073,8 +1088,8 @@ def _require_role(ctx: AuthContext, *, minimum: str = "viewer") -> None:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient role for this operation")
 
 
-async def _subscribe_run(run_id: str) -> tuple[asyncio.Queue[Any], List[Dict[str, Any]]]:
-    queue: asyncio.Queue[Any] = asyncio.Queue[Any](maxsize=32)
+async def _subscribe_run(run_id: str) -> tuple[asyncio.Queue, List[Dict[str, Any]]]:
+    queue: asyncio.Queue = asyncio.Queue(maxsize=32)
     async with RUN_LOCK:
         subscribers = RUN_STREAMS.setdefault(run_id, [])
         subscribers.append(queue)
@@ -1082,7 +1097,7 @@ async def _subscribe_run(run_id: str) -> tuple[asyncio.Queue[Any], List[Dict[str
     return queue, history
 
 
-async def _unsubscribe_run(run_id: str, queue: asyncio.Queue[Any]) -> None:
+async def _unsubscribe_run(run_id: str, queue: asyncio.Queue) -> None:
     async with RUN_LOCK:
         subscribers = RUN_STREAMS.get(run_id)
         if not subscribers:
@@ -1152,7 +1167,7 @@ async def _evaluate_run(
     engine = {"guards": guard_config}
 
     def _do_evaluate() -> Dict[str, Any]:
-        return evaluate(engine, rows, policy={})  # type: ignore[no-any-return]
+        return evaluate(engine, rows, policy={})
 
     summary = await run_in_threadpool(_do_evaluate)
     return summary
@@ -1407,8 +1422,13 @@ async def score_endpoint(request: ScoreRequest, ctx: Optional[AuthContext] = Dep
             slices = result.get("slices") or []
 
             privacy_mode = privacy_mode_for("score")
+            prediction = result.get("prediction")
+            threshold = result.get("threshold", 0.5)
+            
             response_payload = {
                 "score": score_value,
+                "prediction": prediction,
+                "threshold": threshold,
                 "slices": slices,
                 "policy_version": POLICY_VERSION,
                 "policy_checksum": POLICY_CHECKSUM,
@@ -1421,7 +1441,6 @@ async def score_endpoint(request: ScoreRequest, ctx: Optional[AuthContext] = Dep
             if rationale:
                 response_payload["rationale"] = rationale
 
-            prediction = result.get("prediction")
             if isinstance(prediction, bool):
                 outcome_label = "flag" if prediction else "allow"
             else:
