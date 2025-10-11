@@ -6,7 +6,7 @@ import json
 import os
 import tarfile
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import Any, Dict, Tuple
 
 
 def _sha256_file(path: Path) -> str:
@@ -17,7 +17,7 @@ def _sha256_file(path: Path) -> str:
     return h.hexdigest()
 
 
-def _extract_manifest(tar_path: Path, workdir: Path) -> Tuple[Dict[str, object], bytes | None]:
+def _extract_manifest(tar_path: Path, workdir: Path) -> Tuple[Dict[str, Any], bytes | None]:
     with tarfile.open(tar_path, "r:gz") as tar:
         members = {m.name: m for m in tar.getmembers()}
         tar.extract("MANIFEST.json", path=workdir)

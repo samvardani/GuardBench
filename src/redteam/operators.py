@@ -5,7 +5,7 @@ from __future__ import annotations
 import random
 from typing import Callable, List, Sequence
 
-_LEET_MAP = str.maketrans({
+_LEET_MAP: dict[str, str] = {
     "a": "4",
     "e": "3",
     "i": "1",
@@ -14,7 +14,7 @@ _LEET_MAP = str.maketrans({
     "t": "7",
     "g": "9",
     "b": "8",
-})
+}
 
 _HOMOGLYPHS = {
     "a": ["а", "ᴀ", "α"],

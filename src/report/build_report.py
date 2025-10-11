@@ -10,7 +10,7 @@ import datetime
 import sys
 from pathlib import Path
 from collections import defaultdict
-from typing import Iterable, List, Optional
+from typing import Iterable, List, Optional, Set, Dict
 from jinja2 import Environment, FileSystemLoader
 
 from guards.baseline import predict as predict_baseline
@@ -219,8 +219,8 @@ def load_runtime_telemetry(path: Path, assets_root: Path, offline_slices: dict):
     if not telemetry:
         return [], None, {}
 
-    by_slice = defaultdict(list)
-    modality_counts = defaultdict(int)
+    by_slice: Dict[str, List[float]] = defaultdict(list)
+    modality_counts: Dict[str, int] = defaultdict(int)
     for entry in telemetry:
         slice_key = f"{entry.get('category_guess')}/{entry.get('language_guess')}"
         diff = float(entry.get("score", 0.0)) - float(entry.get("threshold", 0.0))
@@ -282,7 +282,7 @@ def load_obfuscation_summary(path: Path, assets_root: Path):
         return [], None
 
     ordered = []
-    operators = set()
+    operators: Set[str] = set()
     summary = []
     for slice_key in sorted(data.keys()):
         payload = data.get(slice_key) or {}
@@ -429,7 +429,7 @@ def render_parity_chart(summary: dict, assets_root: Path):
 
 
 def load_incident_reports(directory: Path) -> List[dict]:
-    incidents = []
+    incidents: List[dict] = []
     if not directory.exists():
         return incidents
     for path in directory.glob("incident_*.json"):

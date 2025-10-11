@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import logging
 import re
-from typing import Any, Dict, List, Pattern, Set
+from typing import Any, Dict, List, Optional, Pattern, Set
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +36,7 @@ class SecretRedactor:
         r"credential",
     ]
     
-    def __init__(self, patterns: List[str] = None, redacted_text: str = "***REDACTED***"):
+    def __init__(self, patterns: Optional[List[str]] = None, redacted_text: str = "***REDACTED***"):
         """Initialize redactor.
         
         Args:
@@ -128,7 +128,7 @@ class SecretRedactor:
         return self.redacted_keys.copy()
 
 
-def redact_secrets(data: Any, patterns: List[str] = None) -> Any:
+def redact_secrets(data: Any, patterns: Optional[List[str]] = None) -> Any:
     """Convenience function to redact secrets from data.
     
     Args:

@@ -7,7 +7,7 @@ import random
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Mapping, MutableMapping, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Mapping, MutableMapping, Optional, Sequence, Tuple
 
 import yaml
 
@@ -104,7 +104,7 @@ class SwarmSearch:
                 agent_limits[(slice_key, agent.name)] = per_agent
                 agent_counts[(slice_key, agent.name)] = 0
 
-        stats = {
+        stats: dict[str, Any] = {
             "attempts": 0,
             "successes": 0,
             "duplicates": 0,
@@ -125,7 +125,7 @@ class SwarmSearch:
                 continue
 
             seed = self.rng.choice(seeds_for_slice)
-            agent = self._pick_agent(slice_key, agent_limits, agent_counts)
+            agent = self._pick_agent(slice_key, agent_limits, agent_counts)  # type: ignore[assignment]
             if not agent:
                 # All agents exhausted for this slice
                 mutable_budget[slice_key] = 0

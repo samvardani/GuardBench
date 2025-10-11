@@ -86,7 +86,7 @@ def evaluate(
 
 
 def confusion(rows: Sequence[Mapping[str, Any]], preds: Sequence[bool], mode: str = "strict") -> Dict[str, Any]:
-    cm = Counter()
+    cm: Counter[str] = Counter()
     for row, pred in zip(rows, preds):
         gt_pos = _is_pos_label(row.get("label"), mode)
         if gt_pos and pred:

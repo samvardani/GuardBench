@@ -55,20 +55,20 @@ def _compile_action(name: str | None) -> Action:
 
 def _compile_rule(rule: Dict[str, object]) -> CompiledRule:
     regex_patterns = []
-    for pattern in rule.get("match", {}).get("regex", []) or []:
+    for pattern in rule.get("match", {}).get("regex", []) or []:  # type: ignore[attr-defined]
         regex_patterns.append(re.compile(pattern, re.IGNORECASE))
-    substrings = tuple(str(s).lower() for s in (rule.get("match", {}).get("substrings") or []))
+    substrings = tuple(str(s).lower() for s in (rule.get("match", {}).get("substrings") or []))  # type: ignore[attr-defined]
     languages_field = rule.get("languages")
     if languages_field is None:
         languages: Tuple[str, ...] = tuple()
     elif isinstance(languages_field, str):
         languages = (languages_field.strip().lower(),) if languages_field.strip() else tuple()
     else:
-        languages = tuple(str(lang).strip().lower() for lang in languages_field if str(lang).strip())
+        languages = tuple(str(lang).strip().lower() for lang in languages_field if str(lang).strip())  # type: ignore[attr-defined]
     return CompiledRule(
         id=str(rule["id"]),
-        weight=float(rule["weight"]),
-        action=_compile_action(rule.get("action")),
+        weight=float(rule["weight"]),  # type: ignore[arg-type]
+        action=_compile_action(rule.get("action")),  # type: ignore[arg-type]
         regex=tuple(regex_patterns),
         substrings=substrings,
         languages=languages,
@@ -76,11 +76,11 @@ def _compile_rule(rule: Dict[str, object]) -> CompiledRule:
 
 
 def _compile_slice(entry: Dict[str, object]) -> CompiledSlice:
-    rules = tuple(_compile_rule(rule) for rule in entry.get("rules", []))
+    rules = tuple(_compile_rule(rule) for rule in entry.get("rules", []))  # type: ignore[attr-defined]
     return CompiledSlice(
         category=str(entry["category"] or "misc"),
         language=str(entry["language"] or "en"),
-        threshold=float(entry.get("threshold", 1.0)),
+        threshold=float(entry.get("threshold", 1.0)),  # type: ignore[arg-type]
         rules=rules,
     )
 
@@ -89,20 +89,20 @@ def compile_policy(data: Dict[str, object]) -> CompiledPolicy:
     validate_policy(data)
 
     safe_patterns = []
-    for entry in data.get("safe_contexts", []) or []:
-        for pattern in entry.get("patterns", []):
+    for entry in data.get("safe_contexts", []) or []:  # type: ignore[attr-defined]
+        for pattern in entry.get("patterns", []):  # type: ignore[attr-defined]
             safe_patterns.append(re.compile(pattern, re.IGNORECASE))
 
     slices: Dict[Tuple[str, str], CompiledSlice] = {}
-    for entry in data.get("slices"):
+    for entry in data.get("slices"):  # type: ignore[attr-defined]
         compiled = _compile_slice(entry)
         key = (compiled.category, compiled.language)
         slices[key] = compiled
 
-    penalty = float(data.get("penalties", {}).get("safe_context", 0.0))
+    penalty = float(data.get("penalties", {}).get("safe_context", 0.0))  # type: ignore[attr-defined,arg-type]
 
     return CompiledPolicy(
-        version=int(data.get("version", 0)),
+        version=int(data.get("version", 0)),  # type: ignore[call-overload]
         slices=slices,
         safe_context_patterns=tuple(safe_patterns),
         safe_context_penalty=penalty,
