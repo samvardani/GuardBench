@@ -75,8 +75,8 @@ def main(argv: list[str] | None = None) -> int:
     search = SwarmSearch()
     stats = search.run(seeds=seeds, store=store, deduper=deduper, budgets=budget, max_iters=args.max_iters)
 
-    remaining = stats.get("budget_remaining", {})
-    discovered = stats.get("discovered_slices", [])
+    remaining: dict[str, int] = stats.get("budget_remaining", {})  # type: ignore[assignment]
+    discovered: list[str] = stats.get("discovered_slices", [])  # type: ignore[assignment]
 
     output = {
         "attempts": stats["attempts"],

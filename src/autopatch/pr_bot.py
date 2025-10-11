@@ -52,17 +52,17 @@ def generate_pr_bundle(
     pr_body = AUTOPATCH_DIR / "PR_BODY.md"
     per_slice = evaluation.get("per_slice", {})
     metrics_lines: List[str] = ["| Slice | Recall Δ | FPR Δ |", "| --- | --- | --- |"]
-    for slice_key, data in per_slice.items():
-        delta = data.get("delta", {})
+    for slice_key, data in per_slice.items():  # type: ignore[attr-defined]
+        delta = data.get("delta", {})  # type: ignore[attr-defined]
         metrics_lines.append(
             f"| {slice_key} | {delta.get('recall', 0.0):+.3f} | {delta.get('fpr', 0.0):+.3f} |"
         )
 
-    fixed_samples = evaluation.get("fixed_samples", [])[:3]
-    fixed_lines = ["- " + textwrap.shorten(sample, width=120) for sample in fixed_samples] or ["- (no new fixes)"]
+    fixed_samples = evaluation.get("fixed_samples", [])[:3]  # type: ignore[index]
+    fixed_lines = ["- " + textwrap.shorten(sample, width=120) for sample in fixed_samples] or ["- (no new fixes)"]  # type: ignore[arg-type]
 
     regex_lines = [
-        f"- **{s.payload['slice']}**: `{s.payload['pattern']}` (exclude {', '.join(s.payload['safe_context'])})"
+        f"- **{s.payload['slice']}**: `{s.payload['pattern']}` (exclude {', '.join(s.payload['safe_context'])})"  # type: ignore[arg-type]
         for s in regex_suggestions
     ] or ["- (none)"]
 

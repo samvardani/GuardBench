@@ -8,7 +8,7 @@ import json
 import random
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, Dict, List, Sequence
+from typing import Any, Callable, Dict, List, Sequence
 
 from guards.candidate import predict as candidate_predict
 from policy.compiler import load_compiled_policy
@@ -92,10 +92,10 @@ def _apply_operator(name: str, text: str) -> str:
 
 def run_lab(policy_slices: Sequence[str], out_path: Path, max_per_slice: int = 20) -> Dict[str, dict]:
     seeds = _collect_seed_texts(policy_slices, max_per_slice=max_per_slice)
-    results = {}
+    results: Dict[str, Dict[str, Any]] = {}
     for slice_key, cases in seeds.items():
         category, language = slice_key.split("/")
-        slice_stats = {
+        slice_stats: Dict[str, Any] = {
             "total": len(cases),
             "operators": {},
         }
@@ -220,7 +220,7 @@ def main(argv: list[str] | None = None) -> int:
         if not args.dataset:
             print("--dataset is required for media modes")
             return 1
-        results = run_media_lab(Path(args.dataset), Path(args.out), mode=mode)
+        results = run_media_lab(Path(args.dataset), Path(args.out), mode=mode)  # type: ignore[assignment]
     print(json.dumps(results, indent=2))
     return 0
 

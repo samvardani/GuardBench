@@ -45,7 +45,7 @@ _POLICY_MTIME: float | None = None
 
 def _load_policy():
     global _POLICY_CACHE, _POLICY_MTIME
-    if not load_compiled_policy:
+    if load_compiled_policy is None:
         return None
     path = ROOT / "policy" / "policy.yaml"
     if not path.exists():

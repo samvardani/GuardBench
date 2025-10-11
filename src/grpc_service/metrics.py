@@ -24,9 +24,9 @@ try:  # Optional dependency; when missing, we noop entirely
     _PROM_AVAILABLE = True
 except Exception:  # pragma: no cover
     _PROM_AVAILABLE = False
-    Counter = Histogram = object  # type: ignore[assignment]
+    Counter = Histogram = object  # type: ignore[assignment,misc]
     class REGISTRY:  # type: ignore[no-redef]
-        _names_to_collectors = {}
+        _names_to_collectors: dict = {}
 
 try:  # grpc imports
     import grpc  # type: ignore
@@ -68,7 +68,7 @@ def _get_or_create_metrics():
     return req, dur
 
 
-def get_prometheus_interceptor() -> Optional["grpc.aio.ServerInterceptor"]:
+def get_prometheus_interceptor() -> Optional["grpc.aio.ServerInterceptor"]:  # type: ignore[name-defined]
     """Return a grpc.aio ServerInterceptor that records Prometheus metrics.
 
     If prometheus_client or grpc.aio is unavailable, returns None.
@@ -78,7 +78,7 @@ def get_prometheus_interceptor() -> Optional["grpc.aio.ServerInterceptor"]:
 
     requests_counter, duration_hist = _get_or_create_metrics()
 
-    class _Interceptor(grpc.aio.ServerInterceptor):  # type: ignore[attr-defined]
+    class _Interceptor(grpc.aio.ServerInterceptor):  # type: ignore[attr-defined,name-defined]
         async def intercept_service(self, continuation, handler_call_details):  # type: ignore[no-untyped-def]
             handler = await continuation(handler_call_details)
             if handler is None:

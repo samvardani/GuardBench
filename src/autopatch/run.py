@@ -98,12 +98,12 @@ def main(argv: list[str] | None = None) -> int:
             cand.data,
             target_slices=target_slices,
             result_path=tmp_result,
-            cases=cases,
+            cases=cases,  # type: ignore[arg-type]
         )
         if not ab_eval.accepts_improvement(result, target_slices):
             tmp_result.unlink(missing_ok=True)
             continue
-        if best_result is None or result["delta"]["recall"] > best_result["delta"]["recall"]:
+        if best_result is None or result["delta"]["recall"] > best_result["delta"]["recall"]:  # type: ignore[index]
             best_result = result
             best_candidate = cand
             if tmp_result.exists():
@@ -128,15 +128,15 @@ def main(argv: list[str] | None = None) -> int:
     pr_path = pr_bot.generate_pr_bundle(
         threshold_updates=best_candidate.data,
         evaluation=best_result,
-        regex_suggestions=generated.get("regex", []),
-        prompt_suggestions=generated.get("prompt", []),
+        regex_suggestions=generated.get("regex", []),  # type: ignore[arg-type]
+        prompt_suggestions=generated.get("prompt", []),  # type: ignore[arg-type]
     )
 
     summary = {
         "candidate": best_candidate.id,
         "threshold_updates": best_candidate.data,
         "per_slice": {
-            key: data["delta"] for key, data in best_result.get("per_slice", {}).items()
+            key: data["delta"] for key, data in best_result.get("per_slice", {}).items()  # type: ignore[attr-defined]
         },
         "pr_body": str(pr_path),
         "diff_dir": str(pr_bot.DIFF_DIR),
