@@ -46,8 +46,8 @@ def _ensure_parent(path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
 
 
-def _read_lines(content: str) -> List[dict]:
-    rows: List[dict] = []
+def _read_lines(content: str) -> List[dict[str, Any]]:
+    rows: List[dict[str, Any]] = []
     for line in content.splitlines():
         line = line.strip()
         if not line:
@@ -66,7 +66,7 @@ def _storage_client():  # pragma: no cover - sdk path
     return storage.Client()
 
 
-def read_jsonl(uri: str, encoding: str = "utf-8") -> List[dict]:
+def read_jsonl(uri: str, encoding: str = "utf-8") -> List[dict[str, Any]]:
     bucket, blob = _parse(uri)
     client = _storage_client()
     if client is not None:  # pragma: no cover

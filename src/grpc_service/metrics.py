@@ -26,7 +26,7 @@ except Exception:  # pragma: no cover
     _PROM_AVAILABLE = False
     Counter = Histogram = object  # type: ignore[assignment,misc]
     class REGISTRY:  # type: ignore[no-redef]
-        _names_to_collectors: dict = {}
+        _names_to_collectors: dict[str, Any] = {}
 
 try:  # grpc imports
     import grpc  # type: ignore

@@ -49,8 +49,8 @@ def _ensure_parent(path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
 
 
-def _read_lines(content: str) -> List[dict]:
-    lines: List[dict] = []
+def _read_lines(content: str) -> List[dict[str, Any]]:
+    lines: List[dict[str, Any]] = []
     for raw_line in content.splitlines():
         raw_line = raw_line.strip()
         if not raw_line:
@@ -78,7 +78,7 @@ def _botocore_client():  # pragma: no cover - only exercised when botocore prese
     return session.create_client("s3", endpoint_url=endpoint)
 
 
-def read_jsonl(uri: str, encoding: str = "utf-8") -> List[dict]:
+def read_jsonl(uri: str, encoding: str = "utf-8") -> List[dict[str, Any]]:
     bucket, key = _parse(uri)
     client = _boto3_client()
     if client is not None:  # pragma: no cover - boto3 path

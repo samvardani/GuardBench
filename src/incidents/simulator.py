@@ -75,7 +75,7 @@ class Metrics:
     operator_stats: Dict[str, int]
     total_requests: int
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "detection_time_s": self.detection_time_s,
             "mitigation_time_s": self.mitigation_time_s,

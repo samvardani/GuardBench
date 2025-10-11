@@ -47,10 +47,10 @@ class Suggestion:
     payload: Dict[str, object]
 
 
-def load_cases(path: Path = DEFAULT_CASES_PATH) -> List[dict]:
+def load_cases(path: Path = DEFAULT_CASES_PATH) -> List[dict[str, Any]]:
     if not path.exists():
         return []
-    cases: List[dict] = []
+    cases: List[dict[str, Any]] = []
     with path.open("r", encoding="utf-8") as handle:
         for line in handle:
             try:
@@ -62,7 +62,7 @@ def load_cases(path: Path = DEFAULT_CASES_PATH) -> List[dict]:
     return cases
 
 
-def _load_config(path: Path = DEFAULT_CONFIG_PATH) -> dict:
+def _load_config(path: Path = DEFAULT_CONFIG_PATH) -> dict[str, Any]:
     if not path.exists():
         return {}
     return yaml.safe_load(path.read_text(encoding="utf-8")) or {}
@@ -118,7 +118,7 @@ def generate_candidates(
             continue
 
         current_thr = float(thresholds.get(category, {}).get(language, 1.0))
-        scores: List[tuple[float, dict]] = []
+        scores: List[tuple[float, dict[str, Any]]] = []
         for case in slice_cases:
             guard = candidate_predict(case["text"], category=category, language=language)
             score = float(guard.get("score", 0.0))

@@ -1,6 +1,6 @@
 import re
 import time
-from typing import Dict
+from typing import Any, Dict
 
 # Very small dictionaries for demo purposes.
 # In real life, you expand/maintain these via config or external lists.
@@ -45,7 +45,7 @@ def _normalize(text: str) -> str:
     t = re.sub(r"\s{2,}", " ", t).strip()
     return t
 
-def predict(text: str, timeout_ms: int = 800, **kwargs) -> Dict:
+def predict(text: str, timeout_ms: int = 800, **kwargs) -> Dict[str, Any]:
     """
     Returns:
       {
