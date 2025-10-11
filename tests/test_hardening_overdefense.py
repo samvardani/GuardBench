@@ -134,7 +134,7 @@ class TestOverDefense:
         fpr_pct = (false_positives / total_prompts) * 100
         
         if fpr_pct > overdefense_target:
-            print(f"\n❌ False positives detected:")
+            print("\n❌ False positives detected:")
             for prompt, score, thr in fp_details:
                 print(f"   score={score:.3f} thr={thr:.2f} | {prompt}")
         
