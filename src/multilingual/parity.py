@@ -94,7 +94,7 @@ class ParityResult:
     variance: float
     target_delta: float = TARGET_DELTA
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "category": self.category,
             "languages": self.language_metrics,

@@ -4,7 +4,7 @@ import re
 import time
 import unicodedata
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 import yaml
 
 try:
@@ -14,11 +14,11 @@ except Exception:  # pragma: no cover - policy optional during bootstrap
 
 # ---------- Config access ----------
 ROOT = Path(__file__).resolve().parents[2]
-_CFG_CACHE: dict | None = None
+_CFG_CACHE: dict[str, Any] | None = None
 _CFG_MTIME: float | None = None
 
 
-def _load_cfg() -> dict:
+def _load_cfg() -> dict[str, Any]:
     global _CFG_CACHE, _CFG_MTIME
     cfgp = ROOT / "config.yaml"
     if not cfgp.exists():
@@ -287,7 +287,7 @@ def predict(text: str,
             category: Optional[str] = None,
             language: Optional[str] = None,
             default_threshold: Optional[float] = None,
-            **kwargs) -> Dict:
+            **kwargs) -> Dict[str, Any]:
     """
     Returns: {"prediction": "flag"|"pass", "score": float, "threshold": float, "latency_ms": int}
     Pred threshold is read from config.yaml slice_thresholds[category][language] when provided.

@@ -21,7 +21,7 @@ def _get_slice_key(row: Mapping[str, str]) -> str:
     return f"{row.get('category', 'misc')}/{row.get('language', 'en')}"
 
 
-def _evaluate_candidate(rows: List[dict]) -> Dict[str, object]:
+def _evaluate_candidate(rows: List[dict[str, Any]]) -> Dict[str, Any]:
     engine = {
         "guards": {
             "candidate": {"name": "candidate", "predict": candidate_predict},
@@ -40,7 +40,7 @@ def evaluate_threshold_candidate(
     updates: Dict[str, float],
     target_slices: Iterable[str],
     result_path: Path = DEFAULT_RESULT_PATH,
-    cases: Iterable[dict] | None = None,
+    cases: Iterable[dict[str, Any]] | None = None,
 ) -> Dict[str, Any]:
     cfg, rows = load_cfg_and_data()
     baseline: Dict[str, Any] = _evaluate_candidate(rows)

@@ -10,7 +10,7 @@ import datetime
 import sys
 from pathlib import Path
 from collections import defaultdict
-from typing import Iterable, List, Optional, Set, Dict
+from typing import Any, Iterable, List, Optional, Set, Dict
 from jinja2 import Environment, FileSystemLoader
 
 from guards.baseline import predict as predict_baseline
@@ -71,12 +71,12 @@ def _write_local_jsonl(path: Path, records: Iterable[dict], encoding: str = "utf
             handle.write("\n")
 
 
-def _read_local_jsonl(path: Path, encoding: str = "utf-8") -> List[dict]:
+def _read_local_jsonl(path: Path, encoding: str = "utf-8") -> List[dict[str, Any]]:
     with path.open("r", encoding=encoding) as handle:
         return [json.loads(line) for line in handle if line.strip()]
 
 
-def _read_remote_jsonl(uri: str) -> List[dict]:
+def _read_remote_jsonl(uri: str) -> List[dict[str, Any]]:
     if uri.startswith("s3://"):
         return s3_connector.read_jsonl(uri)
     if uri.startswith("gs://") or uri.startswith("gcs://"):
@@ -136,8 +136,8 @@ def load_rows(dataset_path: Path):
     return rows
 
 
-def _normalize_records(records: Iterable[dict]) -> List[dict]:
-    rows: List[dict] = []
+def _normalize_records(records: Iterable[dict]) -> List[dict[str, Any]]:
+    rows: List[dict[str, Any]] = []
     dropped = 0
     for raw in records:
         if not isinstance(raw, dict):
@@ -204,7 +204,7 @@ def load_redteam_summary(path: Path, max_clusters: int = 6, max_examples: int = 
     return summary[:max_clusters]
 
 
-def load_runtime_telemetry(path: Path, assets_root: Path, offline_slices: dict):
+def load_runtime_telemetry(path: Path, assets_root: Path, offline_slices: dict[str, Any]):
     if not path.exists():
         return [], None, {}
     telemetry = []
@@ -382,7 +382,7 @@ def load_parity_actions(path: Path):
         return None
 
 
-def render_parity_chart(summary: dict, assets_root: Path):
+def render_parity_chart(summary: dict[str, Any], assets_root: Path):
     if not summary:
         return None
     rows = summary.get("rows") or []
@@ -428,8 +428,8 @@ def render_parity_chart(summary: dict, assets_root: Path):
         return None
 
 
-def load_incident_reports(directory: Path) -> List[dict]:
-    incidents: List[dict] = []
+def load_incident_reports(directory: Path) -> List[dict[str, Any]]:
+    incidents: List[dict[str, Any]] = []
     if not directory.exists():
         return incidents
     for path in directory.glob("incident_*.json"):
@@ -472,7 +472,7 @@ def main(argv: Optional[Iterable[str]] = None):
     notifier = NotificationManager(cfg.get("notifications"))
 
     ds_sha: str
-    dataset_rows: List[dict]
+    dataset_rows: List[dict[str, Any]]
 
     if args.input_uri:
         remote_records = _read_remote_jsonl(args.input_uri)
