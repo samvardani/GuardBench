@@ -1,12 +1,8 @@
 name: SeaRei CI
 
 on:
-  pull_request:
-    branches:
-      - "**"
   push:
-    branches:
-      - main
+    branches: ["main"]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
