@@ -58,7 +58,7 @@ def _read_lines(content: str) -> List[dict[str, Any]]:
     return rows
 
 
-def _to_content(records: Iterable[dict]) -> str:
+def _to_content(records: Iterable[dict[str, Any]]) -> str:
     return "\n".join(json.dumps(record, separators=(",", ":")) for record in records) + "\n"
 
 
@@ -96,7 +96,7 @@ def read_jsonl(uri: str, encoding: str = "utf-8") -> List[dict[str, Any]]:
     raise FileNotFoundError(f"Azure blob {uri} not found")
 
 
-def write_jsonl(uri: str, records: Iterable[dict], encoding: str = "utf-8") -> None:
+def write_jsonl(uri: str, records: Iterable[dict[str, Any]], encoding: str = "utf-8") -> None:
     container, blob = _parse(uri)
     payload = _to_content(records)
     client = _client()

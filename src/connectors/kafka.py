@@ -7,7 +7,7 @@ import os
 import random
 import time
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 try:  # pragma: no cover - optional dependency
     from kafka import KafkaProducer  # type: ignore
@@ -48,14 +48,14 @@ class Producer:
         except Exception:
             return None
 
-    def _send_via_producer(self, topic: str, payload: dict) -> bool:  # pragma: no cover
+    def _send_via_producer(self, topic: str, payload: dict[str, Any]) -> bool:  # pragma: no cover
         if self._producer is None:
             return False
         future = self._producer.send(topic, value=payload)
         future.get(timeout=10)
         return True
 
-    def _send_via_http(self, topic: str, payload: dict) -> bool:
+    def _send_via_http(self, topic: str, payload: dict[str, Any]) -> bool:
         if not self._rest_endpoint or httpx is None:
             return False
         resp = httpx.post(
@@ -66,7 +66,7 @@ class Producer:
         resp.raise_for_status()
         return True
 
-    def _send_via_filesystem(self, topic: str, payload: dict) -> bool:
+    def _send_via_filesystem(self, topic: str, payload: dict[str, Any]) -> bool:
         ts = int(time.time() * 1000)
         suffix = random.randint(0, 1_000_000)
         path = self._fallback_dir / topic / f"{ts}-{suffix}.json"
@@ -74,7 +74,7 @@ class Producer:
         path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
         return True
 
-    def send_json(self, topic: str, payload: dict) -> None:
+    def send_json(self, topic: str, payload: dict[str, Any]) -> None:
         for attempt in range(1, self._retries + 1):
             try:
                 if self._producer and self._send_via_producer(topic, payload):

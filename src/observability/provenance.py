@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import logging
 import os
-from typing import Callable, Optional
+from typing import Any, Callable, Optional
 
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -55,7 +55,7 @@ class ProvenanceMiddleware(BaseHTTPMiddleware):
         )
     
     async def dispatch(
-        self, request: Request, call_next: Callable
+        self, request: Request, call_next: Callable[..., Any]
     ) -> Response:
         """Process request and add provenance headers to response.
         
