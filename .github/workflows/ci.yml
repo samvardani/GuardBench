@@ -71,10 +71,10 @@ jobs:
         with:
           name: pytest-artifacts-${{ matrix.python-version }}
           path: |
-            .pytest_cache
             .coverage
             reports/**
             grpc_server.log
+          if-no-files-found: ignore
 
   hardening:
     runs-on: ubuntu-latest
