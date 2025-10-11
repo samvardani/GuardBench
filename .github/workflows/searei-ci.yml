@@ -111,7 +111,7 @@ jobs:
           python-version: "3.11"
           cache: "pip"
       - run: pip install mypy types-requests types-PyYAML types-protobuf
-      - run: mypy src --ignore-missing-imports
+      - run: mypy src/  # Uses mypy.ini for strict-like configuration
 
   # Heavy "eval" job — only on push to main (NOT on PRs)
   eval:
