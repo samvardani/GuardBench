@@ -171,8 +171,9 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="Sentinel Safety Service",
-    version="2024.10",
+    title="SeaRei AI Safety Platform",
+    description="Enterprise-grade AI safety with policy-as-code, evidence packs, and red-team automation",
+    version="0.3.1",
     json_dumps=orjson_dumps,
     json_loads=orjson_loads,
     default_response_class=ORJSONResponse,
@@ -1365,6 +1366,81 @@ def me(ctx: AuthContext = Depends(require_auth)) -> Dict[str, Any]:
         "tenant": {"id": ctx.tenant_id, "slug": ctx.tenant_slug},
         "user": {"id": ctx.user_id, "email": ctx.email, "role": ctx.role},
     }
+
+
+# MFA Endpoints
+@app.post("/mfa/setup")
+def mfa_setup(ctx: AuthContext = Depends(require_auth)) -> Dict[str, Any]:
+    """Setup MFA for current user. Returns QR code and backup codes."""
+    from service.mfa import generate_secret, generate_qr_code, generate_backup_codes
+    
+    secret = generate_secret()
+    qr_code = generate_qr_code(secret, ctx.email)
+    backup_codes = generate_backup_codes(10)
+    
+    # Store in database (not enabled yet - awaiting verification)
+    import json
+    with db.db_conn() as con:
+        con.execute(
+            """UPDATE users 
+               SET mfa_secret = ?, mfa_backup_codes = ?, mfa_enabled = 0 
+               WHERE user_id = ?""",
+            (secret, json.dumps(backup_codes), ctx.user_id)
+        )
+    
+    return {
+        "secret": secret,
+        "qr_code": qr_code,
+        "qr_code_url": f"data:image/png;base64,{qr_code}",
+        "backup_codes": backup_codes,
+        "message": "Scan QR code with Google Authenticator or Authy, then call /mfa/enable with code"
+    }
+
+
+@app.post("/mfa/enable")
+def mfa_enable(code: str = Form(...), ctx: AuthContext = Depends(require_auth)) -> Dict[str, Any]:
+    """Verify setup code and enable MFA."""
+    from service.mfa import verify_code
+    
+    with db.db_conn(commit=False) as con:
+        row = con.execute("SELECT mfa_secret FROM users WHERE user_id = ?", (ctx.user_id,)).fetchone()
+    
+    if not row or not row['mfa_secret']:
+        raise HTTPException(400, "MFA not set up. Call /mfa/setup first")
+    
+    if not verify_code(row['mfa_secret'], code):
+        raise HTTPException(400, "Invalid verification code")
+    
+    with db.db_conn() as con:
+        con.execute("UPDATE users SET mfa_enabled = 1 WHERE user_id = ?", (ctx.user_id,))
+    
+    db.create_audit_event(ctx.tenant_id, action="mfa_enabled", user_id=ctx.user_id)
+    
+    return {"status": "enabled", "message": "MFA is now active for your account"}
+
+
+@app.post("/mfa/disable")
+def mfa_disable(ctx: AuthContext = Depends(require_auth)) -> Dict[str, Any]:
+    """Disable MFA for current user."""
+    with db.db_conn() as con:
+        con.execute(
+            "UPDATE users SET mfa_enabled = 0, mfa_secret = NULL, mfa_backup_codes = NULL WHERE user_id = ?",
+            (ctx.user_id,)
+        )
+    
+    db.create_audit_event(ctx.tenant_id, action="mfa_disabled", user_id=ctx.user_id)
+    
+    return {"status": "disabled", "message": "MFA has been disabled"}
+
+
+@app.get("/mfa/status")
+def mfa_status(ctx: AuthContext = Depends(require_auth)) -> Dict[str, Any]:
+    """Check if current user has MFA enabled."""
+    with db.db_conn(commit=False) as con:
+        row = con.execute("SELECT mfa_enabled FROM users WHERE user_id = ?", (ctx.user_id,)).fetchone()
+    
+    enabled = bool(row and row['mfa_enabled']) if row else False
+    return {"enabled": enabled}
 
 
 @app.get("/guards")
