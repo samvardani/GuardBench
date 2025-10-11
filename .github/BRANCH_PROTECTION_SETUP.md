@@ -1,7 +1,7 @@
-# Branch Protection Setup for SeaRai
+# Branch Protection Setup for SeaRei
 ## Enforce Quality Gates
 
-**Go to:** https://github.com/samvardani/SeaRai/settings/branches
+**Go to:** https://github.com/samvardani/SeaRei/settings/branches
 
 ---
 

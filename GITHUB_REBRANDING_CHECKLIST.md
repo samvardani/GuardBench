@@ -1,5 +1,5 @@
 # GitHub Rebranding Checklist
-## Update Repository to SeaRai by SeaTechOne LLC
+## Update Repository to SeaRei by SeaTechOne LLC
 
 **All code changes are complete and pushed.** This checklist covers GitHub-specific settings that need manual updates.
 
@@ -8,7 +8,7 @@
 ## ✅ Completed (Automated)
 
 - [x] Updated README.md header
-- [x] Updated pyproject.toml (package name: searai)
+- [x] Updated pyproject.toml (package name: searei)
 - [x] Updated all evaluation documents
 - [x] Updated Dockerfile metadata
 - [x] Updated docker-compose.yml container names
@@ -21,12 +21,12 @@
 ### 1. Repository Name (Optional but Recommended)
 
 **Current:** `safety-eval-mini`  
-**Recommended:** `searai`
+**Recommended:** `searei`
 
 **Steps:**
 1. Go to https://github.com/samvardani/safety-eval-mini/settings
 2. Scroll to "Repository name"
-3. Change to: `searai`
+3. Change to: `searei`
 4. Click "Rename"
 
 **Note:** GitHub will automatically redirect old URLs, so this is safe.
@@ -35,7 +35,7 @@
 
 **Update to:**
 ```
-SeaRai by SeaTechOne LLC - Enterprise AI safety evaluation platform with REST/gRPC APIs, red-team automation, and governance
+SeaRei by SeaTechOne LLC - Enterprise AI safety evaluation platform with REST/gRPC APIs, red-team automation, and governance
 ```
 
 **Steps:**
@@ -80,13 +80,13 @@ If you have badges in README.md, update them:
 
 **To:**
 ```markdown
-![Build](https://github.com/samvardani/searai/workflows/test/badge.svg)
+![Build](https://github.com/samvardani/searei/workflows/test/badge.svg)
 ```
 
 ### 5. GitHub Organization (Recommended)
 
 **Current:** Personal repo (`samvardani/safety-eval-mini`)  
-**Recommended:** Organization repo (`seatechone/searai`)
+**Recommended:** Organization repo (`seatechone/searei`)
 
 **Benefits:**
 - Professional appearance
@@ -99,12 +99,12 @@ If you have badges in README.md, update them:
 2. Name: `seatechone`
 3. Transfer repository: Settings → "Danger Zone" → "Transfer ownership"
 4. New owner: `seatechone`
-5. New name: `searai`
+5. New name: `searei`
 
 ### 6. Update Default Branch Description
 
 **Current:** `improve/2025-10-seval`  
-**Consider:** Rename to `improve/2025-10-searai` or `main`
+**Consider:** Rename to `improve/2025-10-searei` or `main`
 
 **Steps:**
 1. Create new branch: `git checkout -b main`
@@ -119,14 +119,14 @@ If you have GitHub Pages enabled:
 
 **Update site title:**
 1. Go to Settings → Pages
-2. Update any custom domain to: `searai.seatechone.com`
+2. Update any custom domain to: `searei.seatechone.com`
 3. Update site content/branding
 
 ### 8. Repository Social Preview
 
 **Upload a custom social preview image:**
 1. Go to Settings → "Social preview"
-2. Upload image with SeaRai branding
+2. Upload image with SeaRei branding
 3. Recommended size: 1280 x 640 px
 
 ### 9. License File
@@ -145,7 +145,7 @@ Permission is hereby granted...
 
 Create/Update:
 - `SECURITY.md` - Security policy with SeaTechOne contact
-- `SUPPORT.md` - Support channels for SeaRai
+- `SUPPORT.md` - Support channels for SeaRei
 - `CODE_OF_CONDUCT.md` - Community guidelines
 
 ---
@@ -158,7 +158,7 @@ Update workflow files in `.github/workflows/`:
 
 ```yaml
 # .github/workflows/test.yml
-name: SeaRai CI
+name: SeaRei CI
 
 on:
   push:
@@ -172,11 +172,11 @@ Create `.github/ISSUE_TEMPLATE/`:
 ```markdown
 ---
 name: Bug Report
-about: Report a bug in SeaRai
+about: Report a bug in SeaRei
 labels: bug
 ---
 
-**SeaRai Version:** 0.3.1
+**SeaRei Version:** 0.3.1
 **Company:** SeaTechOne LLC
 ...
 ```
@@ -186,7 +186,7 @@ labels: bug
 Create `.github/PULL_REQUEST_TEMPLATE.md`:
 
 ```markdown
-## SeaRai Pull Request
+## SeaRei Pull Request
 
 **Company:** SeaTechOne LLC
 
@@ -202,8 +202,8 @@ Create `.github/PULL_REQUEST_TEMPLATE.md`:
 
 If you have external references, update them:
 
-- [ ] Docker Hub: `seatechone/searai`
-- [ ] PyPI: Publish as `searai`
+- [ ] Docker Hub: `seatechone/searei`
+- [ ] PyPI: Publish as `searei`
 - [ ] Documentation site: Update domain
 - [ ] Blog posts: Update product name
 - [ ] Social media: Announce rebranding
@@ -216,7 +216,7 @@ If you have external references, update them:
 grep -r "safety-eval-mini" docs/
 
 # Replace with
-# searai or SeaRai (context-dependent)
+# searei or SeaRei (context-dependent)
 ```
 
 ---
@@ -225,13 +225,13 @@ grep -r "safety-eval-mini" docs/
 
 After completing above steps, verify:
 
-- [ ] Repository name is `searai` (or old name with redirects working)
-- [ ] Description mentions "SeaRai by SeaTechOne LLC"
+- [ ] Repository name is `searei` (or old name with redirects working)
+- [ ] Description mentions "SeaRei by SeaTechOne LLC"
 - [ ] Topics/tags include ai-safety, enterprise, governance
-- [ ] README.md shows SeaRai branding
-- [ ] Social preview image has SeaRai branding
-- [ ] All PRs reference SeaRai
-- [ ] Issues reference SeaRai
+- [ ] README.md shows SeaRei branding
+- [ ] Social preview image has SeaRei branding
+- [ ] All PRs reference SeaRei
+- [ ] Issues reference SeaRei
 - [ ] Workflows have correct names
 
 ---
@@ -248,9 +248,9 @@ After completing above steps, verify:
    
    Create release with notes:
    ```
-   # SeaRai v0.3.1 - Official Rebrand
+   # SeaRei v0.3.1 - Official Rebrand
    
-   SafetyEval Mini is now **SeaRai by SeaTechOne LLC**
+   SafetyEval Mini is now **SeaRei by SeaTechOne LLC**
    
    - Professional enterprise branding
    - Same powerful features
@@ -259,12 +259,12 @@ After completing above steps, verify:
    ```
 
 2. **Social Media Announcement:**
-   - LinkedIn post about SeaRai launch
+   - LinkedIn post about SeaRei launch
    - Twitter announcement
    - Dev.to blog post
 
 3. **Update Website:**
-   - Launch seatechone.com/searai
+   - Launch seatechone.com/searei
    - Product page
    - Documentation portal
    - Download/installation guide
@@ -275,17 +275,17 @@ After completing above steps, verify:
 
 **Repository URL Will Change:**
 - Old: `https://github.com/samvardani/safety-eval-mini`
-- New: `https://github.com/seatechone/searai` (if transferred to org)
+- New: `https://github.com/seatechone/searei` (if transferred to org)
 
 **Clones Will Need Update:**
 ```bash
 # Update remote URL after transfer
-git remote set-url origin https://github.com/seatechone/searai.git
+git remote set-url origin https://github.com/seatechone/searei.git
 ```
 
 **Package Name:**
-- PyPI package: Will be `searai` (when published)
-- Import: May stay `seval` or change to `searai`
+- PyPI package: Will be `searei` (when published)
+- Import: May stay `seval` or change to `searei`
 
 ---
 
@@ -295,7 +295,7 @@ git remote set-url origin https://github.com/seatechone/searai.git
 - Professional appearance for enterprise sales
 - Consistent branding across all channels
 - Easier to find and recognize
-- SEO benefits (searchable as "SeaRai")
+- SEO benefits (searchable as "SeaRei")
 
 **Timeline:**
 - Manual steps: 30-60 minutes
@@ -308,5 +308,5 @@ git remote set-url origin https://github.com/seatechone/searai.git
 
 **Status:** Code rebranding complete ✅  
 **Next:** Follow this checklist for GitHub UI updates  
-**Goal:** Professional SeaRai brand across all channels  
+**Goal:** Professional SeaRei brand across all channels  
 
