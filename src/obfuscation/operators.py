@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import random
 import re
-from typing import Callable, List
 
 from redteam.operators import (
     leet_speak,

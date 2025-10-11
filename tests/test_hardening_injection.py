@@ -6,8 +6,6 @@ Gate: FPR (False Positive Rate) ≤ 1.0% on benign instructions.
 
 This ensures the guard can detect adversarial prompt injection attempts.
 """
-import pytest
-from typing import List, Tuple
 from seval import sdk
 
 

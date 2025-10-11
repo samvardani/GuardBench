@@ -6,7 +6,6 @@ Gate: ≥99.9% of gRPC responses MUST include a non-zero x-trace-id trailer.
 This ensures distributed tracing coverage for debugging and audit.
 """
 import pytest
-import asyncio
 import grpc
 from grpc_generated import score_pb2, score_pb2_grpc
 

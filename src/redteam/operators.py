@@ -3,8 +3,7 @@
 from __future__ import annotations
 
 import random
-import re
-from typing import Callable, Iterable, List, Sequence
+from typing import Callable, List, Sequence
 
 _LEET_MAP = str.maketrans({
     "a": "4",

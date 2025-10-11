@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
-from typing import Any, Dict, Generator, Optional
+from typing import Any, Dict, Generator
 
 from .redaction import redact_secrets
 

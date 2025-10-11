@@ -1,5 +1,7 @@
-import csv, pathlib, yaml, datetime
-from statistics import mean
+import csv
+import pathlib
+import yaml
+import datetime
 from collections import Counter
 from jinja2 import Environment, FileSystemLoader
 import matplotlib.pyplot as plt

@@ -1,4 +1,5 @@
-import sys, datetime
+import sys
+import datetime
 from pathlib import Path
 import yaml
 
@@ -31,7 +32,7 @@ def main():
     # write
     CFG.write_text(yaml.safe_dump(cfg, sort_keys=True, allow_unicode=True), encoding="utf-8")
 
-    print(f"Applied tuned slice_thresholds to config.yaml")
+    print("Applied tuned slice_thresholds to config.yaml")
     print(f"Backup saved → {bak}")
     print("New slice_thresholds:")
     for cat, langs in cfg["slice_thresholds"].items():

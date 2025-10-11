@@ -1,4 +1,6 @@
-import csv, pathlib, yaml
+import csv
+import pathlib
+import yaml
 from guards.baseline import predict
 from evaluation import evaluate
 

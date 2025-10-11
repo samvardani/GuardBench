@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from typing import Callable, Optional
+from typing import Optional
 
 from .client import SentinelClient
 from .exporter import TelemetryExporter, log_telemetry

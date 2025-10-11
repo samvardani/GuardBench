@@ -1,5 +1,4 @@
 import json
-from pathlib import Path
 
 from utils.notify import NotificationManager
 

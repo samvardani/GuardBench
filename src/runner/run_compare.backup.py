@@ -1,4 +1,6 @@
-import csv, pathlib, yaml
+import csv
+import pathlib
+import yaml
 from collections import Counter
 from guards.baseline import predict as predict_baseline
 from guards.candidate import predict as predict_candidate

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
-from typing import Any, Dict
+from typing import Any
 
 
 def log_json(logger: logging.Logger, level: int, **kwargs: Any) -> None:

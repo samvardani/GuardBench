@@ -1,4 +1,5 @@
-import json, logging
+import json
+import logging
 from fastapi.testclient import TestClient
 from service import api
 

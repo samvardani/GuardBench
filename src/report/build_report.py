@@ -6,7 +6,6 @@ import os
 import csv
 import json
 import pathlib
-import tempfile
 import datetime
 import sys
 from pathlib import Path
@@ -105,7 +104,9 @@ def _write_remote_jsonl(uri: str, records: Iterable[dict]) -> None:
     raise ValueError(f"Unsupported output URI: {uri}")
 
 def load_rows(dataset_path: Path):
-    import yaml, pathlib, sys
+    import yaml
+    import pathlib
+    import sys
 
     path = pathlib.Path(dataset_path)
     suffix = path.suffix.lower()

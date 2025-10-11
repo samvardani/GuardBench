@@ -7,7 +7,7 @@ import json
 import random
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Sequence
+from typing import Dict, List
 
 from guards.candidate import predict as candidate_predict
 from obfuscation.operators import (

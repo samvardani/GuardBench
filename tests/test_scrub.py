@@ -1,5 +1,3 @@
-import importlib
-from unittest import mock
 
 from utils import scrub
 from utils.scrub import scrub_text, scrub_record, privacy_mode_for

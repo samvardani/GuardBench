@@ -3,18 +3,17 @@
 from __future__ import annotations
 
 import csv
-import json
 import random
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Iterable, List, Mapping, MutableMapping, Optional, Sequence, Tuple
+from typing import Dict, List, Mapping, MutableMapping, Optional, Sequence, Tuple
 
 import yaml
 
 from guards.candidate import _normalize_aggressive, predict as candidate_predict
 
-from .agents import AGENTS, AgentInput, AgentOutput, BaseAgent
+from .agents import AGENTS, AgentInput, BaseAgent
 from .dedupe import TextDeduper
 from .store import CaseStore, StoredCase
 

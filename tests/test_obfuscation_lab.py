@@ -1,4 +1,3 @@
-from pathlib import Path
 
 from obfuscation.lab import run_media_lab
 

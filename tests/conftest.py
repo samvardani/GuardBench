@@ -1,3 +1,4 @@
-import sys, pathlib
+import sys
+import pathlib
 # Put the project root on sys.path so 'src' is a top-level package
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))

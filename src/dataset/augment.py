@@ -1,4 +1,8 @@
-import csv, argparse, random, re, sys
+import csv
+import argparse
+import random
+import re
+import sys
 from pathlib import Path
 
 LEET = {"a":"4","e":"3","i":"1","o":"0","s":"5","t":"7"}

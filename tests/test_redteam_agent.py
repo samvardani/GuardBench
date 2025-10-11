@@ -1,6 +1,5 @@
 import json
 import random
-from pathlib import Path
 
 from redteam.agents import AgentInput, AgentOutput, BaseAgent
 from redteam.redteam_agent import RedTeamAgent

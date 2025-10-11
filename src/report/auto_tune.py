@@ -1,4 +1,6 @@
-import argparse, csv, json
+import argparse
+import csv
+import json
 from pathlib import Path
 from collections import defaultdict
 from utils.io_utils import load_config, resolve_dataset_path
@@ -138,4 +140,4 @@ def main():
             for lang, thr in snippet[cat].items():
                 s += f"    {lang}: {thr}\n"
         p.write_text(s)
-        print(f"\nconfig.yaml updated with auto-tuned slice_thresholds.")
+        print("\nconfig.yaml updated with auto-tuned slice_thresholds.")

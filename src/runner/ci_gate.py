@@ -1,4 +1,7 @@
-import argparse, csv, json, sys
+import argparse
+import csv
+import json
+import sys
 from pathlib import Path
 from collections import defaultdict
 
