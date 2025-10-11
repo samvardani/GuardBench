@@ -16,8 +16,8 @@ from grpc_generated import score_pb2, score_pb2_grpc  # type: ignore
 from seval.settings import POLICY_VERSION, POLICY_CHECKSUM
 from policy.compiler import POLICY_PATH
 from grpc_service.interceptors import TrailingMetaInterceptor
+from grpc_service import metrics as grpc_metrics
 import logging
-from . import metrics as grpc_metrics
 
 # Context variable to track if we're in batch context
 _batch_context: contextvars.ContextVar[bool] = contextvars.ContextVar("batch_context", default=False)
