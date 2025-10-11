@@ -199,6 +199,16 @@ app.add_middleware(
 # Session support (for CSRF tokens on policy page, etc.)
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET", "dev-not-secret"))
 
+# Provenance headers for governance and audit trails
+from observability.provenance import ProvenanceMiddleware
+
+app.add_middleware(
+    ProvenanceMiddleware,
+    service_name="searei",
+    version="0.3.1",
+    build_id=os.getenv("BUILD_ID", os.getenv("GIT_SHA", "dev"))
+)
+
 
 # Policy metadata middleware - injects version and checksum headers
 @app.middleware("http")
@@ -687,6 +697,11 @@ class BatchRequest(BaseModel):
     rows: List[BatchRow]
     baseline_guard: str = "baseline"
     candidate_guard: str = "candidate"
+
+
+class BatchScoreRequest(BaseModel):
+    """Batch scoring request for multiple texts."""
+    items: List[ScoreRequest]
 
 
 class IntegrationRequest(BaseModel):
@@ -1555,6 +1570,65 @@ async def _process_run(
         "bundle_path": str(bundle_path),
         "bundle_url": bundle_url,
         "metrics": metrics_map,
+    }
+
+
+@app.post("/batch-score")
+async def batch_score_endpoint(request: BatchScoreRequest, ctx: Optional[AuthContext] = Depends(maybe_auth)) -> Dict[str, Any]:
+    """Score multiple texts in a single batch request."""
+    if ctx is None:
+        ctx = AuthContext(
+            token="public",
+            tenant_id="public",
+            tenant_slug="public",
+            user_id=None,
+            email=None,
+            role="viewer",
+        )
+    else:
+        _require_role(ctx, minimum="viewer")
+    
+    if not request.items:
+        raise HTTPException(status_code=400, detail="items list cannot be empty")
+    
+    # Process each item
+    results = []
+    for item in request.items:
+        guard_spec = _resolve_guard(item.guard)
+        result, latency_ms = await _invoke_guard_async(
+            item.guard,
+            guard_spec,
+            item.text,
+            item.category,
+            item.language,
+        )
+        
+        score_value = result.get("score")
+        if score_value is None:
+            prediction = result.get("prediction")
+            if isinstance(prediction, (int, float)):
+                score_value = float(prediction)
+            elif isinstance(prediction, bool):
+                score_value = 1.0 if prediction else 0.0
+            else:
+                score_value = 0.0
+        
+        rationale = result.get("rationale") or result.get("explanation")
+        slices = result.get("slices") or []
+        
+        results.append({
+            "score": score_value,
+            "rationale": rationale,
+            "slices": slices,
+            "latency_ms": latency_ms,
+            "policy_version": POLICY_VERSION,
+            "policy_checksum": POLICY_CHECKSUM,
+        })
+    
+    return {
+        "items": results,
+        "policy_version": POLICY_VERSION,
+        "policy_checksum": POLICY_CHECKSUM,
     }
 
 
