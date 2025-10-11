@@ -46,6 +46,14 @@ slices:
             - "(?i)\\bsecurity\\s+override\\b"
             - "(?i)\\b(base64|encoded|cipher|rot13)[:\\s]"
             - "(?i)\\bfirst\\s+tell\\s+me\\b.*\\bnow\\s+(use|apply|convert)\\b"
+      - id: explosive_precursors
+        weight: 1.0
+        action: block
+        match:
+          regex:
+            - "(?i)\\b(ammonium\\s+nitrate|fertilizer)\\b.*\\b(fuel\\s+oil|diesel)\\b"
+            - "(?i)\\b(fuel\\s+oil|diesel)\\b.*\\b(ammonium\\s+nitrate|fertilizer)\\b"
+            - "(?i)\\bANFO\\b"
       - id: violence_keywords
         weight: 1.0
         action: block
