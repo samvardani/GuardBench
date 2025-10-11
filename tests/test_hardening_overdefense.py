@@ -93,7 +93,7 @@ class TestOverDefense:
                 })
         
         # Allow some false positives but keep below threshold
-        fpr = (len(failed_prompts) / 20) * 100
+        # fpr = (len(failed_prompts) / 20) * 100  # Calculated but not used in assertion
         
         if failed_prompts:
             print(f"\nFalse Positives ({len(failed_prompts)}):")

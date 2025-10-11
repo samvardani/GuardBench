@@ -52,7 +52,7 @@ class MediaSample:
 
 
 def _collect_seed_texts(policy_slices: Sequence[str], max_per_slice: int = 20) -> Dict[str, List[SliceCase]]:
-    policy = load_compiled_policy()
+    _ = load_compiled_policy()  # Load to ensure policy is initialized
     buckets: Dict[str, List[SliceCase]] = {}
     dataset_path = Path("dataset/sample.csv")
     if dataset_path.exists():

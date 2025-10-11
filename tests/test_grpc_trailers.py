@@ -19,7 +19,7 @@ async def test_trailing_metadata(grpc_address: str = "127.0.0.1:50051") -> None:
         call = stub.Score(req)
         
         # Get the response
-        resp = await call
+        _ = await call
         
         # Get trailing metadata from the call object
         trailers = await call.trailing_metadata()
@@ -50,7 +50,7 @@ async def test_batch_trailing_metadata(grpc_address: str = "127.0.0.1:50051") ->
         call = stub.BatchScore(req)
         
         # Get the response
-        resp = await call
+        _ = await call
         
         # Get trailing metadata from the call object
         trailers = await call.trailing_metadata()
@@ -171,7 +171,7 @@ async def test_deadline_exceeded_with_trailers(grpc_address: str = "127.0.0.1:50
         try:
             # Make call with 50ms deadline - may or may not timeout depending on system speed
             call = stub.Score(req, timeout=0.05)  # 50ms
-            resp = await call
+            resp = await call  # noqa: F841
             
             # If it didn't timeout, verify normal behavior
             assert resp.score is not None, "Should get response if no timeout"
@@ -215,7 +215,7 @@ async def test_all_rpc_methods_have_trailers(grpc_address: str = "127.0.0.1:5005
         
         # Test 1: Score (unary-unary)
         call = stub.Score(score_pb2.ScoreRequest(text="test", category="violence", language="en"))
-        resp = await call
+        _ = await call
         trailers = await call.trailing_metadata()
         d = {k: v for k, v in trailers}
         for header in required_headers:
@@ -224,7 +224,7 @@ async def test_all_rpc_methods_have_trailers(grpc_address: str = "127.0.0.1:5005
         # Test 2: BatchScore (unary-unary)
         items = [score_pb2.ScoreRequest(text="a", category="violence", language="en")]
         call = stub.BatchScore(score_pb2.BatchScoreRequest(items=items))
-        resp = await call
+        _ = await call
         trailers = await call.trailing_metadata()
         d = {k: v for k, v in trailers}
         for header in required_headers:

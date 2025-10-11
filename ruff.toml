@@ -1,0 +1,20 @@
+[lint]
+# Exclude backup files and other non-production code
+exclude = [
+    "*.backup.py",
+    "*.bak",
+    ".git",
+    ".venv",
+    "venv",
+    "__pycache__",
+    "dist",
+    "build",
+]
+
+# Ignore specific rules that are too strict for this codebase
+ignore = [
+    "E701",  # Multiple statements on one line (colon) - common in compact code
+    "E702",  # Multiple statements on one line (semicolon) - common in compact code
+    "E741",  # Ambiguous variable name (l, O, I) - used for label shorthand
+]
+

@@ -92,15 +92,12 @@ def create_slack_app() -> Optional[App]:
             if result.score >= 0.99:
                 emoji = "🚨"
                 verdict = "UNSAFE"
-                color = "danger"
             elif result.score >= 0.7:
                 emoji = "⚠️"
                 verdict = "CAUTION"
-                color = "warning"
             else:
                 emoji = "✅"
                 verdict = "SAFE"
-                color = "good"
             
             blocks = [
                 {
