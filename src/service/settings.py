@@ -23,6 +23,15 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     cors_allow_origins: str | None = None  # comma-separated list or None for "*"
     max_json_body_bytes: int = 1_048_576
+    
+    # Request & connection timeouts
+    http_request_timeout_seconds: float = 30.0
+    http_connect_timeout_seconds: float = 5.0
+    http_read_timeout_seconds: float = 30.0
+    
+    # Database settings
+    db_timeout_seconds: float = 5.0
+    db_max_pool_size: int = 10
 
     # Observability
     otel_exporter_otlp_endpoint: str | None = None

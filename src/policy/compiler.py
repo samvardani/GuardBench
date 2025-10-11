@@ -21,7 +21,7 @@ class CompiledRule:
     id: str
     weight: float
     action: Action
-    regex: Tuple[re.Pattern, ...]
+    regex: Tuple[re.Pattern[str], ...]
     substrings: Tuple[str, ...]
     languages: Tuple[str, ...]
 
@@ -38,7 +38,7 @@ class CompiledSlice:
 class CompiledPolicy:
     version: int
     slices: Dict[Tuple[str, str], CompiledSlice]
-    safe_context_patterns: Tuple[re.Pattern, ...]
+    safe_context_patterns: Tuple[re.Pattern[str], ...]
     safe_context_penalty: float
 
 

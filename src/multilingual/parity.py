@@ -134,11 +134,22 @@ def _suggest_actions(result: ParityResult) -> Dict[str, object]:
     for lang, stats in langs.items():
         delta = best - stats.get("recall", 0.0)
         if delta > target:
+            # NOTE: Auto-generated rules would require language-specific pattern analysis.
+            # For production use, implement a pattern extraction system that:
+            # 1. Analyzes false negatives in the underperforming language
+            # 2. Extracts common n-grams or semantic patterns
+            # 3. Generates language-appropriate regex patterns
+            # For now, suggest threshold tuning as the primary mitigation.
             actions.append({
                 "slice": f"{result.category}/{lang}",
                 "delta": round(delta, 3),
                 "suggested_rules": [
-                    {"id": f"auto_{result.category}_{lang}_regex1", "match": {"regex": ["TODO-fill"]}, "weight": 0.5},
+                    {
+                        "id": f"auto_{result.category}_{lang}_pattern",
+                        "match": {"regex": [r"(?i)\b(placeholder_for_language_specific_pattern)\b"]},
+                        "weight": 0.5,
+                        "note": "Manual pattern definition required - analyze false negatives for this slice",
+                    },
                 ],
                 "autopatch_flags": {"enable_threshold_tuning": True, "candidate_only": True},
             })
