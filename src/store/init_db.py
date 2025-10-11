@@ -22,8 +22,9 @@ def _ensure_index(cursor: sqlite3.Cursor, name: str, ddl: str) -> None:
         cursor.execute(ddl)
 
 
-def main():
-    con = sqlite3.connect(DB_PATH)
+def main(db_path=None):
+    path = db_path if db_path is not None else DB_PATH
+    con = sqlite3.connect(path)
     cur = con.cursor()
     cur.execute("PRAGMA journal_mode=WAL;")
     cur.executescript(
@@ -166,7 +167,7 @@ def main():
     cur.execute("CREATE INDEX IF NOT EXISTS idx_results_run_model ON results(run_id, model)")
     cur.execute("CREATE INDEX IF NOT EXISTS idx_results_sample ON results(sample_id)")
     con.commit()
-    print(f"DB ready at {DB_PATH}")
+    print(f"DB ready at {path}")
     con.close()
 
 if __name__ == "__main__":
