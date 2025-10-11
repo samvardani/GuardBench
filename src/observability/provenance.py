@@ -4,12 +4,13 @@ from __future__ import annotations
 
 import logging
 import os
-import uuid
 from typing import Callable
 
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.types import ASGIApp
+
+from .trace import get_or_create_trace_id
 
 logger = logging.getLogger(__name__)
 
@@ -65,13 +66,9 @@ class ProvenanceMiddleware(BaseHTTPMiddleware):
         Returns:
             Response with provenance headers
         """
-        # Extract or generate trace ID
-        trace_id = (
-            request.headers.get("x-trace-id")
-            or request.headers.get("x-request-id")
-            or request.headers.get("traceparent", "").split("-")[1] if "traceparent" in request.headers else None
-            or str(uuid.uuid4())
-        )
+        # Get or create trace ID using unified trace module
+        # This sets the contextvar for the duration of the request
+        trace_id = get_or_create_trace_id(request.headers)
         
         # Get policy metadata from settings
         try:
