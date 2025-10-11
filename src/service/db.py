@@ -26,7 +26,7 @@ def ensure_schema() -> None:
     global _SCHEMA_READY
     if _SCHEMA_READY and DB_PATH.exists():
         return
-    init_db.main()
+    init_db.main(db_path=DB_PATH)
     _SCHEMA_READY = True
 
 
