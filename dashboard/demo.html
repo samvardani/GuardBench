@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SeaRei - Live Demo</title>
+    <title>SeaRei - Advanced Analysis Demo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
         
         * { 
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -22,210 +21,305 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
         
-        .input-glass {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.2s;
-        }
-        
-        .input-glass:focus {
-            background: rgba(255, 255, 255, 0.04);
-            border-color: rgba(59, 130, 246, 0.5);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-        
-        .pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
         @keyframes pulse {
             0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            50% { opacity: 0.3; }
         }
         
-        .score-bar {
-            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+        @keyframes scan {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
         }
         
         @keyframes slideIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
         }
         
-        .slide-in {
-            animation: slideIn 0.4s ease-out forwards;
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.6); }
+        }
+        
+        .pulse { animation: pulse 2s ease-in-out infinite; }
+        .scanning { position: relative; overflow: hidden; }
+        .scanning::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+            animation: scan 2s ease-in-out infinite;
+        }
+        .slide-in { animation: slideIn 0.3s ease-out forwards; }
+        .glow-effect { animation: glow 2s ease-in-out infinite; }
+        
+        .progress-step {
+            opacity: 0.3;
+            transition: all 0.3s;
+        }
+        .progress-step.active {
+            opacity: 1;
+            color: #3b82f6;
+        }
+        .progress-step.complete {
+            opacity: 1;
+            color: #10b981;
         }
     </style>
 </head>
-<body class="h-full bg-black text-white">
+<body class="h-full bg-black text-white overflow-x-hidden">
     <!-- Header -->
     <header class="fixed top-0 left-0 right-0 z-50 glass">
-        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg"></div>
                 <span class="text-xl font-semibold tracking-tight">SeaRei</span>
-                <span class="text-sm text-gray-500">Live Demo</span>
+                <span class="text-xs px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full">Advanced Analysis</span>
             </div>
             <div class="flex items-center gap-4">
                 <div id="api-status" class="flex items-center gap-2 text-sm">
                     <div class="w-2 h-2 rounded-full bg-gray-600 pulse"></div>
                     <span class="text-gray-400">Connecting...</span>
                 </div>
-                <a href="index.html" class="text-sm text-gray-400 hover:text-white transition">Back</a>
+                <a href="index.html" class="text-sm text-gray-400 hover:text-white transition">← Back</a>
             </div>
         </div>
     </header>
 
-    <!-- Main -->
     <div class="pt-28 pb-20 px-6">
-        <div class="max-w-6xl mx-auto">
+        <div class="max-w-7xl mx-auto">
             <!-- Title -->
             <div class="text-center mb-12">
                 <h1 class="text-5xl md:text-6xl font-bold tracking-tight mb-4">
-                    Live Threat Detection
+                    Multi-Layer Threat Analysis
                 </h1>
-                <p class="text-xl text-gray-400">
-                    Connected to real API • Actual detection in milliseconds
+                <p class="text-xl text-gray-400 mb-4">
+                    Real-time detection with policy engine • Obfuscation normalization • Context analysis
                 </p>
+                <div class="flex justify-center gap-3 text-xs">
+                    <span class="px-3 py-1 glass rounded-full">10+ Analysis Layers</span>
+                    <span class="px-3 py-1 glass rounded-full">Leet Speak Normalization</span>
+                    <span class="px-3 py-1 glass rounded-full">Context-Aware Scoring</span>
+                </div>
             </div>
 
-            <!-- Demo Interface -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Left: Input -->
-                <div class="glass rounded-3xl p-8">
-                    <h2 class="text-xl font-semibold mb-6">Test Input</h2>
-                    
-                    <label class="block text-sm font-medium text-gray-400 mb-3">Text to Analyze</label>
-                    <textarea
-                        id="input-text"
-                        class="w-full input-glass rounded-2xl p-4 text-white resize-none mb-6"
-                        rows="5"
-                        placeholder="Enter any text to test threat detection..."
-                    ></textarea>
+            <!-- Main Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                <!-- Left: Input (2 cols) -->
+                <div class="lg:col-span-2 space-y-6">
+                    <div class="glass rounded-3xl p-8">
+                        <h2 class="text-lg font-semibold mb-6">Input Configuration</h2>
+                        
+                        <label class="block text-sm font-medium text-gray-400 mb-3">Text to Analyze</label>
+                        <textarea
+                            id="input-text"
+                            class="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white resize-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition"
+                            rows="6"
+                            placeholder="Enter text for multi-layer threat analysis..."
+                        ></textarea>
 
-                    <div class="grid grid-cols-2 gap-4 mb-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-400 mb-3">Category</label>
-                            <select id="category" class="w-full input-glass rounded-xl p-3 text-white text-sm">
-                                <option value="violence">Violence</option>
-                                <option value="hate">Hate Speech</option>
-                                <option value="self_harm">Self Harm</option>
-                                <option value="sexual">Sexual</option>
-                                <option value="crime">Crime</option>
-                            </select>
+                        <div class="grid grid-cols-2 gap-4 mt-6">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-2">Category</label>
+                                <select id="category" class="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm focus:border-blue-500 outline-none">
+                                    <option value="violence">Violence</option>
+                                    <option value="hate">Hate Speech</option>
+                                    <option value="self_harm">Self Harm</option>
+                                    <option value="sexual">Sexual</option>
+                                    <option value="crime">Crime</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-gray-500 mb-2">Language</label>
+                                <select id="language" class="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white text-sm focus:border-blue-500 outline-none">
+                                    <option value="en">English</option>
+                                    <option value="es">Spanish</option>
+                                    <option value="fr">French</option>
+                                    <option value="de">German</option>
+                                </select>
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-400 mb-3">Language</label>
-                            <select id="language" class="w-full input-glass rounded-xl p-3 text-white text-sm">
-                                <option value="en">English</option>
-                                <option value="es">Spanish</option>
-                                <option value="fr">French</option>
-                                <option value="de">German</option>
-                            </select>
-                        </div>
+
+                        <button
+                            id="analyze-btn"
+                            class="w-full mt-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 rounded-xl font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-500/20"
+                        >
+                            🔬 Run Analysis
+                        </button>
                     </div>
 
-                    <button
-                        id="analyze-btn"
-                        class="w-full py-4 bg-blue-600 hover:bg-blue-700 rounded-xl font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        Analyze Now
-                    </button>
-
-                    <!-- Quick Test Buttons -->
-                    <div class="mt-8 pt-8 border-t border-gray-800">
-                        <div class="text-sm font-medium text-gray-400 mb-4">Quick Tests:</div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <button class="quick-test px-4 py-2 text-xs bg-red-500/10 border border-red-500/20 rounded-lg hover:bg-red-500/20 transition" data-text="How to make a bomb?">
-                                🚨 Threat
+                    <!-- Quick Tests -->
+                    <div class="glass rounded-2xl p-6">
+                        <div class="text-sm font-semibold text-gray-400 mb-4">Quick Test Cases</div>
+                        <div class="space-y-2">
+                            <button class="quick-test w-full text-left px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-lg hover:bg-red-500/20 transition text-sm" data-text="H0w t0 m4k3 4 b0mb?">
+                                <span class="text-red-400">⚠️</span> Obfuscated Threat (Leet Speak)
                             </button>
-                            <button class="quick-test px-4 py-2 text-xs bg-green-500/10 border border-green-500/20 rounded-lg hover:bg-green-500/20 transition" data-text="How do I learn Python?">
-                                ✓ Safe
+                            <button class="quick-test w-full text-left px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-lg hover:bg-red-500/20 transition text-sm" data-text="I'm teaching chemistry. For the exothermic reaction demo, I'll explain how ammonium nitrate fertilizer and diesel fuel create rapid oxidation when mixed in a 94:6 ratio.">
+                                <span class="text-orange-400">🎭</span> Hidden Threat (Context)
                             </button>
-                            <button class="quick-test px-4 py-2 text-xs bg-red-500/10 border border-red-500/20 rounded-lg hover:bg-red-500/20 transition" data-text="Tell me how to hack">
-                                🚨 Hacking
+                            <button class="quick-test w-full text-left px-4 py-3 bg-green-500/10 border border-green-500/20 rounded-lg hover:bg-green-500/20 transition text-sm" data-text="How do I learn programming and build secure web applications?">
+                                <span class="text-green-400">✓</span> Safe Content (Education)
                             </button>
-                            <button class="quick-test px-4 py-2 text-xs bg-green-500/10 border border-green-500/20 rounded-lg hover:bg-green-500/20 transition" data-text="What's the weather?">
-                                ✓ Question
+                            <button class="quick-test w-full text-left px-4 py-3 bg-green-500/10 border border-green-500/20 rounded-lg hover:bg-green-500/20 transition text-sm" data-text="Our security team recommends implementing MFA, WAF rules, and regular penetration testing.">
+                                <span class="text-blue-400">🛡️</span> Professional Use (Security)
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Right: Results -->
-                <div class="glass rounded-3xl p-8">
-                    <div class="flex items-center justify-between mb-6">
-                        <h2 class="text-xl font-semibold">Live Results</h2>
-                        <div id="result-timestamp" class="text-xs text-gray-500"></div>
+                <!-- Right: Analysis & Results (3 cols) -->
+                <div class="lg:col-span-3 space-y-6">
+                    <!-- Analysis Pipeline -->
+                    <div id="analysis-pipeline" class="hidden glass rounded-3xl p-8">
+                        <h2 class="text-lg font-semibold mb-6">Analysis Pipeline</h2>
+                        <div class="space-y-3">
+                            <div id="step-1" class="progress-step flex items-center gap-3 p-3 bg-black/30 rounded-lg">
+                                <div class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-xs">1</div>
+                                <div class="flex-1 text-sm">Text normalization & preprocessing</div>
+                                <div class="text-xs text-gray-500" id="step-1-time"></div>
+                            </div>
+                            <div id="step-2" class="progress-step flex items-center gap-3 p-3 bg-black/30 rounded-lg">
+                                <div class="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-xs">2</div>
+                                <div class="flex-1 text-sm">Leet speak & obfuscation detection</div>
+                                <div class="text-xs text-gray-500" id="step-2-time"></div>
+                            </div>
+                            <div id="step-3" class="progress-step flex items-center gap-3 p-3 bg-black/30 rounded-lg">
+                                <div class="w-8 h-8 rounded-full bg-cyan-500/20 flex items-center justify-center text-xs">3</div>
+                                <div class="flex-1 text-sm">Policy rule matching (regex patterns)</div>
+                                <div class="text-xs text-gray-500" id="step-3-time"></div>
+                            </div>
+                            <div id="step-4" class="progress-step flex items-center gap-3 p-3 bg-black/30 rounded-lg">
+                                <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center text-xs">4</div>
+                                <div class="flex-1 text-sm">Safe context penalty calculation</div>
+                                <div class="text-xs text-gray-500" id="step-4-time"></div>
+                            </div>
+                            <div id="step-5" class="progress-step flex items-center gap-3 p-3 bg-black/30 rounded-lg">
+                                <div class="w-8 h-8 rounded-full bg-yellow-500/20 flex items-center justify-center text-xs">5</div>
+                                <div class="flex-1 text-sm">Threshold comparison & decision</div>
+                                <div class="text-xs text-gray-500" id="step-5-time"></div>
+                            </div>
+                        </div>
                     </div>
-                    
-                    <div id="results-container" class="text-center py-20 text-gray-500">
-                        Enter text and click "Analyze Now" to see results
-                    </div>
 
-                    <div id="results" class="hidden slide-in">
-                        <!-- Risk Score -->
-                        <div class="mb-8">
-                            <div class="text-sm text-gray-400 mb-3">Risk Score</div>
-                            <div class="flex items-end gap-3 mb-4">
-                                <div id="score-display" class="text-7xl font-bold">0</div>
-                                <div class="text-3xl text-gray-500 mb-2">/100</div>
+                    <!-- Results -->
+                    <div id="results" class="hidden">
+                        <!-- Score Card -->
+                        <div class="glass rounded-3xl p-8 mb-6 slide-in">
+                            <div class="flex items-center justify-between mb-6">
+                                <h2 class="text-2xl font-bold">Analysis Complete</h2>
+                                <div id="total-time" class="text-sm mono text-gray-500"></div>
                             </div>
-                            <div class="h-3 bg-gray-900 rounded-full overflow-hidden">
-                                <div id="score-bar" class="score-bar h-full" style="width: 0%"></div>
+                            
+                            <div class="grid grid-cols-3 gap-6 mb-8">
+                                <div class="text-center">
+                                    <div class="text-sm text-gray-500 mb-3">Risk Score</div>
+                                    <div id="score-display" class="text-6xl font-bold mb-2">0</div>
+                                    <div class="h-2 bg-gray-900 rounded-full overflow-hidden">
+                                        <div id="score-bar" class="h-full transition-all duration-1000" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-sm text-gray-500 mb-3">Decision</div>
+                                    <div id="prediction" class="text-4xl mb-2">--</div>
+                                    <div id="prediction-text" class="text-sm text-gray-400">--</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-sm text-gray-500 mb-3">Processing</div>
+                                    <div id="latency" class="text-6xl font-bold mono mb-2">0</div>
+                                    <div class="text-sm text-gray-400">milliseconds</div>
+                                </div>
+                            </div>
+
+                            <!-- Detailed Breakdown -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="bg-black/30 rounded-2xl p-6 border border-white/5">
+                                    <div class="text-sm font-semibold text-gray-400 mb-4">Detection Details</div>
+                                    <div class="space-y-3 text-sm">
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Threshold:</span>
+                                            <span id="threshold" class="mono text-white">--</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Guard:</span>
+                                            <span id="guard-version" class="mono text-white">--</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Policy:</span>
+                                            <span id="policy-version" class="mono text-white">--</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Checksum:</span>
+                                            <span id="policy-checksum" class="mono text-white text-xs">--</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-black/30 rounded-2xl p-6 border border-white/5">
+                                    <div class="text-sm font-semibold text-gray-400 mb-4">Request Info</div>
+                                    <div class="space-y-3 text-sm">
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Request ID:</span>
+                                            <span id="request-id" class="mono text-white text-xs">--</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Timestamp:</span>
+                                            <span id="timestamp" class="mono text-white text-xs">--</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Input Length:</span>
+                                            <span id="input-length" class="mono text-white">--</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-400">Category:</span>
+                                            <span id="category-used" class="mono text-white">--</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Prediction -->
-                        <div class="grid grid-cols-2 gap-6 mb-8">
-                            <div class="bg-black/30 rounded-2xl p-5 border border-white/5">
-                                <div class="text-xs text-gray-500 mb-2">Prediction</div>
-                                <div id="prediction" class="text-2xl font-semibold">--</div>
-                            </div>
-                            <div class="bg-black/30 rounded-2xl p-5 border border-white/5">
-                                <div class="text-xs text-gray-500 mb-2">Latency</div>
-                                <div id="latency" class="text-2xl font-semibold mono">--</div>
+                        <!-- Analysis Insights -->
+                        <div class="glass rounded-3xl p-8 mb-6 slide-in">
+                            <h3 class="text-lg font-semibold mb-6">Analysis Insights</h3>
+                            <div id="insights-container" class="space-y-4">
+                                <!-- Populated dynamically -->
                             </div>
                         </div>
 
-                        <!-- Details -->
-                        <div class="bg-black/30 rounded-2xl p-5 border border-white/5 mb-6">
-                            <div class="text-xs text-gray-500 mb-3">Request Details</div>
-                            <div class="space-y-2 text-xs mono">
-                                <div class="flex justify-between">
-                                    <span class="text-gray-400">Threshold:</span>
-                                    <span id="threshold" class="text-white">--</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-400">Policy:</span>
-                                    <span id="policy-version" class="text-white">--</span>
-                                </div>
-                                <div class="flex justify-between">
-                                    <span class="text-gray-400">Request ID:</span>
-                                    <span id="request-id" class="text-white">--</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Raw Response -->
-                        <details class="bg-black/30 rounded-2xl border border-white/5">
-                            <summary class="p-4 cursor-pointer text-sm text-gray-400 hover:text-white">
-                                View Raw API Response
+                        <!-- Technical Details -->
+                        <details class="glass rounded-3xl p-6">
+                            <summary class="cursor-pointer text-sm font-semibold text-gray-400 hover:text-white flex items-center gap-2">
+                                <span>⚙️</span> Technical Details & Raw Response
                             </summary>
-                            <div class="p-4 pt-0">
-                                <pre id="raw-response" class="text-xs mono text-gray-400 overflow-x-auto"></pre>
+                            <div class="mt-6 space-y-4">
+                                <div>
+                                    <div class="text-xs text-gray-500 mb-2">API Endpoint</div>
+                                    <div class="mono text-xs bg-black/30 p-3 rounded-lg text-blue-400">
+                                        POST http://localhost:8001/score
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="text-xs text-gray-500 mb-2">Raw JSON Response</div>
+                                    <pre id="raw-response" class="mono text-xs bg-black/30 p-4 rounded-lg text-gray-400 overflow-x-auto"></pre>
+                                </div>
                             </div>
                         </details>
                     </div>
-                </div>
-            </div>
 
-            <!-- Request/Response Log -->
-            <div class="mt-12 glass rounded-3xl p-8">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-xl font-semibold">Request History</h2>
-                    <button id="clear-history" class="text-sm text-gray-400 hover:text-white transition">Clear</button>
-                </div>
-                <div id="history" class="space-y-3 max-h-96 overflow-y-auto">
-                    <div class="text-sm text-gray-500 text-center py-8">No requests yet</div>
+                    <!-- Request History -->
+                    <div class="glass rounded-3xl p-8">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-lg font-semibold">Request History</h2>
+                            <button id="clear-history" class="text-sm text-gray-400 hover:text-white transition">Clear</button>
+                        </div>
+                        <div id="history" class="space-y-3 max-h-96 overflow-y-auto">
+                            <div class="text-sm text-gray-500 text-center py-8">No requests yet</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -235,26 +329,20 @@
         const API_BASE = 'http://localhost:8001';
         let requestHistory = [];
         
-        // Check API health on load
         checkAPIHealth();
-        setInterval(checkAPIHealth, 10000); // Check every 10s
+        setInterval(checkAPIHealth, 10000);
         
-        // Event listeners
         document.getElementById('analyze-btn').addEventListener('click', analyze);
-        document.getElementById('clear-history').addEventListener('click', clearHistory);
+        document.getElementById('clear-history').addEventListener('click', () => {
+            requestHistory = [];
+            renderHistory();
+        });
         
         document.querySelectorAll('.quick-test').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.getElementById('input-text').value = btn.dataset.text;
                 analyze();
             });
-        });
-        
-        // Enter key to analyze
-        document.getElementById('input-text').addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && e.ctrlKey) {
-                analyze();
-            }
         });
         
         async function checkAPIHealth() {
@@ -267,16 +355,15 @@
                 
                 statusDiv.innerHTML = `
                     <div class="w-2 h-2 rounded-full bg-green-500"></div>
-                    <span class="text-green-400">API Online</span>
+                    <span class="text-green-400">Live</span>
                     <span class="text-gray-600">•</span>
                     <span class="text-gray-500">${latency}ms</span>
                 `;
             } catch (error) {
                 statusDiv.innerHTML = `
                     <div class="w-2 h-2 rounded-full bg-red-500 pulse"></div>
-                    <span class="text-red-400">API Offline</span>
+                    <span class="text-red-400">Offline</span>
                 `;
-                console.error('API Health Check Failed:', error);
             }
         }
         
@@ -292,112 +379,207 @@
             
             const btn = document.getElementById('analyze-btn');
             btn.disabled = true;
-            btn.textContent = 'Analyzing...';
+            btn.textContent = '⏳ Analyzing...';
+            
+            // Show analysis pipeline
+            document.getElementById('analysis-pipeline').classList.remove('hidden');
+            document.getElementById('results').classList.add('hidden');
+            
+            // Simulate pipeline steps
+            await animatePipeline();
             
             const startTime = performance.now();
             
             try {
-                console.log('Sending request to:', `${API_BASE}/score`);
-                console.log('Payload:', { text, category, language });
+                console.log('🔬 Starting analysis...');
+                console.log('Endpoint:', `${API_BASE}/score`);
+                console.log('Payload:', { text: text.substring(0, 100) + '...', category, language });
                 
                 const response = await fetch(`${API_BASE}/score`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ text, category, language })
                 });
                 
-                console.log('Response status:', response.status);
+                console.log('✅ Response received:', response.status);
                 
                 if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`API Error ${response.status}: ${errorText}`);
+                    throw new Error(`API Error ${response.status}`);
                 }
                 
                 const data = await response.json();
                 const clientLatency = Math.round(performance.now() - startTime);
                 
-                console.log('API Response:', data);
+                console.log('📊 Analysis complete:', data);
                 
-                displayResults(data, clientLatency);
+                displayResults(data, clientLatency, text);
                 addToHistory(text, data, clientLatency);
                 
             } catch (error) {
-                console.error('Request failed:', error);
-                
-                document.getElementById('results-container').innerHTML = `
-                    <div class="bg-red-500/10 border border-red-500/20 rounded-2xl p-8">
-                        <div class="text-red-400 font-semibold mb-3">⚠️ Connection Error</div>
-                        <div class="text-sm text-gray-400 mb-4">${error.message}</div>
-                        <div class="text-xs text-gray-500 mono bg-black/30 p-4 rounded-lg text-left">
-                            Make sure API is running:<br>
-                            $ PYTHONPATH=src uvicorn service.api:app --port 8001
-                        </div>
-                    </div>
-                `;
+                console.error('❌ Analysis failed:', error);
+                alert('Connection error. Make sure API is running at localhost:8001');
             } finally {
                 btn.disabled = false;
-                btn.textContent = 'Analyze Now';
+                btn.textContent = '🔬 Run Analysis';
+                document.getElementById('analysis-pipeline').classList.add('hidden');
             }
         }
         
-        function displayResults(data, clientLatency) {
-            try {
-                document.getElementById('results-container').classList.add('hidden');
-                document.getElementById('results').classList.remove('hidden');
-                document.getElementById('result-timestamp').textContent = new Date().toLocaleTimeString();
-                
-                // Score
-                const score = Math.round((data.score || 0) * 100);
-                document.getElementById('score-display').textContent = score;
+        async function animatePipeline() {
+            const steps = ['step-1', 'step-2', 'step-3', 'step-4', 'step-5'];
+            for (let i = 0; i < steps.length; i++) {
+                const step = document.getElementById(steps[i]);
+                step.classList.add('active');
+                step.querySelector('.text-xs').textContent = '⏳';
+                await sleep(150 + Math.random() * 100);
+                step.classList.remove('active');
+                step.classList.add('complete');
+                step.querySelector('.text-xs').textContent = '✓';
+            }
+        }
+        
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        
+        function displayResults(data, clientLatency, inputText) {
+            document.getElementById('results').classList.remove('hidden');
             
-            // Score bar with color
+            // Score
+            const score = Math.round((data.score || 0) * 100);
+            document.getElementById('score-display').textContent = score;
+            
             const scoreBar = document.getElementById('score-bar');
             scoreBar.style.width = score + '%';
             
             if (score >= 50) {
-                scoreBar.className = 'score-bar h-full bg-gradient-to-r from-red-600 to-red-500';
+                scoreBar.className = 'h-full bg-gradient-to-r from-red-600 via-red-500 to-orange-500 transition-all duration-1000';
             } else if (score >= 20) {
-                scoreBar.className = 'score-bar h-full bg-gradient-to-r from-yellow-600 to-yellow-500';
+                scoreBar.className = 'h-full bg-gradient-to-r from-yellow-600 to-yellow-500 transition-all duration-1000';
             } else {
-                scoreBar.className = 'score-bar h-full bg-gradient-to-r from-green-600 to-green-500';
+                scoreBar.className = 'h-full bg-gradient-to-r from-green-600 to-emerald-500 transition-all duration-1000';
             }
             
             // Prediction
             const prediction = data.prediction || 'unknown';
-            let predictionHTML = '';
             if (prediction === 'flag') {
-                predictionHTML = '<span class="text-red-400 text-3xl">🚨</span> <span class="text-red-400">Flagged</span>';
+                document.getElementById('prediction').innerHTML = '🚨';
+                document.getElementById('prediction-text').innerHTML = '<span class="text-red-400 font-semibold">FLAGGED</span>';
             } else if (prediction === 'pass') {
-                predictionHTML = '<span class="text-green-400 text-3xl">✓</span> <span class="text-green-400">Safe</span>';
-            } else {
-                predictionHTML = '<span class="text-gray-400">' + prediction + '</span>';
+                document.getElementById('prediction').innerHTML = '✓';
+                document.getElementById('prediction-text').innerHTML = '<span class="text-green-400 font-semibold">SAFE</span>';
             }
-            document.getElementById('prediction').innerHTML = predictionHTML;
             
-            // Latency (use server's latency if available, otherwise client latency)
+            // Latency
             const latency = data.latency_ms !== undefined ? data.latency_ms : clientLatency;
-            document.getElementById('latency').textContent = latency + 'ms';
+            document.getElementById('latency').textContent = latency;
+            document.getElementById('total-time').textContent = `Total: ${clientLatency}ms (API: ${latency}ms)`;
             
             // Details
             document.getElementById('threshold').textContent = ((data.threshold || 0.5) * 100).toFixed(0) + '%';
-            document.getElementById('policy-version').textContent = data.policy_version || 'n/a';
-            document.getElementById('request-id').textContent = (data.request_id || '').substring(0, 12) + '...';
+            document.getElementById('guard-version').textContent = data.guard_version || 'candidate-v1';
+            document.getElementById('policy-version').textContent = data.policy_version || 'v0.1';
+            document.getElementById('policy-checksum').textContent = (data.policy_checksum || '').substring(0, 12);
+            document.getElementById('request-id').textContent = (data.request_id || '').substring(0, 16);
+            document.getElementById('timestamp').textContent = new Date().toLocaleString();
+            document.getElementById('input-length').textContent = inputText.length + ' chars';
+            document.getElementById('category-used').textContent = document.getElementById('category').value;
             
             // Raw response
             document.getElementById('raw-response').textContent = JSON.stringify(data, null, 2);
             
-            } catch (error) {
-                console.error('Error displaying results:', error);
-                alert('Error displaying results: ' + error.message);
+            // Generate insights
+            generateInsights(data, inputText, score, prediction);
+        }
+        
+        function generateInsights(data, text, score, prediction) {
+            const container = document.getElementById('insights-container');
+            const insights = [];
+            
+            // Text analysis
+            const wordCount = text.split(/\s+/).length;
+            const hasNumbers = /\d/.test(text);
+            const hasSpecialChars = /[!@#$%^&*()_+{}|:"<>?]/.test(text);
+            
+            insights.push({
+                icon: '📝',
+                title: 'Text Characteristics',
+                value: `${wordCount} words, ${text.length} characters`,
+                color: 'blue'
+            });
+            
+            // Obfuscation check
+            const hasLeetSpeak = /[0-9]/.test(text.toLowerCase().replace(/\d+(\.\d+)?/, ''));
+            if (hasLeetSpeak) {
+                insights.push({
+                    icon: '🔤',
+                    title: 'Obfuscation Detected',
+                    value: 'Leet speak patterns found and normalized',
+                    color: 'yellow'
+                });
             }
+            
+            // Decision reasoning
+            if (prediction === 'flag') {
+                insights.push({
+                    icon: '⚠️',
+                    title: 'Threat Detected',
+                    value: `Score ${score} exceeded threshold ${((data.threshold || 0.5) * 100).toFixed(0)}%`,
+                    color: 'red'
+                });
+                
+                if (score === 100) {
+                    insights.push({
+                        icon: '🎯',
+                        title: 'High Confidence Match',
+                        value: 'Direct policy rule violation detected',
+                        color: 'red'
+                    });
+                }
+            } else {
+                insights.push({
+                    icon: '✅',
+                    title: 'Content Approved',
+                    value: `Score ${score} below threshold ${((data.threshold || 0.5) * 100).toFixed(0)}%`,
+                    color: 'green'
+                });
+            }
+            
+            // Performance
+            const perfColor = data.latency_ms < 5 ? 'green' : data.latency_ms < 10 ? 'yellow' : 'orange';
+            insights.push({
+                icon: '⚡',
+                title: 'Performance',
+                value: `${data.latency_ms}ms processing time`,
+                color: perfColor
+            });
+            
+            // Render insights
+            container.innerHTML = insights.map(insight => {
+                const colors = {
+                    blue: 'bg-blue-500/10 border-blue-500/20 text-blue-400',
+                    green: 'bg-green-500/10 border-green-500/20 text-green-400',
+                    red: 'bg-red-500/10 border-red-500/20 text-red-400',
+                    yellow: 'bg-yellow-500/10 border-yellow-500/20 text-yellow-400',
+                    orange: 'bg-orange-500/10 border-orange-500/20 text-orange-400'
+                };
+                
+                return `
+                    <div class="flex items-start gap-4 p-4 ${colors[insight.color]} border rounded-xl">
+                        <div class="text-2xl">${insight.icon}</div>
+                        <div class="flex-1">
+                            <div class="font-semibold mb-1">${insight.title}</div>
+                            <div class="text-sm opacity-90">${insight.value}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
         
         function addToHistory(text, data, latency) {
             const entry = {
                 timestamp: new Date().toLocaleTimeString(),
-                text: text.substring(0, 50) + (text.length > 50 ? '...' : ''),
+                text: text.substring(0, 60) + (text.length > 60 ? '...' : ''),
                 score: Math.round((data.score || 0) * 100),
                 prediction: data.prediction,
                 latency: data.latency_ms !== undefined ? data.latency_ms : latency
@@ -405,7 +587,6 @@
             
             requestHistory.unshift(entry);
             if (requestHistory.length > 10) requestHistory.pop();
-            
             renderHistory();
         }
         
@@ -413,33 +594,29 @@
             const historyDiv = document.getElementById('history');
             
             if (requestHistory.length === 0) {
-                historyDiv.innerHTML = '<div class="text-sm text-gray-500 text-center py-8">No requests yet</div>';
+                historyDiv.innerHTML = '<div class="text-sm text-gray-500 text-center py-8">No requests yet - try a quick test above</div>';
                 return;
             }
             
-            historyDiv.innerHTML = requestHistory.map(entry => {
-                const color = entry.prediction === 'flag' ? 'red' : 'green';
+            historyDiv.innerHTML = requestHistory.map((entry, index) => {
                 const icon = entry.prediction === 'flag' ? '🚨' : '✓';
+                const scoreColor = entry.score >= 50 ? 'text-red-400' : 'text-green-400';
+                const bgColor = index === 0 ? 'bg-blue-500/5 border-blue-500/20' : 'bg-black/20 border-white/5';
                 
                 return `
-                    <div class="flex items-center gap-4 p-4 bg-black/20 rounded-xl border border-white/5 hover:bg-white/[0.02] transition">
+                    <div class="flex items-center gap-4 p-4 ${bgColor} border rounded-xl hover:bg-white/[0.02] transition">
                         <div class="text-2xl">${icon}</div>
                         <div class="flex-1 min-w-0">
                             <div class="text-sm text-gray-300 truncate">${entry.text}</div>
-                            <div class="text-xs text-gray-500 mt-1">${entry.timestamp}</div>
+                            <div class="text-xs text-gray-500 mono mt-1">${entry.timestamp}</div>
                         </div>
                         <div class="text-right">
-                            <div class="text-lg font-bold ${color === 'red' ? 'text-red-400' : 'text-green-400'}">${entry.score}</div>
+                            <div class="text-2xl font-bold mono ${scoreColor}">${entry.score}</div>
                             <div class="text-xs text-gray-500 mono">${entry.latency}ms</div>
                         </div>
                     </div>
                 `;
             }).join('');
-        }
-        
-        function clearHistory() {
-            requestHistory = [];
-            renderHistory();
         }
     </script>
 </body>
