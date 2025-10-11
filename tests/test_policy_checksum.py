@@ -1,9 +1,13 @@
+import os
 import prometheus_client  # type: ignore
 from fastapi.testclient import TestClient
 from service import api
 
 
-def test_score_includes_policy_checksum():
+def test_score_includes_policy_checksum(monkeypatch):
+    # Disable rate limiting for this test
+    monkeypatch.setenv("RATE_LIMIT_ENABLED", "false")
+    
     for m in (
         getattr(api, "SCORE_LATENCY", None),
         getattr(api, "SCORE_REQUESTS", None),
