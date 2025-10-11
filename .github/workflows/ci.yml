@@ -49,10 +49,10 @@ jobs:
       - name: Generate gRPC stubs
         run: |
           python -m grpc_tools.protoc \
-            -I src/grpc_proto \
+            -I src/grpc_service \
             --python_out=src/grpc_generated \
             --grpc_python_out=src/grpc_generated \
-            src/grpc_proto/score.proto
+            src/grpc_service/score.proto
 
       - name: Start gRPC server (background)
         run: |
