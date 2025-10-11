@@ -9,7 +9,7 @@ def predict(text: str, category: str, language: str, *, guard: str = "candidate"
     spec = _resolve_guard(guard)
     fn = _wrap_guard_sync(guard, spec)
     result = fn(text, category, language)
-    return result
+    return result  # type: ignore[no-any-return]
 
 
 def batch_predict(rows: Iterable[Mapping[str, str]], *, guard: str = "candidate") -> List[Dict[str, Any]]:

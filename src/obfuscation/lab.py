@@ -87,7 +87,7 @@ def _collect_seed_texts(policy_slices: Sequence[str], max_per_slice: int = 20) -
 
 def _apply_operator(name: str, text: str) -> str:
     func = OPERATORS[name]
-    return func(text)
+    return func(text)  # type: ignore[no-any-return]
 
 
 def run_lab(policy_slices: Sequence[str], out_path: Path, max_per_slice: int = 20) -> Dict[str, dict[str, Any]]:

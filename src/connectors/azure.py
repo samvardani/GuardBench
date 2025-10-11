@@ -119,7 +119,7 @@ def exists(uri: str) -> bool:
     client = _client()
     if client is not None:  # pragma: no cover
         blob_client = client.get_blob_client(container, blob)
-        return blob_client.exists()
+        return blob_client.exists()  # type: ignore[no-any-return]
 
     path = _blob_path(container, blob)
     if path.exists():

@@ -179,7 +179,7 @@ class RedTeamAgent:
 
     def _evaluate(self, text: str, category: str, language: str) -> Optional[Mapping[str, object]]:
         try:
-            return self.guard_fn(text, category=category, language=language)
+            return self.guard_fn(text, category=category, language=language)  # type: ignore[no-any-return]
         except Exception:
             return None
 

@@ -78,11 +78,11 @@ def _read_local_jsonl(path: Path, encoding: str = "utf-8") -> List[dict[str, Any
 
 def _read_remote_jsonl(uri: str) -> List[dict[str, Any]]:
     if uri.startswith("s3://"):
-        return s3_connector.read_jsonl(uri)
+        return s3_connector.read_jsonl(uri)  # type: ignore[no-any-return]
     if uri.startswith("gs://") or uri.startswith("gcs://"):
-        return gcs_connector.read_jsonl(uri)
+        return gcs_connector.read_jsonl(uri)  # type: ignore[no-any-return]
     if uri.startswith("azure://") or uri.startswith("az://") or uri.startswith("wasbs://"):
-        return azure_connector.read_jsonl(uri)
+        return azure_connector.read_jsonl(uri)  # type: ignore[no-any-return]
     if uri.startswith("file://"):
         return _read_local_jsonl(Path(uri[len("file://") :]))
     raise ValueError(f"Unsupported input URI: {uri}")
