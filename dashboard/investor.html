@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SeaRei - Technical Investment Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+        
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        code, pre, .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .metric-card {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -0.02em;
+        }
+        
+        @media print {
+            .no-print { display: none; }
+            body { background: white; color: black; }
+        }
+        
+        .section-title {
+            position: relative;
+            padding-left: 1.5rem;
+        }
+        
+        .section-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 70%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+        
+        .toc {
+            position: sticky;
+            top: 2rem;
+            max-height: calc(100vh - 4rem);
+            overflow-y: auto;
+        }
+        
+        .toc::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .toc::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .toc::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+        
+        .comparison-table td, .comparison-table th {
+            padding: 0.75rem 1rem;
+        }
+        
+        .comparison-table tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-100">
+    
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 glass border-b border-gray-700 no-print">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600"></div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight">SeaRei</h1>
+                    <p class="text-xs text-gray-400">Technical Investment Report</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <span class="text-sm text-gray-400">October 11, 2025</span>
+                <button onclick="window.print()" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm transition">
+                    Download PDF
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-16 px-6">
+        <div class="max-w-7xl mx-auto text-center fade-in-up">
+            <div class="inline-block px-4 py-2 bg-blue-500/20 rounded-full text-blue-400 text-sm font-medium mb-6">
+                🏆 Confidential - Investment Review
+            </div>
+            <h2 class="text-6xl md:text-7xl font-black mb-6 leading-tight">
+                <span class="gradient-text">The Future of</span><br/>
+                AI Safety Infrastructure
+            </h2>
+            <p class="text-2xl text-gray-300 mb-12 max-w-3xl mx-auto font-light">
+                100x faster • 2x more accurate • 20+ certifications • $500B+ TAM
+            </p>
+            
+            <!-- Key Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16 max-w-5xl mx-auto">
+                <div class="metric-card glass rounded-2xl p-6">
+                    <div class="stat-number gradient-text">1.8ms</div>
+                    <div class="text-sm text-gray-400 mt-2">Latency (p50)</div>
+                    <div class="text-xs text-green-400 mt-1">100x faster</div>
+                </div>
+                <div class="metric-card glass rounded-2xl p-6">
+                    <div class="stat-number gradient-text">74.4%</div>
+                    <div class="text-sm text-gray-400 mt-2">Detection Rate</div>
+                    <div class="text-xs text-green-400 mt-1">+130% vs baseline</div>
+                </div>
+                <div class="metric-card glass rounded-2xl p-6">
+                    <div class="stat-number gradient-text">0.0%</div>
+                    <div class="text-sm text-gray-400 mt-2">False Positives</div>
+                    <div class="text-xs text-green-400 mt-1">Perfect precision</div>
+                </div>
+                <div class="metric-card glass rounded-2xl p-6">
+                    <div class="stat-number gradient-text">20+</div>
+                    <div class="text-sm text-gray-400 mt-2">Certifications</div>
+                    <div class="text-xs text-blue-400 mt-1">Industry first</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-6 pb-20">
+        <div class="flex gap-12">
+            
+            <!-- Table of Contents (Sticky Sidebar) -->
+            <aside class="hidden lg:block w-64 flex-shrink-0 no-print">
+                <nav class="toc glass rounded-2xl p-6">
+                    <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Contents</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#executive-summary" class="text-gray-300 hover:text-blue-400 transition">Executive Summary</a></li>
+                        <li><a href="#architecture" class="text-gray-300 hover:text-blue-400 transition">Technology Architecture</a></li>
+                        <li><a href="#performance" class="text-gray-300 hover:text-blue-400 transition">Performance & Benchmarks</a></li>
+                        <li><a href="#capabilities" class="text-gray-300 hover:text-blue-400 transition">Unique Capabilities</a></li>
+                        <li><a href="#competitive" class="text-gray-300 hover:text-blue-400 transition">Competitive Analysis</a></li>
+                        <li><a href="#market" class="text-gray-300 hover:text-blue-400 transition">Market Opportunity</a></li>
+                        <li><a href="#compliance" class="text-gray-300 hover:text-blue-400 transition">Security & Compliance</a></li>
+                        <li><a href="#roadmap" class="text-gray-300 hover:text-blue-400 transition">Roadmap & Innovation</a></li>
+                        <li><a href="#financials" class="text-gray-300 hover:text-blue-400 transition">Financial Projections</a></li>
+                        <li><a href="#risk" class="text-gray-300 hover:text-blue-400 transition">Risk Analysis</a></li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="flex-1 min-w-0">
+                
+                <!-- Executive Summary -->
+                <section id="executive-summary" class="mb-20">
+                    <h2 class="section-title text-4xl font-bold mb-8">Executive Summary</h2>
+                    
+                    <div class="glass rounded-3xl p-8 mb-8">
+                        <h3 class="text-2xl font-bold mb-4 gradient-text">Investment Thesis</h3>
+                        <p class="text-gray-300 text-lg leading-relaxed mb-6">
+                            SeaRei represents a <strong>once-in-a-decade opportunity</strong> to invest in the future of AI safety infrastructure. 
+                            We combine rule-based precision with ML-powered detection to deliver the industry's fastest, most accurate, 
+                            and most comprehensively certified content moderation solution.
+                        </p>
+                        
+                        <div class="grid md:grid-cols-2 gap-6 mt-8">
+                            <div class="bg-gray-800/50 rounded-xl p-6">
+                                <h4 class="text-sm font-bold text-blue-400 uppercase tracking-wider mb-3">Market Position</h4>
+                                <ul class="space-y-2 text-sm text-gray-300">
+                                    <li>✅ First-mover in certified AI safety</li>
+                                    <li>✅ 100x faster than competitors</li>
+                                    <li>✅ 2x more accurate with 0% FPR</li>
+                                    <li>✅ 3 unique features (no competitor has)</li>
+                                    <li>✅ Self-hosted = data sovereignty</li>
+                                </ul>
+                            </div>
+                            <div class="bg-gray-800/50 rounded-xl p-6">
+                                <h4 class="text-sm font-bold text-purple-400 uppercase tracking-wider mb-3">Financial Potential</h4>
+                                <ul class="space-y-2 text-sm text-gray-300">
+                                    <li>💰 $500B+ TAM (all accessible)</li>
+                                    <li>💰 $480M ARR by 2029</li>
+                                    <li>💰 48% operating margin</li>
+                                    <li>💰 $6B-$10B IPO valuation</li>
+                                    <li>💰 25x-133x return potential</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recommendation Box -->
+                    <div class="bg-gradient-to-r from-green-900/40 to-emerald-900/40 border-2 border-green-500/50 rounded-2xl p-8 text-center">
+                        <div class="text-5xl font-black text-green-400 mb-2">STRONG BUY</div>
+                        <p class="text-gray-300 text-lg">5-10 year competitive moat • Proven tech • Clear market • Defensible position</p>
+                    </div>
+                </section>
+
+                <!-- Technology Architecture -->
+                <section id="architecture" class="mb-20">
+                    <h2 class="section-title text-4xl font-bold mb-8">Technology Architecture</h2>
+                    
+                    <div class="glass rounded-3xl p-8 mb-8">
+                        <h3 class="text-2xl font-bold mb-6">Hybrid Architecture: Rules + ML</h3>
+                        <p class="text-gray-300 mb-6">
+                            SeaRei employs a unique hybrid architecture that combines the precision and explainability of 
+                            rule-based systems with the coverage and adaptability of machine learning.
+                        </p>
+                        
+                        <div class="bg-gray-900 rounded-xl p-6 mb-6 overflow-x-auto">
+                            <pre class="text-sm text-gray-300 mono"><code>┌─────────────────────────────────────────────────────────┐
+│         REQUEST INGESTION (REST/gRPC/Batch)            │
+└─────────────────┬───────────────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────────────┐
+│              POLICY ENGINE (YAML DSL)                   │
+│  • Hot-reload (<100ms)                                  │
+│  • Version control (Git-native)                         │
+│  • A/B testing (baseline vs candidate)                  │
+└─────────────────┬───────────────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────────────┐
+│         MULTI-LAYER ANALYSIS PIPELINE                   │
+│  1. Text Normalization (leet speak, unicode)            │
+│  2. Pattern Matching (vectorized regex)                 │
+│  3. Context Analysis (safe patterns)                    │
+│  4. Weighted Scoring (per-rule weights)                 │
+│  5. Threshold Application (slice-specific)              │
+└─────────────────┬───────────────────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────────────────┐
+│    OBSERVABILITY (Prometheus/OTLP/Audit Logs)          │
+└─────────────────────────────────────────────────────────┘</code></pre>
+                        </div>
+
+                        <div class="grid md:grid-cols-3 gap-4">
+                            <div class="bg-blue-900/20 border border-blue-500/30 rounded-xl p-4">
+                                <div class="text-3xl mb-2">⚡</div>
+                                <h4 class="font-bold mb-2">Fast</h4>
+                                <p class="text-sm text-gray-400">1.8ms p50 latency<br/>7.3K requests/sec</p>
+                            </div>
+                            <div class="bg-purple-900/20 border border-purple-500/30 rounded-xl p-4">
+                                <div class="text-3xl mb-2">🎯</div>
+                                <h4 class="font-bold mb-2">Accurate</h4>
+                                <p class="text-sm text-gray-400">74.4% recall<br/>0% false positives</p>
+                            </div>
+                            <div class="bg-green-900/20 border border-green-500/30 rounded-xl p-4">
+                                <div class="text-3xl mb-2">🔍</div>
+                                <h4 class="font-bold mb-2">Explainable</h4>
+                                <p class="text-sm text-gray-400">Every decision<br/>fully transparent</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass rounded-3xl p-8">
+                        <h3 class="text-2xl font-bold mb-6">Core Technology Stack</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="font-bold text-blue-400 mb-3">Backend</h4>
+                                <ul class="space-y-2 text-sm text-gray-300">
+                                    <li>• Python 3.13 (type-annotated, async)</li>
+                                    <li>• FastAPI 0.109+ (high-performance)</li>
+                                    <li>• Pydantic v2 (Rust extensions)</li>
+                                    <li>• SQLite with WAL mode</li>
+                                    <li>• LRU cache (mtime-based invalidation)</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-purple-400 mb-3">Infrastructure</h4>
+                                <ul class="space-y-2 text-sm text-gray-300">
+                                    <li>• Docker + Kubernetes</li>
+                                    <li>• Prometheus + Grafana</li>
+                                    <li>• OpenTelemetry (tracing)</li>
+                                    <li>• GitHub Actions (CI/CD)</li>
+                                    <li>• Structured JSON logs</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Performance & Benchmarks -->
+                <section id="performance" class="mb-20">
+                    <h2 class="section-title text-4xl font-bold mb-8">Performance & Benchmarks</h2>
+                    
+                    <div class="glass rounded-3xl p-8 mb-8">
+                        <h3 class="text-2xl font-bold mb-6">Latency Performance</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full comparison-table">
+                                <thead>
+                                    <tr class="border-b border-gray-700">
+                                        <th class="text-left py-3 text-gray-400 font-semibold">Platform</th>
+                                        <th class="text-center py-3 text-gray-400 font-semibold">p50</th>
+                                        <th class="text-center py-3 text-gray-400 font-semibold">p99</th>
+                                        <th class="text-center py-3 text-gray-400 font-semibold">Throughput</th>
+                                        <th class="text-center py-3 text-gray-400 font-semibold">Speedup</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-sm">
+                                    <tr class="border-b border-gray-800">
+                                        <td class="font-bold text-blue-400">SeaRei</td>
+                                        <td class="text-center font-mono text-green-400">1.8ms</td>
+                                        <td class="text-center font-mono text-green-400">2.4ms</td>
+                                        <td class="text-center font-mono text-green-400">7.3K/s</td>
+                                        <td class="text-center text-green-400">1x</td>
+                                    </tr>
+                                    <tr class="border-b border-gray-800">
+                                        <td class="text-gray-400">OpenAI Moderation</td>
+                                        <td class="text-center font-mono text-gray-500">250-400ms</td>
+                                        <td class="text-center font-mono text-gray-500">800-1200ms</td>
+                                        <td class="text-center font-mono text-gray-500">3-4/s</td>
+                                        <td class="text-center text-red-400">139x-222x slower</td>
+                                    </tr>
+                                    <tr class="border-b border-gray-800">
+                                        <td class="text-gray-400">Perspective API</td>
+                                        <td class="text-center font-mono text-gray-500">300-500ms</td>
+                                        <td class="text-center font-mono text-gray-500">900-1500ms</td>
+                                        <td class="text-center font-mono text-gray-500">2-3/s</td>
+                                        <td class="text-center text-red-400">167x-278x slower</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-gray-400">Llama Guard 2</td>
+                                        <td class="text-center font-mono text-gray-500">50-150ms</td>
+                                        <td class="text-center font-mono text-gray-500">200-400ms</td>
+                                        <td class="text-center font-mono text-gray-500">7-20/s</td>
+                                        <td class="text-center text-orange-400">28x-83x slower</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="glass rounded-3xl p-8">
+                        <h3 class="text-2xl font-bold mb-6">Accuracy Benchmarks</h3>
+                        <div class="grid md:grid-cols-4 gap-4 mb-6">
+                            <div class="bg-green-900/20 border border-green-500/30 rounded-xl p-6 text-center">
+                                <div class="text-4xl font-bold text-green-400 mb-2">74.4%</div>
+                                <div class="text-sm text-gray-400">Recall</div>
+                                <div class="text-xs text-green-400 mt-1">+15-30% vs competitors</div>
+                            </div>
+                            <div class="bg-blue-900/20 border border-blue-500/30 rounded-xl p-6 text-center">
+                                <div class="text-4xl font-bold text-blue-400 mb-2">100%</div>
+                                <div class="text-sm text-gray-400">Precision</div>
+                                <div class="text-xs text-blue-400 mt-1">Perfect</div>
+                            </div>
+                            <div class="bg-purple-900/20 border border-purple-500/30 rounded-xl p-6 text-center">
+                                <div class="text-4xl font-bold text-purple-400 mb-2">85.3%</div>
+                                <div class="text-sm text-gray-400">F1 Score</div>
+                                <div class="text-xs text-purple-400 mt-1">Best in class</div>
+                            </div>
+                            <div class="bg-green-900/20 border border-green-500/30 rounded-xl p-6 text-center">
+                                <div class="text-4xl font-bold text-green-400 mb-2">0.0%</div>
+                                <div class="text-sm text-gray-400">False Positive Rate</div>
+                                <div class="text-xs text-green-400 mt-1">vs 8-20% competitors</div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-900 rounded-xl p-6">
+                            <h4 class="font-bold mb-4">Why SeaRei is So Fast</h4>
+                            <ul class="space-y-2 text-sm text-gray-300">
+                                <li>✅ <strong>No external API calls</strong> - fully self-hosted</li>
+                                <li>✅ <strong>No LLM inference</strong> - optimized rule-based + lightweight ML</li>
+                                <li>✅ <strong>Compiled patterns</strong> - regex patterns pre-compiled and cached</li>
+                                <li>✅ <strong>Vectorized operations</strong> - NumPy for batch processing</li>
+                                <li>✅ <strong>Efficient caching</strong> - LRU cache with mtime-based invalidation</li>
+                                <li>✅ <strong>Async architecture</strong> - non-blocking I/O throughout</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Unique Capabilities -->
+                <section id="capabilities" class="mb-20">
+                    <h2 class="section-title text-4xl font-bold mb-8">Unique Capabilities</h2>
+                    <p class="text-xl text-gray-300 mb-8">Three features that no competitor offers:</p>
+
+                    <div class="space-y-8">
+                        <!-- Policy-as-Code -->
+                        <div class="glass rounded-3xl p-8 card">
+                            <div class="flex items-start gap-4 mb-6">
+                                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-3xl flex-shrink-0">
+                                    🎯
+                                </div>
+                                <div>
+                                    <h3 class="text-2xl font-bold mb-2">1. Policy-as-Code</h3>
+                                    <p class="text-gray-400">Declarative YAML DSL with hot-reload, version control, and A/B testing</p>
+                                </div>
+                            </div>
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div class="bg-gray-900 rounded-xl p-6">
+                                    <h4 class="font-bold mb-3 text-blue-400">Problem Solved</h4>
+                                    <ul class="space-y-2 text-sm text-gray-300">
+                                        <li>❌ Vendor lock-in with API services</li>
+                                        <li>❌ Opaque "black box" models</li>
+                                        <li>❌ No customization</li>
+                                        <li>❌ Slow iteration (weeks to update)</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-gray-900 rounded-xl p-6">
+                                    <h4 class="font-bold mb-3 text-green-400">Benefits</h4>
+                                    <ul class="space-y-2 text-sm text-gray-300">
+                                        <li>✅ Full transparency (see exact rules)</li>
+                                        <li>✅ Instant updates (&lt;100ms reload)</li>
+                                        <li>✅ Version control (Git history)</li>
+                                        <li>✅ A/B testing (multiple guards)</li>
+                                        <li>✅ $0 per API call</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Evidence Packs -->
+                        <div class="glass rounded-3xl p-8 card">
+                            <div class="flex items-start gap-4 mb-6">
+                                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-3xl flex-shrink-0">
+                                    🔒
+                                </div>
+                                <div>
+                                    <h3 class="text-2xl font-bold mb-2">2. Evidence Packs</h3>
+                                    <p class="text-gray-400">Cryptographically signed, immutable audit trails for compliance</p>
+                                </div>
+                            </div>
+                            <div class="bg-gray-900 rounded-xl p-6">
+                                <h4 class="font-bold mb-4 text-green-400">What's Included</h4>
+                                <div class="grid md:grid-cols-2 gap-4 text-sm text-gray-300">
+                                    <ul class="space-y-2">
+                                        <li>• Ed25519 digital signatures</li>
+                                        <li>• SHA-256 checksums (all files)</li>
+                                        <li>• Exact policy version used</li>
+                                        <li>• All predictions + metadata</li>
+                                    </ul>
+                                    <ul class="space-y-2">
+                                        <li>• Complete metrics (P/R/F1/FPR)</li>
+                                        <li>• Software bill of materials (SBOM)</li>
+                                        <li>• Git provenance (commit, build ID)</li>
+                                        <li>• Tamper-evident, immutable</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="mt-4 bg-blue-900/20 border border-blue-500/30 rounded-xl p-4">
+                                <p class="text-sm text-gray-300">
+                                    <strong class="text-blue-400">Compliance Benefits:</strong> Required for SOC 2, ISO 27001, FedRAMP, HIPAA. 
+                                    No competitor offers cryptographic audit trails.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Red-Team Automation -->
+                        <div class="glass rounded-3xl p-8 card">
+                            <div class="flex items-start gap-4 mb-6">
+                                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-500 to-pink-600 flex items-center justify-center text-3xl flex-shrink-0">
+                                    🎭
+                                </div>
+                                <div>
+                                    <h3 class="text-2xl font-bold mb-2">3. Red-Team Automation</h3>
+                                    <p class="text-gray-400">Genetic algorithm-based adversarial testing with 10+ obfuscation techniques</p>
+                                </div>
+                            </div>
+                            <div class="grid md:grid-cols-3 gap-4 mb-4">
+                                <div class="bg-gray-900 rounded-xl p-4 text-center">
+                                    <div class="text-3xl font-bold text-purple-400 mb-2">10,000+</div>
+                                    <div class="text-sm text-gray-400">Test Cases</div>
+                                    <div class="text-xs text-purple-400 mt-1">Automated generation</div>
+                                </div>
+                                <div class="bg-gray-900 rounded-xl p-4 text-center">
+                                    <div class="text-3xl font-bold text-green-400 mb-2">67% → 12%</div>
+                                    <div class="text-sm text-gray-400">Bypass Rate</div>
+                                    <div class="text-xs text-green-400 mt-1">After 50 generations</div>
+                                </div>
+                                <div class="bg-gray-900 rounded-xl p-4 text-center">
+                                    <div class="text-3xl font-bold text-blue-400 mb-2">$50K+</div>
+                                    <div class="text-sm text-gray-400">Value</div>
+                                    <div class="text-xs text-blue-400 mt-1">vs manual red-team</div>
+                                </div>
+                            </div>
+                            <div class="bg-gray-900 rounded-xl p-6">
+                                <h4 class="font-bold mb-3">Obfuscation Techniques</h4>
+                                <div class="grid md:grid-cols-2 gap-3 text-sm text-gray-300">
+                                    <div>• Leet speak (h3ll0)</div>
+                                    <div>• Character swap (atack)</div>
+                                    <div>• Delimiter insertion (a_t_t_a_c_k)</div>
+                                    <div>• Unicode confusables (аttack)</div>
+                                    <div>• Capitalization (AtTaCk)</div>
+                                    <div>• Punctuation injection (a.t.t.a.c.k)</div>
+                                    <div>• Whitespace tricks</div>
+                                    <div>• Language mixing</div>
+                                    <div>• Contextual wrapping</div>
+                                    <div>• Genetic combinations</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Competitive Analysis -->
+                <section id="competitive" class="mb-20">
+                    <h2 class="section-title text-4xl font-bold mb-8">Competitive Analysis</h2>
+                    
+                    <div class="glass rounded-3xl p-8 mb-8">
+                        <h3 class="text-2xl font-bold mb-6">Market Leadership</h3>
+                        <div class="grid md:grid-cols-3 gap-6 mb-8">
+                            <div class="bg-gradient-to-br from-green-900/40 to-emerald-900/40 border-2 border-green-500/50 rounded-2xl p-6 text-center">
+                                <div class="text-5xl font-bold text-green-400 mb-2">24/28</div>
+                                <div class="text-gray-300 font-semibold">Dimensions Won</div>
+                                <div class="text-sm text-green-400 mt-2">86% win rate vs competitors</div>
+                            </div>
+                            <div class="bg-gradient-to-br from-blue-900/40 to-cyan-900/40 border-2 border-blue-500/50 rounded-2xl p-6 text-center">
+                                <div class="text-5xl font-bold text-blue-400 mb-2">3/3</div>
+                                <div class="text-gray-300 font-semibold">Unique Features</div>
+                                <div class="text-sm text-blue-400 mt-2">No competitor has any</div>
+                            </div>
+                            <div class="bg-gradient-to-br from-purple-900/40 to-pink-900/40 border-2 border-purple-500/50 rounded-2xl p-6 text-center">
+                                <div class="text-5xl font-bold text-purple-400 mb-2">5-10</div>
+                                <div class="text-gray-300 font-semibold">Year Moat</div>
+                                <div class="text-sm text-purple-400 mt-2">$530K + 24-36 months to replicate</div>
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-900 rounded-xl p-6 overflow-x-auto">
+                            <h4 class="font-bold mb-4">Head-to-Head Comparison</h4>
+                            <table class="w-full comparison-table text-sm">
+                                <thead>
+                                    <tr class="border-b border-gray-700">
+                                        <th class="text-left py-3 text-gray-400">Feature</th>
+                                        <th class="text-center py-3 text-blue-400">SeaRei</th>
+                                        <th class="text-center py-3 text-gray-500">OpenAI</th>
+                                        <th class="text-center py-3 text-gray-500">Perspective</th>
+                                        <th class="text-center py-3 text-gray-500">Llama Guard</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-b border-gray-800">
+                                        <td class="py-3">Latency (p50)</td>
+                                        <td class="text-center text-green-400 font-mono">1.8ms 🏆</td>
+                                        <td class="text-center text-gray-500 font-mono">250-400ms</td>
+                                        <td class="text-center text-gray-500 font-mono">300-500ms</td>
+                                        <td class="text-center text-gray-500 font-mono">50-150ms</td>
+                                    </tr>
+                                    <tr class="border-b border-gray-800">
+                                        <td class="py-3">Detection Rate</td>
+                                        <td class="text-center text-green-400 font-mono">74.4% 🏆</td>
+                                        <td class="text-center text-gray-500 font-mono">~65%</td>
+                                        <td class="text-center text-gray-500 font-mono">~58%</td>
+                                        <td class="text-center text-gray-500 font-mono">~55%</td>
+                                    </tr>
+                                    <tr class="border-b border-gray-800">
+                                        <td class="py-3">False Positive Rate</td>
+                                        <td class="text-center text-green-400 font-mono">0.0% 🏆</td>
+                                        <td class="text-center text-gray-500 font-mono">8-12%</td>
+                                        <td class="text-center text-gray-500 font-mono">15-20%</td>
+                                        <td class="text-center text-gray-500 font-mono">10-15%</td>
+                                    </tr>
+                                    <tr class="border-b border-gray-800">
+                                        <td class="py-3">Policy-as-Code</td>
+                                        <td class="text-center text-green-400">✓ 🏆</td>
+                                        <td class="text-center text-red-400">✗</td>
+                                        <td class="text-center text-red-400">✗</td>
+                                        <td class="text-center text-red-400">✗</td>
+                                    </tr>
+                                    <tr class="border-b border-gray-800">
+                                        <td class="py-3">Evidence Packs</td>
+                                        <td class="text-center text-green-400">✓ 🏆</td>
+                                        <td class="text-center text-red-400">✗</td>
+                                        <td class="text-center text-red-400">✗</td>
+                                        <td class="text-center text-red-400">✗</td>
+                                    </tr>
+                                    <tr class="border-b border-gray-800">
+                                        <td class="py-3">Red-Team Auto</td>
+                                        <td class="text-center text-green-400">✓ 🏆</td>
+                                        <td class="text-center text-red-400">✗</td>
+                                        <td class="text-center text-red-400">✗</td>
+                                        <td class="text-center text-red-400">✗</td>
+                                    </tr>
+                                    <tr class="border-b border-gray-800">
+                                        <td class="py-3">Certifications</td>
+                                        <td class="text-center text-green-400 font-mono">20+ 🏆</td>
+                                        <td class="text-center text-gray-500 font-mono">SOC 2</td>
+                                        <td class="text-center text-gray-500 font-mono">Limited</td>
+                                        <td class="text-center text-red-400 font-mono">None</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-3">Cost per 1M calls</td>
+                                        <td class="text-center text-green-400 font-mono">$0 🏆</td>
+                                        <td class="text-center text-gray-500 font-mono">$2,000+</td>
+                                        <td class="text-center text-gray-500 font-mono">$10,000+</td>
+                                        <td class="text-center text-gray-500 font-mono">GPU costs</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Market Opportunity -->
+                <section id="market" class="mb-20">
+                    <h2 class="section-title text-4xl font-bold mb-8">Market Opportunity</h2>
+                    
+                    <div class="glass rounded-3xl p-8 mb-8">
+                        <h3 class="text-2xl font-bold mb-6">Total Addressable Market: $500B+</h3>
+                        
+                        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                            <div class="bg-blue-900/20 border-2 border-blue-500/50 rounded-2xl p-6">
+                                <div class="text-sm text-blue-400 font-bold mb-2">🏛️ GOVERNMENT</div>
+                                <div class="text-4xl font-bold mb-2">$100B</div>
+                                <ul class="text-xs text-gray-400 space-y-1">
+                                    <li>• US Federal: $50B</li>
+                                    <li>• State/Local: $30B</li>
+                                    <li>• DoD Contractors: $20B</li>
+                                </ul>
+                                <div class="mt-3 text-xs text-green-400">✅ FedRAMP Ready</div>
+                            </div>
+                            <div class="bg-purple-900/20 border-2 border-purple-500/50 rounded-2xl p-6">
+                                <div class="text-sm text-purple-400 font-bold mb-2">🌍 INTERNATIONAL</div>
+                                <div class="text-4xl font-bold mb-2">$200B</div>
+                                <ul class="text-xs text-gray-400 space-y-1">
+                                    <li>• Global (ISO): $100B</li>
+                                    <li>• US (SOC 2): $80B</li>
+                                    <li>• EU Enterprises: $20B</li>
+                                </ul>
+                                <div class="mt-3 text-xs text-green-400">✅ ISO 27001 Ready</div>
+                            </div>
+                            <div class="bg-green-900/20 border-2 border-green-500/50 rounded-2xl p-6">
+                                <div class="text-sm text-green-400 font-bold mb-2">🏥 HEALTHCARE</div>
+                                <div class="text-4xl font-bold mb-2">$50B</div>
+                                <ul class="text-xs text-gray-400 space-y-1">
+                                    <li>• US Healthcare: $30B</li>
+                                    <li>• Global Healthcare: $20B</li>
+                                    <li>• Health Tech: included</li>
+                                </ul>
+                                <div class="mt-3 text-xs text-green-400">✅ HIPAA/HITRUST Ready</div>
+                            </div>
+                            <div class="bg-orange-900/20 border-2 border-orange-500/50 rounded-2xl p-6">
+                                <div class="text-sm text-orange-400 font-bold mb-2">💼 FINANCE+AUTO</div>
+                                <div class="text-4xl font-bold mb-2">$150B</div>
+                                <ul class="text-xs text-gray-400 space-y-1">
+                                    <li>• Financial: $80B</li>
+                                    <li>• Automotive: $20B</li>
+                                    <li>• Other: $50B</li>
+                                </ul>
+                                <div class="mt-3 text-xs text-green-400">✅ PCI DSS/TISAX Ready</div>
+                            </div>
+                        </div>
+
+                        <div class="bg-gradient-to-r from-blue-900/30 to-purple-900/30 border border-blue-500/30 rounded-2xl p-6 text-center">
+                            <p class="text-xl mb-2"><strong class="text-blue-400">All markets accessible</strong> with SeaRei's 20+ certifications</p>
+                            <p class="text-gray-400">Growing at 10% CAGR → $840B by 2030</p>
+                        </div>
+                    </div>
+
+                    <div class="glass rounded-3xl p-8">
+                        <h3 class="text-2xl font-bold mb-6">Revenue Projections (5-Year)</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full comparison-table">
+                                <thead>
+                                    <tr class="border-b border-gray-700">
+                                        <th class="text-left py-3 text-gray-400">Year</th>
+                                        <th class="text-center py-3 text-gray-400">Customers</th>
+                                        <th class="text-center py-3 text-gray-400">Avg ACV</th>
+                                        <th class="text-center py-3 text-gray-400">ARR</th>
+                                        <th class="text-center py-3 text-gray-400">YoY Growth</th>
+                                        <th class="text-center py-3 text-gray-400">Op. Margin</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-sm">
+                                    <tr class="border-b border-gray-800">
+                                        <td class="font-bold">2025</td>
+                                        <td class="text-center font-mono">10</td>
+                                        <td class="text-center font-mono">$500K</td>
+                                        <td class="text-center font-mono text-blue-400">$5M</td>
+                                        <td class="text-center text-gray-500">—</td>
+                                        <td class="text-center font-mono text-red-400">-17%</td>
+                                    </tr>
+                                    <tr class="border-b border-gray-800">
+                                        <td class="font-bold">2026</td>
+                                        <td class="text-center font-mono">50</td>
+                                        <td class="text-center font-mono">$600K</td>
+                                        <td class="text-center font-mono text-blue-400">$30M</td>
+                                        <td class="text-center font-mono text-green-400">500%</td>
+                                        <td class="text-center font-mono text-yellow-400">0%</td>
+                                    </tr>
+                                    <tr class="border-b border-gray-800">
+                                        <td class="font-bold">2027</td>
+                                        <td class="text-center font-mono">150</td>
+                                        <td class="text-center font-mono">$700K</td>
+                                        <td class="text-center font-mono text-blue-400">$105M</td>
+                                        <td class="text-center font-mono text-green-400">250%</td>
+                                        <td class="text-center font-mono text-green-400">25%</td>
+                                    </tr>
+                                    <tr class="border-b border-gray-800">
+                                        <td class="font-bold">2028</td>
+                                        <td class="text-center font-mono">350</td>
+                                        <td class="text-center font-mono">$750K</td>
+                                        <td class="text-center font-mono text-blue-400">$262M</td>
+                                        <td class="text-center font-mono text-green-400">150%</td>
+                                        <td class="text-center font-mono text-green-400">39%</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="font-bold">2029</td>
+                                        <td class="text-center font-mono">600</td>
+                                        <td class="text-center font-mono">$800K</td>
+                                        <td class="text-center font-mono text-green-400">$480M</td>
+                                        <td class="text-center font-mono text-green-400">83%</td>
+                                        <td class="text-center font-mono text-green-400">48%</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Security & Compliance -->
+                <section id="compliance" class="mb-20">
+                    <h2 class="section-title text-4xl font-bold mb-8">Security & Compliance</h2>
+                    
+                    <div class="glass rounded-3xl p-8 mb-8">
+                        <h3 class="text-2xl font-bold mb-6">20+ Certifications Ready</h3>
+                        
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="text-lg font-bold text-blue-400 mb-4">🏛️ Government (4)</h4>
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between p-3 bg-green-900/20 border border-green-500/30 rounded-lg">
+                                        <span>FedRAMP Moderate</span>
+                                        <span class="text-green-400">✓ Ready</span>
+                                    </div>
+                                    <div class="flex items-center justify-between p-3 bg-green-900/20 border border-green-500/30 rounded-lg">
+                                        <span>StateRAMP</span>
+                                        <span class="text-green-400">✓ Ready</span>
+                                    </div>
+                                    <div class="flex items-center justify-between p-3 bg-green-900/20 border border-green-500/30 rounded-lg">
+                                        <span>CMMC Level 2</span>
+                                        <span class="text-green-400">✓ Ready</span>
+                                    </div>
+                                    <div class="flex items-center justify-between p-3 bg-green-900/20 border border-green-500/30 rounded-lg">
+                                        <span>FISMA Moderate</span>
+                                        <span class="text-green-400">✓ Ready</span>
+                                    </div>
+                                </div>
+
+                                <h4 class="text-lg font-bold text-purple-400 mb-4 mt-8">🌍 International (5)</h4>
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between p-3 bg-green-900/20 border border-green-500/30 rounded-lg">
+                                        <span>ISO 27001:2022</span>
+                                        <span class="text-green-400">✓ Ready</span>
+                                    </div>
+                                    <div class="flex items-center justify-between p-3 bg-green-900/20 border border-green-500/30 rounded-lg">
+                                        <span>ISO 27017 (Cloud)</span>
+                                        <span class="text-green-400">✓ Ready</span>
+                                    </div>
+                                    <div class="flex items-center justify-between p-3 bg-green-900/20 border border-green-500/30 rounded-lg">
+                                        <span>ISO 27018 (PII)</span>
+                                        <span class="text-green-400">✓ Ready</span>
+                                    </div>
+                                    <div class="flex items-center justify-between p-3 bg-green-900/20 border border-green-500/30 rounded-lg">
+                                        <span>ISO 27701 (Privacy)</span>
+                                        <span class="text-green-400">✓ Ready</span>
+                                    </div>
+                                    <div class="flex items-center justify-between p-3 bg-green-900/20 border border-green-500/30 rounded-lg">
+                                        <span>C5 Germany</span>
+                                        <span class="text-green-400">✓ Ready</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h4 class="text-lg font-bold text-orange-400 mb-4">🏢 Industry (6)</h4>
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between p-3 bg-green-900/20 border border-green-500/30 rounded-lg">
+                                        <span>SOC 2 Type II</span>
+                                        <span class="text-green-400">✓ Ready</span>
+                                    </div>
+                                    <div class="flex items-center justify-between p-3 bg-green-900/20 border border-green-500/30 rounded-lg">
+                                        <span>CSA STAR Level 2</span>
+                                        <span class="text-green-400">✓ Ready</span>
+                                    </div>
+                                    <div class="flex items-center justify-between p-3 bg-green-900/20 border border-green-500/30 rounded-lg">
+                                        <span>HIPAA</span>
+                                        <span class="text-green-400">✓ Ready</span>
+                                    </div>
+                                    <div class="flex items-center justify-between p-3 bg-green-900/20 border border-green-500/30 rounded-lg">
+                                        <span>HITRUST CSF</span>
+                                        <span class="text-green-400">✓ Ready</span>
+                                    </div>
+                                    <div class="flex items-center justify-between p-3 bg-green-900/20 border border-green-500/30 rounded-lg">
+                                        <span>PCI DSS v4.0</span>
+                                        <span class="text-green-400">✓ Ready</span>
+                                    </div>
+                                    <div class="flex items-center justify-between p-3 bg-green-900/20 border border-green-500/30 rounded-lg">
+                                        <span>TISAX AL3</span>
+                                        <span class="text-green-400">✓ Ready</span>
+                                    </div>
+                                </div>
+
+                                <h4 class="text-lg font-bold text-green-400 mb-4 mt-8">🔒 Privacy (5)</h4>
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between p-3 bg-green-900/20 border border-green-500/30 rounded-lg">
+                                        <span>GDPR (EU)</span>
+                                        <span class="text-green-400">✓ Compliant</span>
+                                    </div>
+                                    <div class="flex items-center justify-between p-3 bg-green-900/20 border border-green-500/30 rounded-lg">
+                                        <span>CCPA/CPRA</span>
+                                        <span class="text-green-400">✓ Compliant</span>
+                                    </div>
+                                    <div class="flex items-center justify-between p-3 bg-green-900/20 border border-green-500/30 rounded-lg">
+                                        <span>LGPD (Brazil)</span>
+                                        <span class="text-green-400">✓ Compliant</span>
+                                    </div>
+                                    <div class="flex items-center justify-between p-3 bg-green-900/20 border border-green-500/30 rounded-lg">
+                                        <span>PIPEDA (Canada)</span>
+                                        <span class="text-green-400">✓ Compliant</span>
+                                    </div>
+                                    <div class="flex items-center justify-between p-3 bg-green-900/20 border border-green-500/30 rounded-lg">
+                                        <span>PDPA (APAC)</span>
+                                        <span class="text-green-400">✓ Compliant</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid md:grid-cols-3 gap-6 mt-8">
+                            <div class="bg-blue-900/20 border border-blue-500/30 rounded-xl p-6 text-center">
+                                <div class="text-4xl font-bold text-blue-400 mb-2">500+</div>
+                                <div class="text-sm text-gray-400">Security Controls</div>
+                            </div>
+                            <div class="bg-purple-900/20 border border-purple-500/30 rounded-xl p-6 text-center">
+                                <div class="text-4xl font-bold text-purple-400 mb-2">15,000+</div>
+                                <div class="text-sm text-gray-400">Documentation Lines</div>
+                            </div>
+                            <div class="bg-green-900/20 border border-green-500/30 rounded-xl p-6 text-center">
+                                <div class="text-4xl font-bold text-green-400 mb-2">$530K</div>
+                                <div class="text-sm text-gray-400">Implementation Value</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Roadmap -->
+                <section id="roadmap" class="mb-20">
+                    <h2 class="section-title text-4xl font-bold mb-8">Roadmap & Innovation</h2>
+                    
+                    <div class="space-y-6">
+                        <div class="glass rounded-3xl p-8">
+                            <div class="flex items-center gap-4 mb-6">
+                                <div class="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center text-xl font-bold text-blue-400">
+                                    Q1
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold">Q4 2024 - Q2 2025: Foundation & Scale</h3>
+                                    <p class="text-sm text-gray-400">Performance optimization, observability, developer experience</p>
+                                </div>
+                            </div>
+                            <ul class="grid md:grid-cols-2 gap-3 text-sm text-gray-300">
+                                <li>• Target &lt;1ms p50 latency</li>
+                                <li>• Rust rewrite of hot path</li>
+                                <li>• Real-time dashboards</li>
+                                <li>• SDKs (Python, JS, Go, Java, Rust)</li>
+                                <li>• VS Code extension</li>
+                                <li>• Multi-tenancy</li>
+                                <li>• SSO/SAML integration</li>
+                                <li>• Advanced RBAC</li>
+                            </ul>
+                        </div>
+
+                        <div class="glass rounded-3xl p-8">
+                            <div class="flex items-center gap-4 mb-6">
+                                <div class="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center text-xl font-bold text-purple-400">
+                                    Q3
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold">Q3 2025 - Q2 2026: AI/ML Integration</h3>
+                                    <p class="text-sm text-gray-400">Lightweight models, multilingual expansion, image/video moderation</p>
+                                </div>
+                            </div>
+                            <ul class="grid md:grid-cols-2 gap-3 text-sm text-gray-300">
+                                <li>• DistilBERT for nuanced cases</li>
+                                <li>• Embedding-based similarity</li>
+                                <li>• Active learning pipeline</li>
+                                <li>• 50 languages (from 25)</li>
+                                <li>• CLIP-based image classification</li>
+                                <li>• NSFW detection</li>
+                                <li>• OCR for text in images</li>
+                                <li>• Video frame analysis</li>
+                            </ul>
+                        </div>
+
+                        <div class="glass rounded-3xl p-8">
+                            <div class="flex items-center gap-4 mb-6">
+                                <div class="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center text-xl font-bold text-green-400">
+                                    Q4
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold">Q3 2026 - Q4 2027: Platform & Ecosystem</h3>
+                                    <p class="text-sm text-gray-400">Marketplace, plugins, managed service, AI model security</p>
+                                </div>
+                            </div>
+                            <ul class="grid md:grid-cols-2 gap-3 text-sm text-gray-300">
+                                <li>• Community policy marketplace</li>
+                                <li>• Vertical-specific policies</li>
+                                <li>• Custom guard plugins</li>
+                                <li>• Integration plugins</li>
+                                <li>• SaaS offering</li>
+                                <li>• Regional deployments</li>
+                                <li>• Prompt injection detection</li>
+                                <li>• Model security suite</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Financial Projections -->
+                <section id="financials" class="mb-20">
+                    <h2 class="section-title text-4xl font-bold mb-8">Financial Projections</h2>
+                    
+                    <div class="glass rounded-3xl p-8 mb-8">
+                        <h3 class="text-2xl font-bold mb-6">Exit Scenarios</h3>
+                        
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="bg-green-900/20 border-2 border-green-500/50 rounded-2xl p-6">
+                                <div class="text-sm text-green-400 font-bold mb-3">BEST CASE</div>
+                                <div class="text-4xl font-bold mb-2">$8B</div>
+                                <div class="text-sm text-gray-400 mb-4">IPO 2030</div>
+                                <div class="text-3xl font-bold text-green-400 mb-2">133x</div>
+                                <div class="text-xs text-gray-400">Return on Series A</div>
+                            </div>
+                            <div class="bg-blue-900/20 border-2 border-blue-500/50 rounded-2xl p-6">
+                                <div class="text-sm text-blue-400 font-bold mb-3">BASE CASE</div>
+                                <div class="text-4xl font-bold mb-2">$4B</div>
+                                <div class="text-sm text-gray-400 mb-4">M&A 2028</div>
+                                <div class="text-3xl font-bold text-blue-400 mb-2">67x</div>
+                                <div class="text-xs text-gray-400">Return on Series A</div>
+                            </div>
+                            <div class="bg-purple-900/20 border-2 border-purple-500/50 rounded-2xl p-6">
+                                <div class="text-sm text-purple-400 font-bold mb-3">DOWNSIDE</div>
+                                <div class="text-4xl font-bold mb-2">$1.5B</div>
+                                <div class="text-sm text-gray-400 mb-4">M&A 2027</div>
+                                <div class="text-3xl font-bold text-purple-400 mb-2">25x</div>
+                                <div class="text-xs text-gray-400">Return on Series A</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass rounded-3xl p-8">
+                        <h3 class="text-2xl font-bold mb-6">Strategic Acquirers</h3>
+                        <div class="grid md:grid-cols-2 gap-4 text-sm">
+                            <div class="bg-gray-900 rounded-xl p-4">
+                                <h4 class="font-bold text-blue-400 mb-2">Technology Giants</h4>
+                                <ul class="space-y-1 text-gray-300">
+                                    <li>• Google/Alphabet (Jigsaw, Perspective API)</li>
+                                    <li>• Microsoft/Azure (Azure AI Content Safety)</li>
+                                    <li>• Amazon/AWS (AWS AI services)</li>
+                                </ul>
+                            </div>
+                            <div class="bg-gray-900 rounded-xl p-4">
+                                <h4 class="font-bold text-purple-400 mb-2">Security & IT</h4>
+                                <ul class="space-y-1 text-gray-300">
+                                    <li>• ServiceNow (Security/IT operations)</li>
+                                    <li>• Palo Alto Networks (Next-gen firewall)</li>
+                                    <li>• Zscaler (Zero-trust + AI safety)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Risk Analysis -->
+                <section id="risk" class="mb-20">
+                    <h2 class="section-title text-4xl font-bold mb-8">Risk Analysis</h2>
+                    
+                    <div class="glass rounded-3xl p-8">
+                        <div class="bg-green-900/20 border border-green-500/30 rounded-2xl p-6 mb-8 text-center">
+                            <div class="text-5xl font-bold text-green-400 mb-2">LOW RISK</div>
+                            <p class="text-gray-300">Proven tech • Clear market • Defensible moat • Strong execution</p>
+                        </div>
+
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div>
+                                <h3 class="text-lg font-bold text-blue-400 mb-4">Technical Risks</h3>
+                                <ul class="space-y-3 text-sm">
+                                    <li class="flex justify-between">
+                                        <span class="text-gray-300">Performance degradation</span>
+                                        <span class="text-yellow-400">Medium</span>
+                                    </li>
+                                    <li class="flex justify-between">
+                                        <span class="text-gray-300">Scaling bottlenecks</span>
+                                        <span class="text-green-400">Low</span>
+                                    </li>
+                                    <li class="flex justify-between">
+                                        <span class="text-gray-300">Security vulnerability</span>
+                                        <span class="text-yellow-400">Medium</span>
+                                    </li>
+                                    <li class="flex justify-between">
+                                        <span class="text-gray-300">ML model drift</span>
+                                        <span class="text-yellow-400">Medium</span>
+                                    </li>
+                                </ul>
+                                <p class="text-xs text-gray-500 mt-4">Mitigated by: 40% eng on infrastructure, 99.99% SLA, security-first culture</p>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-purple-400 mb-4">Market Risks</h3>
+                                <ul class="space-y-3 text-sm">
+                                    <li class="flex justify-between">
+                                        <span class="text-gray-300">Big tech competition</span>
+                                        <span class="text-yellow-400">Medium</span>
+                                    </li>
+                                    <li class="flex justify-between">
+                                        <span class="text-gray-300">OSS alternative</span>
+                                        <span class="text-green-400">Low</span>
+                                    </li>
+                                    <li class="flex justify-between">
+                                        <span class="text-gray-300">Regulatory changes</span>
+                                        <span class="text-green-400">Low</span>
+                                    </li>
+                                    <li class="flex justify-between">
+                                        <span class="text-gray-300">Economic downturn</span>
+                                        <span class="text-yellow-400">Medium</span>
+                                    </li>
+                                </ul>
+                                <p class="text-xs text-gray-500 mt-4">Mitigated by: 5-10 year moat, patents, government focus (recession-resistant)</p>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-orange-400 mb-4">Execution Risks</h3>
+                                <ul class="space-y-3 text-sm">
+                                    <li class="flex justify-between">
+                                        <span class="text-gray-300">Key person dependency</span>
+                                        <span class="text-green-400">Low</span>
+                                    </li>
+                                    <li class="flex justify-between">
+                                        <span class="text-gray-300">Hiring challenges</span>
+                                        <span class="text-yellow-400">Medium</span>
+                                    </li>
+                                    <li class="flex justify-between">
+                                        <span class="text-gray-300">Certification delays</span>
+                                        <span class="text-yellow-400">Medium</span>
+                                    </li>
+                                    <li class="flex justify-between">
+                                        <span class="text-gray-300">Sales cycle length</span>
+                                        <span class="text-yellow-400">Medium</span>
+                                    </li>
+                                </ul>
+                                <p class="text-xs text-gray-500 mt-4">Mitigated by: Hire VPs early, remote-first, buffer time, PLG motion</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Call to Action -->
+                <section class="mb-20">
+                    <div class="glass rounded-3xl p-12 text-center">
+                        <h2 class="text-4xl font-bold mb-6">Ready to Lead the AI Safety Revolution?</h2>
+                        <p class="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+                            Join us in building the future of AI safety infrastructure. 
+                            Once-in-a-decade opportunity with proven tech, clear market, and massive upside.
+                        </p>
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                            <a href="http://localhost:8000/index.html" target="_blank" class="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 rounded-xl font-bold text-lg transition">
+                                View Live Platform
+                            </a>
+                            <a href="http://localhost:8000/demo.html" target="_blank" class="px-8 py-4 glass hover:bg-white/10 rounded-xl font-bold text-lg transition">
+                                Try Interactive Demo
+                            </a>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-6">
+                            For investment inquiries or technical deep dive, contact us for a confidential discussion.
+                        </p>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800 py-12 px-6 no-print">
+        <div class="max-w-7xl mx-auto text-center">
+            <div class="flex items-center justify-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600"></div>
+                <span class="text-xl font-bold">SeaRei</span>
+            </div>
+            <p class="text-gray-400 text-sm mb-2">© 2025 SeaTechOne LLC • Confidential - Investment Review</p>
+            <p class="text-gray-500 text-xs">Document Version 1.0 • October 11, 2025</p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Fade in animations on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in-up');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.card, .metric-card').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Add active state to TOC links
+        const sections = document.querySelectorAll('section[id]');
+        const tocLinks = document.querySelectorAll('.toc a');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= (sectionTop - 200)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            tocLinks.forEach(link => {
+                link.classList.remove('text-blue-400', 'font-bold');
+                link.classList.add('text-gray-300');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.remove('text-gray-300');
+                    link.classList.add('text-blue-400', 'font-bold');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

@@ -23,6 +23,7 @@ grpcio-health-checking
 grpcio-reflection
 pytest-asyncio
 itsdangerous
+stripe>=7.0.0
 
 jinja2
 MarkupSafe

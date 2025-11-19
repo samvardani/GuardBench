@@ -222,3 +222,61 @@ report/
 .autopatch/
 runtime_telemetry.jsonl
 assets/latency_*.png
+evidence/
+
+# Sensitive config files (keep .example files)
+config.yaml
+!config.example.yaml
+*.bak-*
+
+# Database files (local dev only)
+*.db
+*.db-journal
+history.db
+
+# Log files
+*.log
+logs/
+api_server.log
+dashboard_server.log
+demo_server.log
+notifications.log
+training.log
+evaluation_run.log
+
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+secrets/
+*.pem
+*.key
+!*.pub
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Virtual staging uploads (user data)
+virtual-staging/uploads/
+virtual-staging/deliveries/
+virtual-staging/temp/
+
+# WordPress plugin builds (archives)
+wp-ai-engine-pro-*.zip

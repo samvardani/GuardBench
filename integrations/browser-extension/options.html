@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>SeaRei Settings</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f3f4f6;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 32px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            margin: 0 0 24px 0;
+            color: #1f2937;
+            font-size: 24px;
+        }
+        .setting {
+            margin-bottom: 24px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #374151;
+        }
+        input[type="text"],
+        input[type="url"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        input[type="text"]:focus,
+        input[type="url"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .description {
+            font-size: 13px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .toggle {
+            position: relative;
+            width: 48px;
+            height: 26px;
+        }
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #cbd5e1;
+            transition: .4s;
+            border-radius: 26px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #667eea;
+        }
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+        .save-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s;
+        }
+        .save-btn:hover {
+            transform: translateY(-2px);
+        }
+        .save-btn:active {
+            transform: translateY(0);
+        }
+        .status {
+            margin-top: 16px;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 14px;
+            display: none;
+        }
+        .status.success {
+            background: #d1fae5;
+            color: #065f46;
+            display: block;
+        }
+        .status.error {
+            background: #fee2e2;
+            color: #991b1b;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚙️ SeaRei Settings</h1>
+        
+        <div class="setting">
+            <label>API Endpoint</label>
+            <input type="url" id="apiUrl" placeholder="http://localhost:8001">
+            <div class="description">
+                The URL where your SeaRei API is running. Default: http://localhost:8001
+            </div>
+        </div>
+        
+        <div class="setting">
+            <div class="toggle-container">
+                <div>
+                    <label>Auto-scan Pages on Load</label>
+                    <div class="description">
+                        Automatically scan every page you visit for unsafe content
+                    </div>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="autoScan">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+        
+        <div class="setting">
+            <div class="toggle-container">
+                <div>
+                    <label>Show Desktop Notifications</label>
+                    <div class="description">
+                        Display notifications when unsafe content is detected
+                    </div>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="showNotifications" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+        
+        <div class="setting">
+            <div class="toggle-container">
+                <div>
+                    <label>Highlight Unsafe Content</label>
+                    <div class="description">
+                        Visually highlight unsafe text on web pages
+                    </div>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="highlightContent">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+        
+        <button class="save-btn" id="saveBtn">💾 Save Settings</button>
+        
+        <div class="status" id="status"></div>
+    </div>
+    
+    <script src="options.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

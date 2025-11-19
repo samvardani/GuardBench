@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeaRei AI Safety Playground</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-5xl font-bold text-gray-800 mb-2">🛡️ SeaRei AI Safety Playground</h1>
+            <p class="text-gray-600">Test content safety in real-time • Built with multi-tier AI safety</p>
+            <div class="mt-4 flex justify-center gap-4 text-sm text-gray-500">
+                <span>✅ 245 Tests</span>
+                <span>•</span>
+                <span>⚡ &lt;5ms Latency</span>
+                <span>•</span>
+                <span>🎯 77% Accuracy</span>
+                <span>•</span>
+                <span>🔒 ISO 27001 Ready</span>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Input Panel -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">📝 Test Content</h2>
+                
+                <!-- Quick Examples -->
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Quick Examples:</label>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="setExample('safe')" class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm hover:bg-green-200">
+                            ✅ Safe
+                        </button>
+                        <button onclick="setExample('violence')" class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm hover:bg-red-200">
+                            ⚠️ Violence
+                        </button>
+                        <button onclick="setExample('harassment')" class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm hover:bg-orange-200">
+                            😡 Harassment
+                        </button>
+                        <button onclick="setExample('self_harm')" class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm hover:bg-purple-200">
+                            💔 Self-Harm
+                        </button>
+                        <button onclick="setExample('obfuscated')" class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm hover:bg-yellow-200">
+                            🎭 Obfuscated
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Text Input -->
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Text to Analyze:</label>
+                    <textarea 
+                        id="textInput"
+                        class="w-full h-48 p-4 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none font-mono text-sm"
+                        placeholder="Type or paste content here...&#10;&#10;Try:&#10;• I will kill you&#10;• h0w t0 h4ck a w3bs1te&#10;• I'm feeling sad today&#10;• What a beautiful day!"
+                    ></textarea>
+                    <div class="text-xs text-gray-500 mt-1">
+                        <span id="charCount">0</span> / 10,000 characters
+                    </div>
+                </div>
+
+                <!-- Options -->
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Category Filter:</label>
+                        <select id="categoryFilter" class="w-full p-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none">
+                            <option value="">All Categories</option>
+                            <option value="violence">Violence</option>
+                            <option value="self_harm">Self-Harm</option>
+                            <option value="harassment">Harassment</option>
+                            <option value="sexual">Sexual</option>
+                            <option value="illegal">Illegal</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Language:</label>
+                        <select id="languageFilter" class="w-full p-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none">
+                            <option value="en">English</option>
+                            <option value="es">Spanish</option>
+                            <option value="ar">Arabic</option>
+                            <option value="fr">French</option>
+                            <option value="de">German</option>
+                            <option value="zh">Chinese</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex gap-4">
+                    <button 
+                        onclick="analyzeContent()"
+                        id="analyzeBtn"
+                        class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-lg"
+                    >
+                        🚀 Analyze
+                    </button>
+                    <button 
+                        onclick="clearAll()"
+                        class="px-6 py-3 border-2 border-gray-300 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                    >
+                        🗑️ Clear
+                    </button>
+                </div>
+
+                <!-- API Connection Status -->
+                <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+                    <div class="text-xs text-gray-600">
+                        <span class="font-semibold">API Endpoint:</span> 
+                        <span class="font-mono">http://localhost:8001</span>
+                        <span id="apiStatus" class="ml-2">🔴 Not Connected</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Panel -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">📊 Analysis Results</h2>
+                
+                <div id="resultsContainer">
+                    <div class="text-center text-gray-400 py-20">
+                        <div class="text-6xl mb-4">🤖</div>
+                        <p class="text-lg">Enter text and click "Analyze" to get started</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Code Examples Section -->
+        <div class="mt-8 bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">💻 Integration Code</h2>
+            
+            <div class="flex gap-2 mb-4">
+                <button onclick="showCode('curl')" id="btn-curl" class="px-4 py-2 bg-gray-200 rounded-lg font-semibold hover:bg-gray-300">
+                    cURL
+                </button>
+                <button onclick="showCode('python')" id="btn-python" class="px-4 py-2 bg-gray-200 rounded-lg font-semibold hover:bg-gray-300">
+                    Python
+                </button>
+                <button onclick="showCode('javascript')" id="btn-javascript" class="px-4 py-2 bg-gray-200 rounded-lg font-semibold hover:bg-gray-300">
+                    JavaScript
+                </button>
+                <button onclick="showCode('go')" id="btn-go" class="px-4 py-2 bg-gray-200 rounded-lg font-semibold hover:bg-gray-300">
+                    Go
+                </button>
+            </div>
+
+            <div id="codeContainer" class="bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-sm overflow-x-auto">
+                <pre id="codeContent">Click a language tab to see integration code...</pre>
+            </div>
+            
+            <button onclick="copyCode()" class="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                📋 Copy Code
+            </button>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-8 text-center text-gray-600 text-sm">
+            <p>SeaRei AI Safety System v2.1.0 • <a href="/technical.html" class="text-blue-600 hover:underline">Technical Docs</a> • <a href="https://github.com/searei/safety-eval-mini" class="text-blue-600 hover:underline">GitHub</a></p>
+        </div>
+    </div>
+
+    <script>
+        // Example texts
+        const examples = {
+            safe: "What a beautiful day! I love spending time with my family and friends.",
+            violence: "I will kill you and destroy everything you love.",
+            harassment: "You're so stupid and worthless, no one likes you.",
+            self_harm: "I want to hurt myself, I can't take it anymore.",
+            obfuscated: "h0w t0 h4ck a w3bs1te and st34l p4ssw0rds"
+        };
+
+        // Code templates
+        const codeTemplates = {
+            curl: (text) => `curl -X POST http://localhost:8001/score \\
+  -H "Content-Type: application/json" \\
+  -d '{"text": "${text.replace(/"/g, '\\"').substring(0, 50)}..."}'`,
+            
+            python: (text) => `import requests
+
+text = """${text.substring(0, 100)}"""
+
+response = requests.post(
+    "http://localhost:8001/score",
+    json={"text": text}
+)
+result = response.json()
+
+if result['prediction'] == 'flag':
+    print(f"⚠️ Flagged: {result['category']}")
+else:
+    print("✅ Safe")`,
+            
+            javascript: (text) => `const axios = require('axios');
+
+const text = \`${text.substring(0, 100)}\`;
+
+const result = await axios.post(
+    'http://localhost:8001/score',
+    { text }
+);
+
+if (result.data.prediction === 'flag') {
+    console.log(\`⚠️ Flagged: \${result.data.category}\`);
+} else {
+    console.log('✅ Safe');
+}`,
+            
+            go: (text) => `package main
+
+import "net/http"
+
+text := \`${text.substring(0, 100)}\`
+
+resp, _ := http.Post(
+    "http://localhost:8001/score",
+    "application/json",
+    strings.NewReader(\`{"text":"\` + text + \`"}\`)
+)
+
+// Parse and check result`
+        };
+
+        // Update character count
+        document.getElementById('textInput').addEventListener('input', function() {
+            document.getElementById('charCount').textContent = this.value.length;
+        });
+
+        // Set example text
+        function setExample(type) {
+            document.getElementById('textInput').value = examples[type];
+            document.getElementById('charCount').textContent = examples[type].length;
+        }
+
+        // Analyze content
+        async function analyzeContent() {
+            const text = document.getElementById('textInput').value.trim();
+            if (!text) {
+                alert('Please enter some text to analyze');
+                return;
+            }
+
+            const btn = document.getElementById('analyzeBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner mx-auto"></div>';
+
+            const category = document.getElementById('categoryFilter').value;
+            const language = document.getElementById('languageFilter').value;
+
+            try {
+                const payload = { text };
+                if (category) payload.category = category;
+                if (language) payload.language = language;
+
+                const startTime = performance.now();
+                const response = await fetch('http://localhost:8001/score', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const endTime = performance.now();
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                result.actualLatency = Math.round(endTime - startTime);
+                
+                displayResults(result);
+                document.getElementById('apiStatus').innerHTML = '🟢 Connected';
+            } catch (error) {
+                displayError(error.message);
+                document.getElementById('apiStatus').innerHTML = '🔴 Connection Failed';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🚀 Analyze';
+            }
+        }
+
+        // Display results
+        function displayResults(result) {
+            const isSafe = result.prediction === 'pass';
+            const container = document.getElementById('resultsContainer');
+            
+            container.innerHTML = `
+                <div class="fade-in">
+                    <!-- Main Result -->
+                    <div class="mb-6 p-6 rounded-lg ${isSafe ? 'bg-green-50 border-2 border-green-300' : 'bg-red-50 border-2 border-red-300'}">
+                        <div class="text-center">
+                            <div class="text-6xl mb-2">${isSafe ? '✅' : '⚠️'}</div>
+                            <div class="text-2xl font-bold ${isSafe ? 'text-green-700' : 'text-red-700'} mb-2">
+                                ${isSafe ? 'Content is Safe' : 'Content Flagged'}
+                            </div>
+                            <div class="text-lg ${isSafe ? 'text-green-600' : 'text-red-600'}">
+                                Confidence: ${(result.score * 100).toFixed(1)}%
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Details Grid -->
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <div class="text-xs text-gray-600 uppercase font-semibold">Category</div>
+                            <div class="text-lg font-semibold text-gray-800">${result.category || 'None'}</div>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <div class="text-xs text-gray-600 uppercase font-semibold">Method</div>
+                            <div class="text-lg font-semibold text-gray-800">${result.method || 'N/A'}</div>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <div class="text-xs text-gray-600 uppercase font-semibold">Latency</div>
+                            <div class="text-lg font-semibold text-gray-800">${result.actualLatency}ms</div>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <div class="text-xs text-gray-600 uppercase font-semibold">Policy</div>
+                            <div class="text-lg font-semibold text-gray-800">${result.policy_version || 'N/A'}</div>
+                        </div>
+                    </div>
+
+                    <!-- Rationale -->
+                    ${result.rationale ? `
+                        <div class="mb-6 p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
+                            <div class="text-sm font-semibold text-gray-700 mb-2">💡 Analysis:</div>
+                            <div class="text-gray-800">${result.rationale}</div>
+                        </div>
+                    ` : ''}
+
+                    <!-- Raw JSON -->
+                    <div class="mb-2">
+                        <button onclick="document.getElementById('rawJson').classList.toggle('hidden')" class="text-sm text-blue-600 hover:underline">
+                            Toggle Raw JSON
+                        </button>
+                    </div>
+                    <div id="rawJson" class="hidden p-4 bg-gray-900 text-green-400 rounded-lg font-mono text-xs overflow-x-auto">
+                        <pre>${JSON.stringify(result, null, 2)}</pre>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Display error
+        function displayError(message) {
+            const container = document.getElementById('resultsContainer');
+            container.innerHTML = `
+                <div class="fade-in p-6 bg-red-50 border-2 border-red-300 rounded-lg">
+                    <div class="text-center">
+                        <div class="text-6xl mb-2">❌</div>
+                        <div class="text-xl font-bold text-red-700 mb-2">Error</div>
+                        <div class="text-gray-700">${message}</div>
+                        <div class="mt-4 text-sm text-gray-600">
+                            Make sure the API is running at <span class="font-mono">http://localhost:8001</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Clear all
+        function clearAll() {
+            document.getElementById('textInput').value = '';
+            document.getElementById('charCount').textContent = '0';
+            document.getElementById('categoryFilter').value = '';
+            document.getElementById('resultsContainer').innerHTML = `
+                <div class="text-center text-gray-400 py-20">
+                    <div class="text-6xl mb-4">🤖</div>
+                    <p class="text-lg">Enter text and click "Analyze" to get started</p>
+                </div>
+            `;
+        }
+
+        // Show code example
+        function showCode(language) {
+            const text = document.getElementById('textInput').value || "Enter text and analyze to see code";
+            const code = codeTemplates[language](text);
+            
+            document.getElementById('codeContent').textContent = code;
+            
+            // Update button styles
+            ['curl', 'python', 'javascript', 'go'].forEach(lang => {
+                const btn = document.getElementById(`btn-${lang}`);
+                if (lang === language) {
+                    btn.classList.add('bg-blue-600', 'text-white');
+                    btn.classList.remove('bg-gray-200');
+                } else {
+                    btn.classList.remove('bg-blue-600', 'text-white');
+                    btn.classList.add('bg-gray-200');
+                }
+            });
+        }
+
+        // Copy code
+        function copyCode() {
+            const code = document.getElementById('codeContent').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('Code copied to clipboard!');
+            });
+        }
+
+        // Check API health on load
+        async function checkHealth() {
+            try {
+                const response = await fetch('http://localhost:8001/healthz');
+                if (response.ok) {
+                    document.getElementById('apiStatus').innerHTML = '🟢 Connected';
+                }
+            } catch (error) {
+                document.getElementById('apiStatus').innerHTML = '🔴 Not Connected';
+            }
+        }
+
+        // Initialize
+        checkHealth();
+        showCode('curl');
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

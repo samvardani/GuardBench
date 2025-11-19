@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="4096" height="4096" viewBox="0 0 4096 4096">
+  <defs>
+    <style>
+      @font-face { font-family: "DejaVuSans-Bold"; src: local("DejaVu Sans Bold"); }
+      .mono { fill: rgb(12, 23, 38); font: 800 1704px "DejaVuSans-Bold", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    </style>
+  </defs>
+  <rect x="256" y="256" width="3584" height="3584" rx="520" ry="520" fill="#FFFFFF"/>
+  <text class="mono" x="778" y="2851">S</text>
+  <text class="mono" x="1920" y="2851">R</text>
+</svg>

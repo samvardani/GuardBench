@@ -2,6 +2,11 @@ import pathlib
 import sqlite3
 from typing import Iterable
 
+try:
+    from store import staging_schema
+except ImportError:
+    staging_schema = None
+
 DB_PATH = pathlib.Path(__file__).resolve().parents[2] / "history.db"
 
 
@@ -81,6 +86,9 @@ def main(db_path=None):
       status TEXT NOT NULL DEFAULT 'active',
       created_at TEXT NOT NULL,
       last_login_at TEXT,
+      mfa_enabled INTEGER DEFAULT 0,
+      mfa_secret TEXT,
+      mfa_backup_codes TEXT,
       UNIQUE(tenant_id, email_normalized)
     );
     CREATE TABLE IF NOT EXISTS api_tokens (
@@ -166,6 +174,12 @@ def main(db_path=None):
 
     cur.execute("CREATE INDEX IF NOT EXISTS idx_results_run_model ON results(run_id, model)")
     cur.execute("CREATE INDEX IF NOT EXISTS idx_results_sample ON results(sample_id)")
+
+    # Create staging platform tables
+    if staging_schema:
+        staging_schema.create_staging_tables(cur)
+        staging_schema.create_staging_indexes(cur)
+
     con.commit()
     print(f"DB ready at {path}")
     con.close()

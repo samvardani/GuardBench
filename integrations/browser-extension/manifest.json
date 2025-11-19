@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "SeaRei Safety Scanner",
+  "version": "1.0.0",
+  "description": "Real-time AI safety content scanner - detect harmful content on any webpage",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "contextMenus",
+    "notifications",
+    "tabs"
+  ],
+  "host_permissions": [
+    "http://localhost:8001/*",
+    "https://api.searei.ai/*"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "options_page": "options.html",
+  "commands": {
+    "scan-page": {
+      "suggested_key": { "default": "Ctrl+Shift+S", "mac": "Command+Shift+S" },
+      "description": "Scan current page"
+    }
+  }
+}
+

@@ -1,0 +1,3614 @@
+{
+  "general": [
+    {
+      "pattern": "n if",
+      "regex": "\\bn\\ if\\b",
+      "toxicity_ratio": 1.0,
+      "count": 7685
+    },
+    {
+      "pattern": "n we",
+      "regex": "\\bn\\ we\\b",
+      "toxicity_ratio": 1.0,
+      "count": 6192
+    },
+    {
+      "pattern": "mexicans",
+      "regex": "\\bmexicans\\b",
+      "toxicity_ratio": 1.0,
+      "count": 6170
+    },
+    {
+      "pattern": "n there",
+      "regex": "\\bn\\ there\\b",
+      "toxicity_ratio": 1.0,
+      "count": 6081
+    },
+    {
+      "pattern": "n i",
+      "regex": "\\bn\\ i\\b",
+      "toxicity_ratio": 1.0,
+      "count": 5721
+    },
+    {
+      "pattern": "n it",
+      "regex": "\\bn\\ it\\b",
+      "toxicity_ratio": 1.0,
+      "count": 4150
+    },
+    {
+      "pattern": "n when",
+      "regex": "\\bn\\ when\\b",
+      "toxicity_ratio": 1.0,
+      "count": 3983
+    },
+    {
+      "pattern": "bi",
+      "regex": "\\bbi\\b",
+      "toxicity_ratio": 1.0,
+      "count": 3771
+    },
+    {
+      "pattern": "middle east",
+      "regex": "\\bmiddle\\ east\\b",
+      "toxicity_ratio": 1.0,
+      "count": 3646
+    },
+    {
+      "pattern": "the middle east",
+      "regex": "\\bthe\\ middle\\ east\\b",
+      "toxicity_ratio": 1.0,
+      "count": 3646
+    },
+    {
+      "pattern": "with mental",
+      "regex": "\\bwith\\ mental\\b",
+      "toxicity_ratio": 1.0,
+      "count": 3561
+    },
+    {
+      "pattern": "the chinese",
+      "regex": "\\bthe\\ chinese\\b",
+      "toxicity_ratio": 1.0,
+      "count": 3409
+    },
+    {
+      "pattern": "country n",
+      "regex": "\\bcountry\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 3348
+    },
+    {
+      "pattern": "asians",
+      "regex": "\\basians\\b",
+      "toxicity_ratio": 1.0,
+      "count": 3327
+    },
+    {
+      "pattern": "african americans",
+      "regex": "\\bafrican\\ americans\\b",
+      "toxicity_ratio": 1.0,
+      "count": 3296
+    },
+    {
+      "pattern": "middle eastern",
+      "regex": "\\bmiddle\\ eastern\\b",
+      "toxicity_ratio": 1.0,
+      "count": 3234
+    },
+    {
+      "pattern": "them n",
+      "regex": "\\bthem\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 3160
+    },
+    {
+      "pattern": "bitches",
+      "regex": "\\bbitches\\b",
+      "toxicity_ratio": 1.0,
+      "count": 3118
+    },
+    {
+      "pattern": "illness",
+      "regex": "\\billness\\b",
+      "toxicity_ratio": 1.0,
+      "count": 3016
+    },
+    {
+      "pattern": "mental illness",
+      "regex": "\\bmental\\ illness\\b",
+      "toxicity_ratio": 1.0,
+      "count": 3016
+    },
+    {
+      "pattern": "n she",
+      "regex": "\\bn\\ she\\b",
+      "toxicity_ratio": 1.0,
+      "count": 2881
+    },
+    {
+      "pattern": "n many",
+      "regex": "\\bn\\ many\\b",
+      "toxicity_ratio": 1.0,
+      "count": 2850
+    },
+    {
+      "pattern": "chinese n",
+      "regex": "\\bchinese\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 2629
+    },
+    {
+      "pattern": "easterners",
+      "regex": "\\beasterners\\b",
+      "toxicity_ratio": 1.0,
+      "count": 2425
+    },
+    {
+      "pattern": "middle easterners",
+      "regex": "\\bmiddle\\ easterners\\b",
+      "toxicity_ratio": 1.0,
+      "count": 2425
+    },
+    {
+      "pattern": "of asian",
+      "regex": "\\bof\\ asian\\b",
+      "toxicity_ratio": 1.0,
+      "count": 2399
+    },
+    {
+      "pattern": "african american",
+      "regex": "\\bafrican\\ american\\b",
+      "toxicity_ratio": 1.0,
+      "count": 2348
+    },
+    {
+      "pattern": "arabs",
+      "regex": "\\barabs\\b",
+      "toxicity_ratio": 1.0,
+      "count": 2313
+    },
+    {
+      "pattern": "a mental",
+      "regex": "\\ba\\ mental\\b",
+      "toxicity_ratio": 1.0,
+      "count": 2174
+    },
+    {
+      "pattern": "our country",
+      "regex": "\\bour\\ country\\b",
+      "toxicity_ratio": 1.0,
+      "count": 2110
+    },
+    {
+      "pattern": "n my",
+      "regex": "\\bn\\ my\\b",
+      "toxicity_ratio": 1.0,
+      "count": 2039
+    },
+    {
+      "pattern": "portrayed",
+      "regex": "\\bportrayed\\b",
+      "toxicity_ratio": 1.0,
+      "count": 2026
+    },
+    {
+      "pattern": "wheelchair",
+      "regex": "\\bwheelchair\\b",
+      "toxicity_ratio": 1.0,
+      "count": 2003
+    },
+    {
+      "pattern": "trans women",
+      "regex": "\\btrans\\ women\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1991
+    },
+    {
+      "pattern": "mexican friends",
+      "regex": "\\bmexican\\ friends\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1963
+    },
+    {
+      "pattern": "years n",
+      "regex": "\\byears\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1894
+    },
+    {
+      "pattern": "from the middle",
+      "regex": "\\bfrom\\ the\\ middle\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1884
+    },
+    {
+      "pattern": "women n",
+      "regex": "\\bwomen\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1856
+    },
+    {
+      "pattern": "n most",
+      "regex": "\\bn\\ most\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1814
+    },
+    {
+      "pattern": "hundreds",
+      "regex": "\\bhundreds\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1792
+    },
+    {
+      "pattern": "hundreds of",
+      "regex": "\\bhundreds\\ of\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1791
+    },
+    {
+      "pattern": "society n",
+      "regex": "\\bsociety\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1784
+    },
+    {
+      "pattern": "n its",
+      "regex": "\\bn\\ its\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1774
+    },
+    {
+      "pattern": "asian americans",
+      "regex": "\\basian\\ americans\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1771
+    },
+    {
+      "pattern": "diverse",
+      "regex": "\\bdiverse\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1735
+    },
+    {
+      "pattern": "attracted to",
+      "regex": "\\battracted\\ to\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1672
+    },
+    {
+      "pattern": "couples",
+      "regex": "\\bcouples\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1653
+    },
+    {
+      "pattern": "native american",
+      "regex": "\\bnative\\ american\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1641
+    },
+    {
+      "pattern": "have n",
+      "regex": "\\bhave\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1628
+    },
+    {
+      "pattern": "women and",
+      "regex": "\\bwomen\\ and\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1600
+    },
+    {
+      "pattern": "mental health",
+      "regex": "\\bmental\\ health\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1598
+    },
+    {
+      "pattern": "americans n",
+      "regex": "\\bamericans\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1593
+    },
+    {
+      "pattern": "our country n",
+      "regex": "\\bour\\ country\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1554
+    },
+    {
+      "pattern": "greedy",
+      "regex": "\\bgreedy\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1550
+    },
+    {
+      "pattern": "indigenous",
+      "regex": "\\bindigenous\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1548
+    },
+    {
+      "pattern": "dealt",
+      "regex": "\\bdealt\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1546
+    },
+    {
+      "pattern": "some native",
+      "regex": "\\bsome\\ native\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1545
+    },
+    {
+      "pattern": "n women",
+      "regex": "\\bn\\ women\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1543
+    },
+    {
+      "pattern": "with jews",
+      "regex": "\\bwith\\ jews\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1542
+    },
+    {
+      "pattern": "my fashion",
+      "regex": "\\bmy\\ fashion\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1536
+    },
+    {
+      "pattern": "violent",
+      "regex": "\\bviolent\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1535
+    },
+    {
+      "pattern": "jews they",
+      "regex": "\\bjews\\ they\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1534
+    },
+    {
+      "pattern": "greed",
+      "regex": "\\bgreed\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1526
+    },
+    {
+      "pattern": "from china",
+      "regex": "\\bfrom\\ china\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1524
+    },
+    {
+      "pattern": "increase",
+      "regex": "\\bincrease\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1523
+    },
+    {
+      "pattern": "just want to",
+      "regex": "\\bjust\\ want\\ to\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1505
+    },
+    {
+      "pattern": "treated",
+      "regex": "\\btreated\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1501
+    },
+    {
+      "pattern": "language n",
+      "regex": "\\blanguage\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1491
+    },
+    {
+      "pattern": "be treated",
+      "regex": "\\bbe\\ treated\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1490
+    },
+    {
+      "pattern": "workers n",
+      "regex": "\\bworkers\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1482
+    },
+    {
+      "pattern": "transition",
+      "regex": "\\btransition\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1469
+    },
+    {
+      "pattern": "to them",
+      "regex": "\\bto\\ them\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1468
+    },
+    {
+      "pattern": "n most of",
+      "regex": "\\bn\\ most\\ of\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1461
+    },
+    {
+      "pattern": "from mexico",
+      "regex": "\\bfrom\\ mexico\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1447
+    },
+    {
+      "pattern": "n african",
+      "regex": "\\bn\\ african\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1441
+    },
+    {
+      "pattern": "dont want",
+      "regex": "\\bdont\\ want\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1439
+    },
+    {
+      "pattern": "that trans",
+      "regex": "\\bthat\\ trans\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1426
+    },
+    {
+      "pattern": "that woman",
+      "regex": "\\bthat\\ woman\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1412
+    },
+    {
+      "pattern": "a wheelchair",
+      "regex": "\\ba\\ wheelchair\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1406
+    },
+    {
+      "pattern": "better n",
+      "regex": "\\bbetter\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1401
+    },
+    {
+      "pattern": "community n",
+      "regex": "\\bcommunity\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1388
+    },
+    {
+      "pattern": "to society n",
+      "regex": "\\bto\\ society\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1374
+    },
+    {
+      "pattern": "woman n",
+      "regex": "\\bwoman\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1366
+    },
+    {
+      "pattern": "a rich",
+      "regex": "\\ba\\ rich\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1364
+    },
+    {
+      "pattern": "world n",
+      "regex": "\\bworld\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1363
+    },
+    {
+      "pattern": "jew",
+      "regex": "\\bjew\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1361
+    },
+    {
+      "pattern": "crimes",
+      "regex": "\\bcrimes\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1359
+    },
+    {
+      "pattern": "valid",
+      "regex": "\\bvalid\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1359
+    },
+    {
+      "pattern": "n they",
+      "regex": "\\bn\\ they\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1358
+    },
+    {
+      "pattern": "immigration",
+      "regex": "\\bimmigration\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1350
+    },
+    {
+      "pattern": "a jew",
+      "regex": "\\ba\\ jew\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1350
+    },
+    {
+      "pattern": "inherently",
+      "regex": "\\binherently\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1348
+    },
+    {
+      "pattern": "n a lot",
+      "regex": "\\bn\\ a\\ lot\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1342
+    },
+    {
+      "pattern": "americans and",
+      "regex": "\\bamericans\\ and\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1329
+    },
+    {
+      "pattern": "n middle",
+      "regex": "\\bn\\ middle\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1317
+    },
+    {
+      "pattern": "brutes",
+      "regex": "\\bbrutes\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1313
+    },
+    {
+      "pattern": "n when i",
+      "regex": "\\bn\\ when\\ i\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1309
+    },
+    {
+      "pattern": "n indigenous",
+      "regex": "\\bn\\ indigenous\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1303
+    },
+    {
+      "pattern": "n these",
+      "regex": "\\bn\\ these\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1287
+    },
+    {
+      "pattern": "women have",
+      "regex": "\\bwomen\\ have\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1270
+    },
+    {
+      "pattern": "n some",
+      "regex": "\\bn\\ some\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1270
+    },
+    {
+      "pattern": "n some native",
+      "regex": "\\bn\\ some\\ native\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1270
+    },
+    {
+      "pattern": "america n",
+      "regex": "\\bamerica\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1268
+    },
+    {
+      "pattern": "n for",
+      "regex": "\\bn\\ for\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1261
+    },
+    {
+      "pattern": "over our",
+      "regex": "\\bover\\ our\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1261
+    },
+    {
+      "pattern": "over our country",
+      "regex": "\\bover\\ our\\ country\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1261
+    },
+    {
+      "pattern": "illnesses",
+      "regex": "\\billnesses\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1251
+    },
+    {
+      "pattern": "mental illnesses",
+      "regex": "\\bmental\\ illnesses\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1251
+    },
+    {
+      "pattern": "gender",
+      "regex": "\\bgender\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1245
+    },
+    {
+      "pattern": "she will",
+      "regex": "\\bshe\\ will\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1244
+    },
+    {
+      "pattern": "n i have",
+      "regex": "\\bn\\ i\\ have\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1244
+    },
+    {
+      "pattern": "nigga",
+      "regex": "\\bnigga\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1229
+    },
+    {
+      "pattern": "the mexicans",
+      "regex": "\\bthe\\ mexicans\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1223
+    },
+    {
+      "pattern": "than their",
+      "regex": "\\bthan\\ their\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1221
+    },
+    {
+      "pattern": "counterparts",
+      "regex": "\\bcounterparts\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1219
+    },
+    {
+      "pattern": "learning",
+      "regex": "\\blearning\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1217
+    },
+    {
+      "pattern": "a society",
+      "regex": "\\ba\\ society\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1215
+    },
+    {
+      "pattern": "illness n",
+      "regex": "\\billness\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1205
+    },
+    {
+      "pattern": "mental illness n",
+      "regex": "\\bmental\\ illness\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1205
+    },
+    {
+      "pattern": "college students",
+      "regex": "\\bcollege\\ students\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1198
+    },
+    {
+      "pattern": "descent",
+      "regex": "\\bdescent\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1196
+    },
+    {
+      "pattern": "asian descent",
+      "regex": "\\basian\\ descent\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1196
+    },
+    {
+      "pattern": "of asian descent",
+      "regex": "\\bof\\ asian\\ descent\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1196
+    },
+    {
+      "pattern": "of asians",
+      "regex": "\\bof\\ asians\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1194
+    },
+    {
+      "pattern": "n in",
+      "regex": "\\bn\\ in\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1167
+    },
+    {
+      "pattern": "cultures",
+      "regex": "\\bcultures\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1164
+    },
+    {
+      "pattern": "drain",
+      "regex": "\\bdrain\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1163
+    },
+    {
+      "pattern": "n trans",
+      "regex": "\\bn\\ trans\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1158
+    },
+    {
+      "pattern": "we do not",
+      "regex": "\\bwe\\ do\\ not\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1152
+    },
+    {
+      "pattern": "n we need",
+      "regex": "\\bn\\ we\\ need\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1150
+    },
+    {
+      "pattern": "dont want to",
+      "regex": "\\bdont\\ want\\ to\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1137
+    },
+    {
+      "pattern": "they have been",
+      "regex": "\\bthey\\ have\\ been\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1131
+    },
+    {
+      "pattern": "n immigrants",
+      "regex": "\\bn\\ immigrants\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1120
+    },
+    {
+      "pattern": "many different",
+      "regex": "\\bmany\\ different\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1110
+    },
+    {
+      "pattern": "but now",
+      "regex": "\\bbut\\ now\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1092
+    },
+    {
+      "pattern": "of african",
+      "regex": "\\bof\\ african\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1090
+    },
+    {
+      "pattern": "our jobs",
+      "regex": "\\bour\\ jobs\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1079
+    },
+    {
+      "pattern": "jobs n",
+      "regex": "\\bjobs\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1079
+    },
+    {
+      "pattern": "our jobs n",
+      "regex": "\\bour\\ jobs\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1079
+    },
+    {
+      "pattern": "many women",
+      "regex": "\\bmany\\ women\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1079
+    },
+    {
+      "pattern": "friends who",
+      "regex": "\\bfriends\\ who\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1078
+    },
+    {
+      "pattern": "the idea",
+      "regex": "\\bthe\\ idea\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1076
+    },
+    {
+      "pattern": "in their own",
+      "regex": "\\bin\\ their\\ own\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1074
+    },
+    {
+      "pattern": "women in",
+      "regex": "\\bwomen\\ in\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1072
+    },
+    {
+      "pattern": "economy",
+      "regex": "\\beconomy\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1070
+    },
+    {
+      "pattern": "hijab",
+      "regex": "\\bhijab\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1070
+    },
+    {
+      "pattern": "at their",
+      "regex": "\\bat\\ their\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1069
+    },
+    {
+      "pattern": "be chinese",
+      "regex": "\\bbe\\ chinese\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1067
+    },
+    {
+      "pattern": "be chinese n",
+      "regex": "\\bbe\\ chinese\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1067
+    },
+    {
+      "pattern": "n we must",
+      "regex": "\\bn\\ we\\ must\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1066
+    }
+  ],
+  "harassment": [
+    {
+      "pattern": "disabilities",
+      "regex": "\\bdisabilities\\b",
+      "toxicity_ratio": 1.0,
+      "count": 6304
+    },
+    {
+      "pattern": "n people",
+      "regex": "\\bn\\ people\\b",
+      "toxicity_ratio": 1.0,
+      "count": 4336
+    },
+    {
+      "pattern": "n if you",
+      "regex": "\\bn\\ if\\ you\\b",
+      "toxicity_ratio": 1.0,
+      "count": 4140
+    },
+    {
+      "pattern": "disability",
+      "regex": "\\bdisability\\b",
+      "toxicity_ratio": 1.0,
+      "count": 4117
+    },
+    {
+      "pattern": "with disabilities",
+      "regex": "\\bwith\\ disabilities\\b",
+      "toxicity_ratio": 1.0,
+      "count": 3723
+    },
+    {
+      "pattern": "people with disabilities",
+      "regex": "\\bpeople\\ with\\ disabilities\\b",
+      "toxicity_ratio": 1.0,
+      "count": 3723
+    },
+    {
+      "pattern": "people n",
+      "regex": "\\bpeople\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 3493
+    },
+    {
+      "pattern": "n you",
+      "regex": "\\bn\\ you\\b",
+      "toxicity_ratio": 1.0,
+      "count": 3465
+    },
+    {
+      "pattern": "n it is",
+      "regex": "\\bn\\ it\\ is\\b",
+      "toxicity_ratio": 1.0,
+      "count": 3345
+    },
+    {
+      "pattern": "people from",
+      "regex": "\\bpeople\\ from\\b",
+      "toxicity_ratio": 1.0,
+      "count": 3209
+    },
+    {
+      "pattern": "trans people",
+      "regex": "\\btrans\\ people\\b",
+      "toxicity_ratio": 1.0,
+      "count": 2961
+    },
+    {
+      "pattern": "people with mental",
+      "regex": "\\bpeople\\ with\\ mental\\b",
+      "toxicity_ratio": 1.0,
+      "count": 2810
+    },
+    {
+      "pattern": "mentally ill",
+      "regex": "\\bmentally\\ ill\\b",
+      "toxicity_ratio": 1.0,
+      "count": 2798
+    },
+    {
+      "pattern": "n there are",
+      "regex": "\\bn\\ there\\ are\\b",
+      "toxicity_ratio": 1.0,
+      "count": 2529
+    },
+    {
+      "pattern": "n people with",
+      "regex": "\\bn\\ people\\ with\\b",
+      "toxicity_ratio": 1.0,
+      "count": 2341
+    },
+    {
+      "pattern": "n there is",
+      "regex": "\\bn\\ there\\ is\\b",
+      "toxicity_ratio": 1.0,
+      "count": 2282
+    },
+    {
+      "pattern": "you cant",
+      "regex": "\\byou\\ cant\\b",
+      "toxicity_ratio": 1.0,
+      "count": 2248
+    },
+    {
+      "pattern": "disabilities are",
+      "regex": "\\bdisabilities\\ are\\b",
+      "toxicity_ratio": 1.0,
+      "count": 2141
+    },
+    {
+      "pattern": "discrimination",
+      "regex": "\\bdiscrimination\\b",
+      "toxicity_ratio": 1.0,
+      "count": 2080
+    },
+    {
+      "pattern": "african americans are",
+      "regex": "\\bafrican\\ americans\\ are\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1979
+    },
+    {
+      "pattern": "mental disabilities",
+      "regex": "\\bmental\\ disabilities\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1957
+    },
+    {
+      "pattern": "with mental disabilities",
+      "regex": "\\bwith\\ mental\\ disabilities\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1957
+    },
+    {
+      "pattern": "african american people",
+      "regex": "\\bafrican\\ american\\ people\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1944
+    },
+    {
+      "pattern": "disabled people",
+      "regex": "\\bdisabled\\ people\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1840
+    },
+    {
+      "pattern": "chinese people",
+      "regex": "\\bchinese\\ people\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1598
+    },
+    {
+      "pattern": "mexicans are",
+      "regex": "\\bmexicans\\ are\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1596
+    },
+    {
+      "pattern": "are asian",
+      "regex": "\\bare\\ asian\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1559
+    },
+    {
+      "pattern": "indigenous people",
+      "regex": "\\bindigenous\\ people\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1548
+    },
+    {
+      "pattern": "trans women are",
+      "regex": "\\btrans\\ women\\ are\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1543
+    },
+    {
+      "pattern": "are often",
+      "regex": "\\bare\\ often\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1535
+    },
+    {
+      "pattern": "history n",
+      "regex": "\\bhistory\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1524
+    },
+    {
+      "pattern": "the mentally",
+      "regex": "\\bthe\\ mentally\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1487
+    },
+    {
+      "pattern": "are portrayed",
+      "regex": "\\bare\\ portrayed\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1426
+    },
+    {
+      "pattern": "immigrants are",
+      "regex": "\\bimmigrants\\ are\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1401
+    },
+    {
+      "pattern": "risk",
+      "regex": "\\brisk\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1393
+    },
+    {
+      "pattern": "with disabilities are",
+      "regex": "\\bwith\\ disabilities\\ are\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1380
+    },
+    {
+      "pattern": "are hundreds",
+      "regex": "\\bare\\ hundreds\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1367
+    },
+    {
+      "pattern": "there are hundreds",
+      "regex": "\\bthere\\ are\\ hundreds\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1367
+    },
+    {
+      "pattern": "are hundreds of",
+      "regex": "\\bare\\ hundreds\\ of\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1367
+    },
+    {
+      "pattern": "are criminals",
+      "regex": "\\bare\\ criminals\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1345
+    },
+    {
+      "pattern": "n disabled",
+      "regex": "\\bn\\ disabled\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1343
+    },
+    {
+      "pattern": "stupid and",
+      "regex": "\\bstupid\\ and\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1328
+    },
+    {
+      "pattern": "n indigenous people",
+      "regex": "\\bn\\ indigenous\\ people\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1303
+    },
+    {
+      "pattern": "n people from",
+      "regex": "\\bn\\ people\\ from\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1226
+    },
+    {
+      "pattern": "a jewish",
+      "regex": "\\ba\\ jewish\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1213
+    },
+    {
+      "pattern": "people from the",
+      "regex": "\\bpeople\\ from\\ the\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1209
+    },
+    {
+      "pattern": "they should be",
+      "regex": "\\bthey\\ should\\ be\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1206
+    },
+    {
+      "pattern": "of people with",
+      "regex": "\\bof\\ people\\ with\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1189
+    },
+    {
+      "pattern": "disability is",
+      "regex": "\\bdisability\\ is\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1171
+    },
+    {
+      "pattern": "n disabled people",
+      "regex": "\\bn\\ disabled\\ people\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1164
+    },
+    {
+      "pattern": "it is a",
+      "regex": "\\bit\\ is\\ a\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1145
+    },
+    {
+      "pattern": "people think",
+      "regex": "\\bpeople\\ think\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1128
+    },
+    {
+      "pattern": "of discrimination",
+      "regex": "\\bof\\ discrimination\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1125
+    },
+    {
+      "pattern": "native americans are",
+      "regex": "\\bnative\\ americans\\ are\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1120
+    },
+    {
+      "pattern": "the mentally ill",
+      "regex": "\\bthe\\ mentally\\ ill\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1118
+    },
+    {
+      "pattern": "youre not",
+      "regex": "\\byoure\\ not\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1116
+    },
+    {
+      "pattern": "hispanics",
+      "regex": "\\bhispanics\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1113
+    },
+    {
+      "pattern": "disability n",
+      "regex": "\\bdisability\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1094
+    },
+    {
+      "pattern": "arabs are",
+      "regex": "\\barabs\\ are\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1089
+    },
+    {
+      "pattern": "immigration is",
+      "regex": "\\bimmigration\\ is\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1086
+    },
+    {
+      "pattern": "trans people are",
+      "regex": "\\btrans\\ people\\ are\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1074
+    },
+    {
+      "pattern": "are chinese n",
+      "regex": "\\bare\\ chinese\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1071
+    },
+    {
+      "pattern": "it is not",
+      "regex": "\\bit\\ is\\ not\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1063
+    },
+    {
+      "pattern": "shouldnt",
+      "regex": "\\bshouldnt\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1061
+    },
+    {
+      "pattern": "shouldnt be",
+      "regex": "\\bshouldnt\\ be\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1060
+    },
+    {
+      "pattern": "n jewish",
+      "regex": "\\bn\\ jewish\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1025
+    },
+    {
+      "pattern": "generally",
+      "regex": "\\bgenerally\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1020
+    },
+    {
+      "pattern": "middle east is",
+      "regex": "\\bmiddle\\ east\\ is\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1017
+    },
+    {
+      "pattern": "historically",
+      "regex": "\\bhistorically\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1007
+    },
+    {
+      "pattern": "china are",
+      "regex": "\\bchina\\ are\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1007
+    },
+    {
+      "pattern": "from china are",
+      "regex": "\\bfrom\\ china\\ are\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1007
+    },
+    {
+      "pattern": "is because",
+      "regex": "\\bis\\ because\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1005
+    },
+    {
+      "pattern": "are portrayed in",
+      "regex": "\\bare\\ portrayed\\ in\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1001
+    },
+    {
+      "pattern": "awareness and",
+      "regex": "\\bawareness\\ and\\b",
+      "toxicity_ratio": 1.0,
+      "count": 995
+    },
+    {
+      "pattern": "long history of",
+      "regex": "\\blong\\ history\\ of\\b",
+      "toxicity_ratio": 1.0,
+      "count": 973
+    },
+    {
+      "pattern": "people think about",
+      "regex": "\\bpeople\\ think\\ about\\b",
+      "toxicity_ratio": 1.0,
+      "count": 954
+    },
+    {
+      "pattern": "are mentally",
+      "regex": "\\bare\\ mentally\\b",
+      "toxicity_ratio": 1.0,
+      "count": 949
+    },
+    {
+      "pattern": "they are just",
+      "regex": "\\bthey\\ are\\ just\\b",
+      "toxicity_ratio": 1.0,
+      "count": 909
+    },
+    {
+      "pattern": "n immigration is",
+      "regex": "\\bn\\ immigration\\ is\\b",
+      "toxicity_ratio": 1.0,
+      "count": 905
+    },
+    {
+      "pattern": "n immigrants are",
+      "regex": "\\bn\\ immigrants\\ are\\b",
+      "toxicity_ratio": 1.0,
+      "count": 900
+    },
+    {
+      "pattern": "and should",
+      "regex": "\\band\\ should\\b",
+      "toxicity_ratio": 1.0,
+      "count": 893
+    },
+    {
+      "pattern": "should be treated",
+      "regex": "\\bshould\\ be\\ treated\\b",
+      "toxicity_ratio": 1.0,
+      "count": 890
+    },
+    {
+      "pattern": "easterners are",
+      "regex": "\\beasterners\\ are\\b",
+      "toxicity_ratio": 1.0,
+      "count": 886
+    },
+    {
+      "pattern": "middle easterners are",
+      "regex": "\\bmiddle\\ easterners\\ are\\b",
+      "toxicity_ratio": 1.0,
+      "count": 886
+    },
+    {
+      "pattern": "are many",
+      "regex": "\\bare\\ many\\b",
+      "toxicity_ratio": 1.0,
+      "count": 881
+    },
+    {
+      "pattern": "there are many",
+      "regex": "\\bthere\\ are\\ many\\b",
+      "toxicity_ratio": 1.0,
+      "count": 881
+    },
+    {
+      "pattern": "if youre",
+      "regex": "\\bif\\ youre\\b",
+      "toxicity_ratio": 1.0,
+      "count": 880
+    },
+    {
+      "pattern": "learning spanish",
+      "regex": "\\blearning\\ spanish\\b",
+      "toxicity_ratio": 1.0,
+      "count": 879
+    },
+    {
+      "pattern": "there are so",
+      "regex": "\\bthere\\ are\\ so\\b",
+      "toxicity_ratio": 1.0,
+      "count": 877
+    },
+    {
+      "pattern": "are so many",
+      "regex": "\\bare\\ so\\ many\\b",
+      "toxicity_ratio": 1.0,
+      "count": 877
+    },
+    {
+      "pattern": "people are all",
+      "regex": "\\bpeople\\ are\\ all\\b",
+      "toxicity_ratio": 1.0,
+      "count": 873
+    },
+    {
+      "pattern": "people were",
+      "regex": "\\bpeople\\ were\\b",
+      "toxicity_ratio": 1.0,
+      "count": 873
+    },
+    {
+      "pattern": "shouldnt be allowed",
+      "regex": "\\bshouldnt\\ be\\ allowed\\b",
+      "toxicity_ratio": 1.0,
+      "count": 863
+    },
+    {
+      "pattern": "n when people",
+      "regex": "\\bn\\ when\\ people\\b",
+      "toxicity_ratio": 1.0,
+      "count": 863
+    },
+    {
+      "pattern": "animalistic",
+      "regex": "\\banimalistic\\b",
+      "toxicity_ratio": 1.0,
+      "count": 853
+    },
+    {
+      "pattern": "extremists",
+      "regex": "\\bextremists\\b",
+      "toxicity_ratio": 1.0,
+      "count": 832
+    },
+    {
+      "pattern": "american people are",
+      "regex": "\\bamerican\\ people\\ are\\b",
+      "toxicity_ratio": 1.0,
+      "count": 825
+    },
+    {
+      "pattern": "fashion is",
+      "regex": "\\bfashion\\ is\\b",
+      "toxicity_ratio": 1.0,
+      "count": 825
+    },
+    {
+      "pattern": "people should",
+      "regex": "\\bpeople\\ should\\b",
+      "toxicity_ratio": 1.0,
+      "count": 810
+    },
+    {
+      "pattern": "people dont",
+      "regex": "\\bpeople\\ dont\\b",
+      "toxicity_ratio": 1.0,
+      "count": 807
+    },
+    {
+      "pattern": "that people",
+      "regex": "\\bthat\\ people\\b",
+      "toxicity_ratio": 1.0,
+      "count": 802
+    },
+    {
+      "pattern": "all of our",
+      "regex": "\\ball\\ of\\ our\\b",
+      "toxicity_ratio": 1.0,
+      "count": 802
+    },
+    {
+      "pattern": "hispanic",
+      "regex": "\\bhispanic\\b",
+      "toxicity_ratio": 1.0,
+      "count": 801
+    },
+    {
+      "pattern": "steal all",
+      "regex": "\\bsteal\\ all\\b",
+      "toxicity_ratio": 1.0,
+      "count": 801
+    },
+    {
+      "pattern": "steal all of",
+      "regex": "\\bsteal\\ all\\ of\\b",
+      "toxicity_ratio": 1.0,
+      "count": 801
+    },
+    {
+      "pattern": "hate me",
+      "regex": "\\bhate\\ me\\b",
+      "toxicity_ratio": 1.0,
+      "count": 786
+    },
+    {
+      "pattern": "should try",
+      "regex": "\\bshould\\ try\\b",
+      "toxicity_ratio": 1.0,
+      "count": 785
+    },
+    {
+      "pattern": "we should try",
+      "regex": "\\bwe\\ should\\ try\\b",
+      "toxicity_ratio": 1.0,
+      "count": 784
+    },
+    {
+      "pattern": "should try and",
+      "regex": "\\bshould\\ try\\ and\\b",
+      "toxicity_ratio": 1.0,
+      "count": 784
+    },
+    {
+      "pattern": "naturally less",
+      "regex": "\\bnaturally\\ less\\b",
+      "toxicity_ratio": 1.0,
+      "count": 783
+    },
+    {
+      "pattern": "naturally less productive",
+      "regex": "\\bnaturally\\ less\\ productive\\b",
+      "toxicity_ratio": 1.0,
+      "count": 783
+    },
+    {
+      "pattern": "if they are",
+      "regex": "\\bif\\ they\\ are\\b",
+      "toxicity_ratio": 1.0,
+      "count": 782
+    },
+    {
+      "pattern": "scientist",
+      "regex": "\\bscientist\\b",
+      "toxicity_ratio": 1.0,
+      "count": 781
+    },
+    {
+      "pattern": "a scientist",
+      "regex": "\\ba\\ scientist\\b",
+      "toxicity_ratio": 1.0,
+      "count": 781
+    },
+    {
+      "pattern": "scientist or",
+      "regex": "\\bscientist\\ or\\b",
+      "toxicity_ratio": 1.0,
+      "count": 781
+    },
+    {
+      "pattern": "whether a scientist",
+      "regex": "\\bwhether\\ a\\ scientist\\b",
+      "toxicity_ratio": 1.0,
+      "count": 781
+    },
+    {
+      "pattern": "a scientist or",
+      "regex": "\\ba\\ scientist\\ or\\b",
+      "toxicity_ratio": 1.0,
+      "count": 781
+    },
+    {
+      "pattern": "scientist or janitor",
+      "regex": "\\bscientist\\ or\\ janitor\\b",
+      "toxicity_ratio": 1.0,
+      "count": 781
+    },
+    {
+      "pattern": "people are mentally",
+      "regex": "\\bpeople\\ are\\ mentally\\b",
+      "toxicity_ratio": 1.0,
+      "count": 781
+    },
+    {
+      "pattern": "who are not",
+      "regex": "\\bwho\\ are\\ not\\b",
+      "toxicity_ratio": 1.0,
+      "count": 781
+    },
+    {
+      "pattern": "the british",
+      "regex": "\\bthe\\ british\\b",
+      "toxicity_ratio": 1.0,
+      "count": 781
+    },
+    {
+      "pattern": "british were",
+      "regex": "\\bbritish\\ were\\b",
+      "toxicity_ratio": 1.0,
+      "count": 781
+    },
+    {
+      "pattern": "after the british",
+      "regex": "\\bafter\\ the\\ british\\b",
+      "toxicity_ratio": 1.0,
+      "count": 781
+    },
+    {
+      "pattern": "the british were",
+      "regex": "\\bthe\\ british\\ were\\b",
+      "toxicity_ratio": 1.0,
+      "count": 781
+    },
+    {
+      "pattern": "british were defeated",
+      "regex": "\\bbritish\\ were\\ defeated\\b",
+      "toxicity_ratio": 1.0,
+      "count": 781
+    },
+    {
+      "pattern": "asian are",
+      "regex": "\\basian\\ are\\b",
+      "toxicity_ratio": 1.0,
+      "count": 781
+    },
+    {
+      "pattern": "moms who are",
+      "regex": "\\bmoms\\ who\\ are\\b",
+      "toxicity_ratio": 1.0,
+      "count": 781
+    },
+    {
+      "pattern": "who are asian",
+      "regex": "\\bwho\\ are\\ asian\\b",
+      "toxicity_ratio": 1.0,
+      "count": 781
+    },
+    {
+      "pattern": "are asian are",
+      "regex": "\\bare\\ asian\\ are\\b",
+      "toxicity_ratio": 1.0,
+      "count": 781
+    },
+    {
+      "pattern": "asian are known",
+      "regex": "\\basian\\ are\\ known\\b",
+      "toxicity_ratio": 1.0,
+      "count": 781
+    },
+    {
+      "pattern": "are known to",
+      "regex": "\\bare\\ known\\ to\\b",
+      "toxicity_ratio": 1.0,
+      "count": 781
+    },
+    {
+      "pattern": "are not behaving",
+      "regex": "\\bare\\ not\\ behaving\\b",
+      "toxicity_ratio": 1.0,
+      "count": 781
+    },
+    {
+      "pattern": "jews some are",
+      "regex": "\\bjews\\ some\\ are\\b",
+      "toxicity_ratio": 1.0,
+      "count": 781
+    },
+    {
+      "pattern": "some are complete",
+      "regex": "\\bsome\\ are\\ complete\\b",
+      "toxicity_ratio": 1.0,
+      "count": 781
+    },
+    {
+      "pattern": "are complete pigs",
+      "regex": "\\bare\\ complete\\ pigs\\b",
+      "toxicity_ratio": 1.0,
+      "count": 781
+    },
+    {
+      "pattern": "illness is",
+      "regex": "\\billness\\ is\\b",
+      "toxicity_ratio": 1.0,
+      "count": 780
+    },
+    {
+      "pattern": "mental illness is",
+      "regex": "\\bmental\\ illness\\ is\\b",
+      "toxicity_ratio": 1.0,
+      "count": 780
+    },
+    {
+      "pattern": "drivers are",
+      "regex": "\\bdrivers\\ are\\b",
+      "toxicity_ratio": 1.0,
+      "count": 779
+    },
+    {
+      "pattern": "you have been",
+      "regex": "\\byou\\ have\\ been\\b",
+      "toxicity_ratio": 1.0,
+      "count": 778
+    },
+    {
+      "pattern": "lately it is",
+      "regex": "\\blately\\ it\\ is\\b",
+      "toxicity_ratio": 1.0,
+      "count": 778
+    },
+    {
+      "pattern": "it is pretty",
+      "regex": "\\bit\\ is\\ pretty\\b",
+      "toxicity_ratio": 1.0,
+      "count": 778
+    },
+    {
+      "pattern": "is pretty obvious",
+      "regex": "\\bis\\ pretty\\ obvious\\b",
+      "toxicity_ratio": 1.0,
+      "count": 778
+    },
+    {
+      "pattern": "worst drivers are",
+      "regex": "\\bworst\\ drivers\\ are\\b",
+      "toxicity_ratio": 1.0,
+      "count": 778
+    },
+    {
+      "pattern": "drivers are asian",
+      "regex": "\\bdrivers\\ are\\ asian\\b",
+      "toxicity_ratio": 1.0,
+      "count": 778
+    },
+    {
+      "pattern": "are asian women",
+      "regex": "\\bare\\ asian\\ women\\b",
+      "toxicity_ratio": 1.0,
+      "count": 778
+    },
+    {
+      "pattern": "indigenous people are",
+      "regex": "\\bindigenous\\ people\\ are\\b",
+      "toxicity_ratio": 1.0,
+      "count": 777
+    },
+    {
+      "pattern": "people are often",
+      "regex": "\\bpeople\\ are\\ often\\b",
+      "toxicity_ratio": 1.0,
+      "count": 777
+    },
+    {
+      "pattern": "are often left",
+      "regex": "\\bare\\ often\\ left\\b",
+      "toxicity_ratio": 1.0,
+      "count": 777
+    },
+    {
+      "pattern": "hate me because",
+      "regex": "\\bhate\\ me\\ because\\b",
+      "toxicity_ratio": 1.0,
+      "count": 776
+    },
+    {
+      "pattern": "they hate",
+      "regex": "\\bthey\\ hate\\b",
+      "toxicity_ratio": 1.0,
+      "count": 776
+    }
+  ],
+  "sexual": [
+    {
+      "pattern": "bisexual",
+      "regex": "\\bbisexual\\b",
+      "toxicity_ratio": 1.0,
+      "count": 5311
+    },
+    {
+      "pattern": "fuck",
+      "regex": "\\bfuck\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1599
+    },
+    {
+      "pattern": "bisexuality",
+      "regex": "\\bbisexuality\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1524
+    },
+    {
+      "pattern": "bisexuals",
+      "regex": "\\bbisexuals\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1425
+    },
+    {
+      "pattern": "heterosexual",
+      "regex": "\\bheterosexual\\b",
+      "toxicity_ratio": 1.0,
+      "count": 1391
+    },
+    {
+      "pattern": "sex couples",
+      "regex": "\\bsex\\ couples\\b",
+      "toxicity_ratio": 1.0,
+      "count": 969
+    },
+    {
+      "pattern": "fucking",
+      "regex": "\\bfucking\\b",
+      "toxicity_ratio": 1.0,
+      "count": 923
+    },
+    {
+      "pattern": "same sex couples",
+      "regex": "\\bsame\\ sex\\ couples\\b",
+      "toxicity_ratio": 1.0,
+      "count": 914
+    },
+    {
+      "pattern": "bisexual there",
+      "regex": "\\bbisexual\\ there\\b",
+      "toxicity_ratio": 1.0,
+      "count": 789
+    },
+    {
+      "pattern": "bisexual there are",
+      "regex": "\\bbisexual\\ there\\ are\\b",
+      "toxicity_ratio": 1.0,
+      "count": 789
+    },
+    {
+      "pattern": "youre bisexual",
+      "regex": "\\byoure\\ bisexual\\b",
+      "toxicity_ratio": 1.0,
+      "count": 777
+    },
+    {
+      "pattern": "sex marriage",
+      "regex": "\\bsex\\ marriage\\b",
+      "toxicity_ratio": 1.0,
+      "count": 772
+    },
+    {
+      "pattern": "same sex marriage",
+      "regex": "\\bsame\\ sex\\ marriage\\b",
+      "toxicity_ratio": 1.0,
+      "count": 772
+    },
+    {
+      "pattern": "be bisexual",
+      "regex": "\\bbe\\ bisexual\\b",
+      "toxicity_ratio": 1.0,
+      "count": 712
+    },
+    {
+      "pattern": "your sexuality",
+      "regex": "\\byour\\ sexuality\\b",
+      "toxicity_ratio": 1.0,
+      "count": 712
+    },
+    {
+      "pattern": "bisexuals are",
+      "regex": "\\bbisexuals\\ are\\b",
+      "toxicity_ratio": 1.0,
+      "count": 709
+    },
+    {
+      "pattern": "n bisexuals",
+      "regex": "\\bn\\ bisexuals\\b",
+      "toxicity_ratio": 1.0,
+      "count": 691
+    },
+    {
+      "pattern": "n bisexuality",
+      "regex": "\\bn\\ bisexuality\\b",
+      "toxicity_ratio": 1.0,
+      "count": 574
+    },
+    {
+      "pattern": "im bisexual",
+      "regex": "\\bim\\ bisexual\\b",
+      "toxicity_ratio": 1.0,
+      "count": 549
+    },
+    {
+      "pattern": "n bisexuals are",
+      "regex": "\\bn\\ bisexuals\\ are\\b",
+      "toxicity_ratio": 1.0,
+      "count": 541
+    },
+    {
+      "pattern": "bisexuality is",
+      "regex": "\\bbisexuality\\ is\\b",
+      "toxicity_ratio": 1.0,
+      "count": 469
+    },
+    {
+      "pattern": "heterosexual couples",
+      "regex": "\\bheterosexual\\ couples\\b",
+      "toxicity_ratio": 1.0,
+      "count": 460
+    },
+    {
+      "pattern": "sexuality is",
+      "regex": "\\bsexuality\\ is\\b",
+      "toxicity_ratio": 1.0,
+      "count": 448
+    },
+    {
+      "pattern": "your sexuality is",
+      "regex": "\\byour\\ sexuality\\ is\\b",
+      "toxicity_ratio": 1.0,
+      "count": 448
+    },
+    {
+      "pattern": "mean youre bisexual",
+      "regex": "\\bmean\\ youre\\ bisexual\\b",
+      "toxicity_ratio": 1.0,
+      "count": 444
+    },
+    {
+      "pattern": "opposite sex",
+      "regex": "\\bopposite\\ sex\\b",
+      "toxicity_ratio": 1.0,
+      "count": 431
+    },
+    {
+      "pattern": "not bisexual",
+      "regex": "\\bnot\\ bisexual\\b",
+      "toxicity_ratio": 1.0,
+      "count": 421
+    },
+    {
+      "pattern": "bisexual you",
+      "regex": "\\bbisexual\\ you\\b",
+      "toxicity_ratio": 1.0,
+      "count": 421
+    },
+    {
+      "pattern": "not bisexual you",
+      "regex": "\\bnot\\ bisexual\\ you\\b",
+      "toxicity_ratio": 1.0,
+      "count": 421
+    },
+    {
+      "pattern": "the bisexual",
+      "regex": "\\bthe\\ bisexual\\b",
+      "toxicity_ratio": 1.0,
+      "count": 401
+    },
+    {
+      "pattern": "sex marriages",
+      "regex": "\\bsex\\ marriages\\b",
+      "toxicity_ratio": 1.0,
+      "count": 388
+    },
+    {
+      "pattern": "same sex marriages",
+      "regex": "\\bsame\\ sex\\ marriages\\b",
+      "toxicity_ratio": 1.0,
+      "count": 388
+    },
+    {
+      "pattern": "the opposite sex",
+      "regex": "\\bthe\\ opposite\\ sex\\b",
+      "toxicity_ratio": 1.0,
+      "count": 376
+    },
+    {
+      "pattern": "sex n",
+      "regex": "\\bsex\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 374
+    },
+    {
+      "pattern": "opposite sex n",
+      "regex": "\\bopposite\\ sex\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 374
+    },
+    {
+      "pattern": "bisexual if",
+      "regex": "\\bbisexual\\ if\\b",
+      "toxicity_ratio": 1.0,
+      "count": 364
+    },
+    {
+      "pattern": "bisexual if youre",
+      "regex": "\\bbisexual\\ if\\ youre\\b",
+      "toxicity_ratio": 1.0,
+      "count": 364
+    },
+    {
+      "pattern": "are sexual",
+      "regex": "\\bare\\ sexual\\b",
+      "toxicity_ratio": 1.0,
+      "count": 354
+    },
+    {
+      "pattern": "sexual deviants",
+      "regex": "\\bsexual\\ deviants\\b",
+      "toxicity_ratio": 1.0,
+      "count": 354
+    },
+    {
+      "pattern": "are sexual deviants",
+      "regex": "\\bare\\ sexual\\ deviants\\b",
+      "toxicity_ratio": 1.0,
+      "count": 354
+    },
+    {
+      "pattern": "a heterosexual",
+      "regex": "\\ba\\ heterosexual\\b",
+      "toxicity_ratio": 1.0,
+      "count": 353
+    },
+    {
+      "pattern": "in a heterosexual",
+      "regex": "\\bin\\ a\\ heterosexual\\b",
+      "toxicity_ratio": 1.0,
+      "count": 352
+    },
+    {
+      "pattern": "dresses sexy",
+      "regex": "\\bdresses\\ sexy\\b",
+      "toxicity_ratio": 1.0,
+      "count": 326
+    },
+    {
+      "pattern": "sexy she",
+      "regex": "\\bsexy\\ she\\b",
+      "toxicity_ratio": 1.0,
+      "count": 326
+    },
+    {
+      "pattern": "woman dresses sexy",
+      "regex": "\\bwoman\\ dresses\\ sexy\\b",
+      "toxicity_ratio": 1.0,
+      "count": 326
+    },
+    {
+      "pattern": "dresses sexy she",
+      "regex": "\\bdresses\\ sexy\\ she\\b",
+      "toxicity_ratio": 1.0,
+      "count": 326
+    },
+    {
+      "pattern": "sexy she is",
+      "regex": "\\bsexy\\ she\\ is\\b",
+      "toxicity_ratio": 1.0,
+      "count": 326
+    },
+    {
+      "pattern": "heterosexual relationships",
+      "regex": "\\bheterosexual\\ relationships\\b",
+      "toxicity_ratio": 1.0,
+      "count": 324
+    },
+    {
+      "pattern": "heterosexual relationships n",
+      "regex": "\\bheterosexual\\ relationships\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 324
+    },
+    {
+      "pattern": "being bisexual",
+      "regex": "\\bbeing\\ bisexual\\b",
+      "toxicity_ratio": 1.0,
+      "count": 318
+    },
+    {
+      "pattern": "with being bisexual",
+      "regex": "\\bwith\\ being\\ bisexual\\b",
+      "toxicity_ratio": 1.0,
+      "count": 318
+    },
+    {
+      "pattern": "n bisexuality is",
+      "regex": "\\bn\\ bisexuality\\ is\\b",
+      "toxicity_ratio": 1.0,
+      "count": 315
+    },
+    {
+      "pattern": "asexual",
+      "regex": "\\basexual\\b",
+      "toxicity_ratio": 1.0,
+      "count": 304
+    },
+    {
+      "pattern": "sexually",
+      "regex": "\\bsexually\\b",
+      "toxicity_ratio": 1.0,
+      "count": 303
+    },
+    {
+      "pattern": "the same sex",
+      "regex": "\\bthe\\ same\\ sex\\b",
+      "toxicity_ratio": 1.0,
+      "count": 299
+    },
+    {
+      "pattern": "homosexuality",
+      "regex": "\\bhomosexuality\\b",
+      "toxicity_ratio": 1.0,
+      "count": 295
+    },
+    {
+      "pattern": "fucking people",
+      "regex": "\\bfucking\\ people\\b",
+      "toxicity_ratio": 1.0,
+      "count": 293
+    },
+    {
+      "pattern": "those fucking",
+      "regex": "\\bthose\\ fucking\\b",
+      "toxicity_ratio": 1.0,
+      "count": 293
+    },
+    {
+      "pattern": "want those fucking",
+      "regex": "\\bwant\\ those\\ fucking\\b",
+      "toxicity_ratio": 1.0,
+      "count": 292
+    },
+    {
+      "pattern": "those fucking people",
+      "regex": "\\bthose\\ fucking\\ people\\b",
+      "toxicity_ratio": 1.0,
+      "count": 292
+    },
+    {
+      "pattern": "fucking people in",
+      "regex": "\\bfucking\\ people\\ in\\b",
+      "toxicity_ratio": 1.0,
+      "count": 292
+    },
+    {
+      "pattern": "bisexual end",
+      "regex": "\\bbisexual\\ end\\b",
+      "toxicity_ratio": 1.0,
+      "count": 276
+    },
+    {
+      "pattern": "about im bisexual",
+      "regex": "\\babout\\ im\\ bisexual\\b",
+      "toxicity_ratio": 1.0,
+      "count": 276
+    },
+    {
+      "pattern": "im bisexual end",
+      "regex": "\\bim\\ bisexual\\ end\\b",
+      "toxicity_ratio": 1.0,
+      "count": 276
+    },
+    {
+      "pattern": "bisexual end of",
+      "regex": "\\bbisexual\\ end\\ of\\b",
+      "toxicity_ratio": 1.0,
+      "count": 276
+    },
+    {
+      "pattern": "bisexuals are valid",
+      "regex": "\\bbisexuals\\ are\\ valid\\b",
+      "toxicity_ratio": 1.0,
+      "count": 274
+    },
+    {
+      "pattern": "a sexuality",
+      "regex": "\\ba\\ sexuality\\b",
+      "toxicity_ratio": 1.0,
+      "count": 273
+    },
+    {
+      "pattern": "sexuality its",
+      "regex": "\\bsexuality\\ its\\b",
+      "toxicity_ratio": 1.0,
+      "count": 273
+    },
+    {
+      "pattern": "mean im bisexual",
+      "regex": "\\bmean\\ im\\ bisexual\\b",
+      "toxicity_ratio": 1.0,
+      "count": 273
+    },
+    {
+      "pattern": "im bisexual there",
+      "regex": "\\bim\\ bisexual\\ there\\b",
+      "toxicity_ratio": 1.0,
+      "count": 273
+    },
+    {
+      "pattern": "identify a sexuality",
+      "regex": "\\bidentify\\ a\\ sexuality\\b",
+      "toxicity_ratio": 1.0,
+      "count": 273
+    },
+    {
+      "pattern": "a sexuality its",
+      "regex": "\\ba\\ sexuality\\ its\\b",
+      "toxicity_ratio": 1.0,
+      "count": 273
+    },
+    {
+      "pattern": "sexuality its just",
+      "regex": "\\bsexuality\\ its\\ just\\b",
+      "toxicity_ratio": 1.0,
+      "count": 273
+    },
+    {
+      "pattern": "bisexuals are attracted",
+      "regex": "\\bbisexuals\\ are\\ attracted\\b",
+      "toxicity_ratio": 1.0,
+      "count": 271
+    },
+    {
+      "pattern": "bisexual means",
+      "regex": "\\bbisexual\\ means\\b",
+      "toxicity_ratio": 1.0,
+      "count": 270
+    },
+    {
+      "pattern": "bisexual means that",
+      "regex": "\\bbisexual\\ means\\ that\\b",
+      "toxicity_ratio": 1.0,
+      "count": 270
+    },
+    {
+      "pattern": "a bisexual",
+      "regex": "\\ba\\ bisexual\\b",
+      "toxicity_ratio": 1.0,
+      "count": 266
+    },
+    {
+      "pattern": "bisexual character",
+      "regex": "\\bbisexual\\ character\\b",
+      "toxicity_ratio": 1.0,
+      "count": 266
+    },
+    {
+      "pattern": "see a bisexual",
+      "regex": "\\bsee\\ a\\ bisexual\\b",
+      "toxicity_ratio": 1.0,
+      "count": 266
+    },
+    {
+      "pattern": "a bisexual character",
+      "regex": "\\ba\\ bisexual\\ character\\b",
+      "toxicity_ratio": 1.0,
+      "count": 266
+    },
+    {
+      "pattern": "bisexual character we",
+      "regex": "\\bbisexual\\ character\\ we\\b",
+      "toxicity_ratio": 1.0,
+      "count": 266
+    },
+    {
+      "pattern": "bisexual sure",
+      "regex": "\\bbisexual\\ sure\\b",
+      "toxicity_ratio": 1.0,
+      "count": 264
+    },
+    {
+      "pattern": "sexuality based",
+      "regex": "\\bsexuality\\ based\\b",
+      "toxicity_ratio": 1.0,
+      "count": 264
+    },
+    {
+      "pattern": "to be bisexual",
+      "regex": "\\bto\\ be\\ bisexual\\b",
+      "toxicity_ratio": 1.0,
+      "count": 264
+    },
+    {
+      "pattern": "be bisexual sure",
+      "regex": "\\bbe\\ bisexual\\ sure\\b",
+      "toxicity_ratio": 1.0,
+      "count": 264
+    },
+    {
+      "pattern": "bisexual sure ive",
+      "regex": "\\bbisexual\\ sure\\ ive\\b",
+      "toxicity_ratio": 1.0,
+      "count": 264
+    },
+    {
+      "pattern": "im not bisexual",
+      "regex": "\\bim\\ not\\ bisexual\\b",
+      "toxicity_ratio": 1.0,
+      "count": 264
+    },
+    {
+      "pattern": "bisexual you dont",
+      "regex": "\\bbisexual\\ you\\ dont\\b",
+      "toxicity_ratio": 1.0,
+      "count": 264
+    },
+    {
+      "pattern": "of your sexuality",
+      "regex": "\\bof\\ your\\ sexuality\\b",
+      "toxicity_ratio": 1.0,
+      "count": 264
+    },
+    {
+      "pattern": "your sexuality based",
+      "regex": "\\byour\\ sexuality\\ based\\b",
+      "toxicity_ratio": 1.0,
+      "count": 264
+    },
+    {
+      "pattern": "sexuality based on",
+      "regex": "\\bsexuality\\ based\\ on\\b",
+      "toxicity_ratio": 1.0,
+      "count": 264
+    },
+    {
+      "pattern": "about your sexuality",
+      "regex": "\\babout\\ your\\ sexuality\\b",
+      "toxicity_ratio": 1.0,
+      "count": 264
+    },
+    {
+      "pattern": "sexuality is that",
+      "regex": "\\bsexuality\\ is\\ that\\b",
+      "toxicity_ratio": 1.0,
+      "count": 264
+    },
+    {
+      "pattern": "sex couples are",
+      "regex": "\\bsex\\ couples\\ are\\b",
+      "toxicity_ratio": 1.0,
+      "count": 264
+    },
+    {
+      "pattern": "bisexual and",
+      "regex": "\\bbisexual\\ and\\b",
+      "toxicity_ratio": 1.0,
+      "count": 263
+    },
+    {
+      "pattern": "and asexual",
+      "regex": "\\band\\ asexual\\b",
+      "toxicity_ratio": 1.0,
+      "count": 263
+    },
+    {
+      "pattern": "asexual at",
+      "regex": "\\basexual\\ at\\b",
+      "toxicity_ratio": 1.0,
+      "count": 263
+    },
+    {
+      "pattern": "can be bisexual",
+      "regex": "\\bcan\\ be\\ bisexual\\b",
+      "toxicity_ratio": 1.0,
+      "count": 263
+    },
+    {
+      "pattern": "be bisexual and",
+      "regex": "\\bbe\\ bisexual\\ and\\b",
+      "toxicity_ratio": 1.0,
+      "count": 263
+    },
+    {
+      "pattern": "bisexual and asexual",
+      "regex": "\\bbisexual\\ and\\ asexual\\b",
+      "toxicity_ratio": 1.0,
+      "count": 263
+    },
+    {
+      "pattern": "and asexual at",
+      "regex": "\\band\\ asexual\\ at\\b",
+      "toxicity_ratio": 1.0,
+      "count": 263
+    },
+    {
+      "pattern": "asexual at the",
+      "regex": "\\basexual\\ at\\ the\\b",
+      "toxicity_ratio": 1.0,
+      "count": 263
+    },
+    {
+      "pattern": "sex with another",
+      "regex": "\\bsex\\ with\\ another\\b",
+      "toxicity_ratio": 1.0,
+      "count": 263
+    },
+    {
+      "pattern": "your bisexuality",
+      "regex": "\\byour\\ bisexuality\\b",
+      "toxicity_ratio": 1.0,
+      "count": 263
+    },
+    {
+      "pattern": "bisexuality its",
+      "regex": "\\bbisexuality\\ its\\b",
+      "toxicity_ratio": 1.0,
+      "count": 263
+    },
+    {
+      "pattern": "express your bisexuality",
+      "regex": "\\bexpress\\ your\\ bisexuality\\b",
+      "toxicity_ratio": 1.0,
+      "count": 263
+    },
+    {
+      "pattern": "your bisexuality its",
+      "regex": "\\byour\\ bisexuality\\ its\\b",
+      "toxicity_ratio": 1.0,
+      "count": 263
+    },
+    {
+      "pattern": "bisexuality its a",
+      "regex": "\\bbisexuality\\ its\\ a\\b",
+      "toxicity_ratio": 1.0,
+      "count": 263
+    },
+    {
+      "pattern": "many bisexuals",
+      "regex": "\\bmany\\ bisexuals\\b",
+      "toxicity_ratio": 1.0,
+      "count": 261
+    },
+    {
+      "pattern": "bisexuals exist",
+      "regex": "\\bbisexuals\\ exist\\b",
+      "toxicity_ratio": 1.0,
+      "count": 261
+    },
+    {
+      "pattern": "of bisexuals",
+      "regex": "\\bof\\ bisexuals\\b",
+      "toxicity_ratio": 1.0,
+      "count": 261
+    },
+    {
+      "pattern": "bisexuals in",
+      "regex": "\\bbisexuals\\ in\\b",
+      "toxicity_ratio": 1.0,
+      "count": 261
+    },
+    {
+      "pattern": "term heterosexual",
+      "regex": "\\bterm\\ heterosexual\\b",
+      "toxicity_ratio": 1.0,
+      "count": 261
+    },
+    {
+      "pattern": "being bisexual there",
+      "regex": "\\bbeing\\ bisexual\\ there\\b",
+      "toxicity_ratio": 1.0,
+      "count": 261
+    },
+    {
+      "pattern": "how many bisexuals",
+      "regex": "\\bhow\\ many\\ bisexuals\\b",
+      "toxicity_ratio": 1.0,
+      "count": 261
+    },
+    {
+      "pattern": "many bisexuals exist",
+      "regex": "\\bmany\\ bisexuals\\ exist\\b",
+      "toxicity_ratio": 1.0,
+      "count": 261
+    },
+    {
+      "pattern": "bisexuals exist there",
+      "regex": "\\bbisexuals\\ exist\\ there\\b",
+      "toxicity_ratio": 1.0,
+      "count": 261
+    },
+    {
+      "pattern": "tons of bisexuals",
+      "regex": "\\btons\\ of\\ bisexuals\\b",
+      "toxicity_ratio": 1.0,
+      "count": 261
+    },
+    {
+      "pattern": "of bisexuals in",
+      "regex": "\\bof\\ bisexuals\\ in\\b",
+      "toxicity_ratio": 1.0,
+      "count": 261
+    },
+    {
+      "pattern": "bisexuals in happy",
+      "regex": "\\bbisexuals\\ in\\ happy\\b",
+      "toxicity_ratio": 1.0,
+      "count": 261
+    },
+    {
+      "pattern": "long term heterosexual",
+      "regex": "\\blong\\ term\\ heterosexual\\b",
+      "toxicity_ratio": 1.0,
+      "count": 261
+    },
+    {
+      "pattern": "term heterosexual relationships",
+      "regex": "\\bterm\\ heterosexual\\ relationships\\b",
+      "toxicity_ratio": 1.0,
+      "count": 261
+    },
+    {
+      "pattern": "recognizing same sex",
+      "regex": "\\brecognizing\\ same\\ sex\\b",
+      "toxicity_ratio": 1.0,
+      "count": 260
+    },
+    {
+      "pattern": "blame bisexuality",
+      "regex": "\\bblame\\ bisexuality\\b",
+      "toxicity_ratio": 1.0,
+      "count": 259
+    },
+    {
+      "pattern": "bisexuality on",
+      "regex": "\\bbisexuality\\ on\\b",
+      "toxicity_ratio": 1.0,
+      "count": 259
+    },
+    {
+      "pattern": "to blame bisexuality",
+      "regex": "\\bto\\ blame\\ bisexuality\\b",
+      "toxicity_ratio": 1.0,
+      "count": 259
+    },
+    {
+      "pattern": "blame bisexuality on",
+      "regex": "\\bblame\\ bisexuality\\ on\\b",
+      "toxicity_ratio": 1.0,
+      "count": 259
+    },
+    {
+      "pattern": "bisexuality on your",
+      "regex": "\\bbisexuality\\ on\\ your\\b",
+      "toxicity_ratio": 1.0,
+      "count": 259
+    },
+    {
+      "pattern": "fuckin",
+      "regex": "\\bfuckin\\b",
+      "toxicity_ratio": 1.0,
+      "count": 258
+    },
+    {
+      "pattern": "as bisexual",
+      "regex": "\\bas\\ bisexual\\b",
+      "toxicity_ratio": 1.0,
+      "count": 256
+    },
+    {
+      "pattern": "bisexual when",
+      "regex": "\\bbisexual\\ when\\b",
+      "toxicity_ratio": 1.0,
+      "count": 256
+    },
+    {
+      "pattern": "my sexuality",
+      "regex": "\\bmy\\ sexuality\\b",
+      "toxicity_ratio": 1.0,
+      "count": 256
+    },
+    {
+      "pattern": "sexuality any",
+      "regex": "\\bsexuality\\ any\\b",
+      "toxicity_ratio": 1.0,
+      "count": 256
+    },
+    {
+      "pattern": "out as bisexual",
+      "regex": "\\bout\\ as\\ bisexual\\b",
+      "toxicity_ratio": 1.0,
+      "count": 256
+    },
+    {
+      "pattern": "as bisexual when",
+      "regex": "\\bas\\ bisexual\\ when\\b",
+      "toxicity_ratio": 1.0,
+      "count": 256
+    },
+    {
+      "pattern": "bisexual when i",
+      "regex": "\\bbisexual\\ when\\ i\\b",
+      "toxicity_ratio": 1.0,
+      "count": 256
+    },
+    {
+      "pattern": "make my sexuality",
+      "regex": "\\bmake\\ my\\ sexuality\\b",
+      "toxicity_ratio": 1.0,
+      "count": 256
+    },
+    {
+      "pattern": "my sexuality any",
+      "regex": "\\bmy\\ sexuality\\ any\\b",
+      "toxicity_ratio": 1.0,
+      "count": 256
+    },
+    {
+      "pattern": "sexuality any less",
+      "regex": "\\bsexuality\\ any\\ less\\b",
+      "toxicity_ratio": 1.0,
+      "count": 256
+    },
+    {
+      "pattern": "youre bisexual there",
+      "regex": "\\byoure\\ bisexual\\ there\\b",
+      "toxicity_ratio": 1.0,
+      "count": 255
+    },
+    {
+      "pattern": "bisexuality is for",
+      "regex": "\\bbisexuality\\ is\\ for\\b",
+      "toxicity_ratio": 1.0,
+      "count": 253
+    },
+    {
+      "pattern": "was bisexual",
+      "regex": "\\bwas\\ bisexual\\b",
+      "toxicity_ratio": 1.0,
+      "count": 250
+    },
+    {
+      "pattern": "bisexual before",
+      "regex": "\\bbisexual\\ before\\b",
+      "toxicity_ratio": 1.0,
+      "count": 250
+    },
+    {
+      "pattern": "i was bisexual",
+      "regex": "\\bi\\ was\\ bisexual\\b",
+      "toxicity_ratio": 1.0,
+      "count": 250
+    },
+    {
+      "pattern": "was bisexual before",
+      "regex": "\\bwas\\ bisexual\\ before\\b",
+      "toxicity_ratio": 1.0,
+      "count": 250
+    },
+    {
+      "pattern": "bisexual before i",
+      "regex": "\\bbisexual\\ before\\ i\\b",
+      "toxicity_ratio": 1.0,
+      "count": 250
+    },
+    {
+      "pattern": "sex with someone",
+      "regex": "\\bsex\\ with\\ someone\\b",
+      "toxicity_ratio": 1.0,
+      "count": 250
+    },
+    {
+      "pattern": "still sexually",
+      "regex": "\\bstill\\ sexually\\b",
+      "toxicity_ratio": 1.0,
+      "count": 245
+    },
+    {
+      "pattern": "sexually attracted",
+      "regex": "\\bsexually\\ attracted\\b",
+      "toxicity_ratio": 1.0,
+      "count": 245
+    },
+    {
+      "pattern": "active sex",
+      "regex": "\\bactive\\ sex\\b",
+      "toxicity_ratio": 1.0,
+      "count": 245
+    }
+  ],
+  "violence": [
+    {
+      "pattern": "even killed",
+      "regex": "\\beven\\ killed\\b",
+      "toxicity_ratio": 1.0,
+      "count": 754
+    },
+    {
+      "pattern": "killed off",
+      "regex": "\\bkilled\\ off\\b",
+      "toxicity_ratio": 1.0,
+      "count": 754
+    },
+    {
+      "pattern": "were even killed",
+      "regex": "\\bwere\\ even\\ killed\\b",
+      "toxicity_ratio": 1.0,
+      "count": 754
+    },
+    {
+      "pattern": "even killed off",
+      "regex": "\\beven\\ killed\\ off\\b",
+      "toxicity_ratio": 1.0,
+      "count": 754
+    },
+    {
+      "pattern": "killed off n",
+      "regex": "\\bkilled\\ off\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 754
+    },
+    {
+      "pattern": "been attacked",
+      "regex": "\\bbeen\\ attacked\\b",
+      "toxicity_ratio": 1.0,
+      "count": 608
+    },
+    {
+      "pattern": "have been attacked",
+      "regex": "\\bhave\\ been\\ attacked\\b",
+      "toxicity_ratio": 1.0,
+      "count": 608
+    },
+    {
+      "pattern": "been attacked and",
+      "regex": "\\bbeen\\ attacked\\ and\\b",
+      "toxicity_ratio": 1.0,
+      "count": 608
+    },
+    {
+      "pattern": "attacked and threatened",
+      "regex": "\\battacked\\ and\\ threatened\\b",
+      "toxicity_ratio": 1.0,
+      "count": 608
+    },
+    {
+      "pattern": "face attacks",
+      "regex": "\\bface\\ attacks\\b",
+      "toxicity_ratio": 1.0,
+      "count": 589
+    },
+    {
+      "pattern": "attacks it",
+      "regex": "\\battacks\\ it\\b",
+      "toxicity_ratio": 1.0,
+      "count": 589
+    },
+    {
+      "pattern": "oppression face attacks",
+      "regex": "\\boppression\\ face\\ attacks\\b",
+      "toxicity_ratio": 1.0,
+      "count": 589
+    },
+    {
+      "pattern": "face attacks it",
+      "regex": "\\bface\\ attacks\\ it\\b",
+      "toxicity_ratio": 1.0,
+      "count": 589
+    },
+    {
+      "pattern": "attacks it is",
+      "regex": "\\battacks\\ it\\ is\\b",
+      "toxicity_ratio": 1.0,
+      "count": 589
+    },
+    {
+      "pattern": "hurtful",
+      "regex": "\\bhurtful\\b",
+      "toxicity_ratio": 1.0,
+      "count": 586
+    },
+    {
+      "pattern": "being hurtful",
+      "regex": "\\bbeing\\ hurtful\\b",
+      "toxicity_ratio": 1.0,
+      "count": 586
+    },
+    {
+      "pattern": "hurtful so",
+      "regex": "\\bhurtful\\ so\\b",
+      "toxicity_ratio": 1.0,
+      "count": 586
+    },
+    {
+      "pattern": "them being hurtful",
+      "regex": "\\bthem\\ being\\ hurtful\\b",
+      "toxicity_ratio": 1.0,
+      "count": 586
+    },
+    {
+      "pattern": "being hurtful so",
+      "regex": "\\bbeing\\ hurtful\\ so\\b",
+      "toxicity_ratio": 1.0,
+      "count": 586
+    },
+    {
+      "pattern": "hurtful so i",
+      "regex": "\\bhurtful\\ so\\ i\\b",
+      "toxicity_ratio": 1.0,
+      "count": 586
+    },
+    {
+      "pattern": "in attacks",
+      "regex": "\\bin\\ attacks\\b",
+      "toxicity_ratio": 1.0,
+      "count": 575
+    },
+    {
+      "pattern": "increase in attacks",
+      "regex": "\\bincrease\\ in\\ attacks\\b",
+      "toxicity_ratio": 1.0,
+      "count": 575
+    },
+    {
+      "pattern": "in attacks against",
+      "regex": "\\bin\\ attacks\\ against\\b",
+      "toxicity_ratio": 1.0,
+      "count": 575
+    },
+    {
+      "pattern": "attacks against asian",
+      "regex": "\\battacks\\ against\\ asian\\b",
+      "toxicity_ratio": 1.0,
+      "count": 575
+    },
+    {
+      "pattern": "kill the",
+      "regex": "\\bkill\\ the\\b",
+      "toxicity_ratio": 1.0,
+      "count": 553
+    },
+    {
+      "pattern": "to kill the",
+      "regex": "\\bto\\ kill\\ the\\b",
+      "toxicity_ratio": 1.0,
+      "count": 549
+    },
+    {
+      "pattern": "need to kill",
+      "regex": "\\bneed\\ to\\ kill\\b",
+      "toxicity_ratio": 1.0,
+      "count": 547
+    },
+    {
+      "pattern": "kill the chinese",
+      "regex": "\\bkill\\ the\\ chinese\\b",
+      "toxicity_ratio": 1.0,
+      "count": 547
+    },
+    {
+      "pattern": "kills",
+      "regex": "\\bkills\\b",
+      "toxicity_ratio": 1.0,
+      "count": 424
+    },
+    {
+      "pattern": "to skills",
+      "regex": "\\bto\\ skills\\b",
+      "toxicity_ratio": 1.0,
+      "count": 418
+    },
+    {
+      "pattern": "skills in",
+      "regex": "\\bskills\\ in\\b",
+      "toxicity_ratio": 1.0,
+      "count": 418
+    },
+    {
+      "pattern": "them to skills",
+      "regex": "\\bthem\\ to\\ skills\\b",
+      "toxicity_ratio": 1.0,
+      "count": 418
+    },
+    {
+      "pattern": "to skills in",
+      "regex": "\\bto\\ skills\\ in\\b",
+      "toxicity_ratio": 1.0,
+      "count": 418
+    },
+    {
+      "pattern": "skills in computer",
+      "regex": "\\bskills\\ in\\ computer\\b",
+      "toxicity_ratio": 1.0,
+      "count": 418
+    },
+    {
+      "pattern": "who kills",
+      "regex": "\\bwho\\ kills\\b",
+      "toxicity_ratio": 1.0,
+      "count": 414
+    },
+    {
+      "pattern": "kills an",
+      "regex": "\\bkills\\ an\\b",
+      "toxicity_ratio": 1.0,
+      "count": 414
+    },
+    {
+      "pattern": "officer who kills",
+      "regex": "\\bofficer\\ who\\ kills\\b",
+      "toxicity_ratio": 1.0,
+      "count": 414
+    },
+    {
+      "pattern": "who kills an",
+      "regex": "\\bwho\\ kills\\ an\\b",
+      "toxicity_ratio": 1.0,
+      "count": 414
+    },
+    {
+      "pattern": "kills an unarmed",
+      "regex": "\\bkills\\ an\\ unarmed\\b",
+      "toxicity_ratio": 1.0,
+      "count": 414
+    },
+    {
+      "pattern": "hurt the",
+      "regex": "\\bhurt\\ the\\b",
+      "toxicity_ratio": 1.0,
+      "count": 411
+    },
+    {
+      "pattern": "and hurt",
+      "regex": "\\band\\ hurt\\b",
+      "toxicity_ratio": 1.0,
+      "count": 410
+    },
+    {
+      "pattern": "schools and hurt",
+      "regex": "\\bschools\\ and\\ hurt\\b",
+      "toxicity_ratio": 1.0,
+      "count": 410
+    },
+    {
+      "pattern": "and hurt the",
+      "regex": "\\band\\ hurt\\ the\\b",
+      "toxicity_ratio": 1.0,
+      "count": 410
+    },
+    {
+      "pattern": "hurt the quality",
+      "regex": "\\bhurt\\ the\\ quality\\b",
+      "toxicity_ratio": 1.0,
+      "count": 410
+    },
+    {
+      "pattern": "terrorist attacks",
+      "regex": "\\bterrorist\\ attacks\\b",
+      "toxicity_ratio": 1.0,
+      "count": 386
+    },
+    {
+      "pattern": "attacks increase",
+      "regex": "\\battacks\\ increase\\b",
+      "toxicity_ratio": 1.0,
+      "count": 386
+    },
+    {
+      "pattern": "terrorist attacks increase",
+      "regex": "\\bterrorist\\ attacks\\ increase\\b",
+      "toxicity_ratio": 1.0,
+      "count": 386
+    },
+    {
+      "pattern": "attacks increase the",
+      "regex": "\\battacks\\ increase\\ the\\b",
+      "toxicity_ratio": 1.0,
+      "count": 386
+    },
+    {
+      "pattern": "from hurting",
+      "regex": "\\bfrom\\ hurting\\b",
+      "toxicity_ratio": 1.0,
+      "count": 376
+    },
+    {
+      "pattern": "hurting others",
+      "regex": "\\bhurting\\ others\\b",
+      "toxicity_ratio": 1.0,
+      "count": 376
+    },
+    {
+      "pattern": "them from hurting",
+      "regex": "\\bthem\\ from\\ hurting\\b",
+      "toxicity_ratio": 1.0,
+      "count": 376
+    },
+    {
+      "pattern": "from hurting others",
+      "regex": "\\bfrom\\ hurting\\ others\\b",
+      "toxicity_ratio": 1.0,
+      "count": 376
+    },
+    {
+      "pattern": "hurting others n",
+      "regex": "\\bhurting\\ others\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 376
+    },
+    {
+      "pattern": "n terrorist attacks",
+      "regex": "\\bn\\ terrorist\\ attacks\\b",
+      "toxicity_ratio": 1.0,
+      "count": 322
+    },
+    {
+      "pattern": "being destroyed",
+      "regex": "\\bbeing\\ destroyed\\b",
+      "toxicity_ratio": 1.0,
+      "count": 267
+    },
+    {
+      "pattern": "destroyed by",
+      "regex": "\\bdestroyed\\ by\\b",
+      "toxicity_ratio": 1.0,
+      "count": 267
+    },
+    {
+      "pattern": "is being destroyed",
+      "regex": "\\bis\\ being\\ destroyed\\b",
+      "toxicity_ratio": 1.0,
+      "count": 267
+    },
+    {
+      "pattern": "being destroyed by",
+      "regex": "\\bbeing\\ destroyed\\ by\\b",
+      "toxicity_ratio": 1.0,
+      "count": 267
+    },
+    {
+      "pattern": "destroyed by the",
+      "regex": "\\bdestroyed\\ by\\ the\\b",
+      "toxicity_ratio": 1.0,
+      "count": 267
+    },
+    {
+      "pattern": "skilled",
+      "regex": "\\bskilled\\b",
+      "toxicity_ratio": 1.0,
+      "count": 264
+    },
+    {
+      "pattern": "high skilled",
+      "regex": "\\bhigh\\ skilled\\b",
+      "toxicity_ratio": 1.0,
+      "count": 263
+    },
+    {
+      "pattern": "skilled workers",
+      "regex": "\\bskilled\\ workers\\b",
+      "toxicity_ratio": 1.0,
+      "count": 263
+    },
+    {
+      "pattern": "are high skilled",
+      "regex": "\\bare\\ high\\ skilled\\b",
+      "toxicity_ratio": 1.0,
+      "count": 263
+    },
+    {
+      "pattern": "high skilled workers",
+      "regex": "\\bhigh\\ skilled\\ workers\\b",
+      "toxicity_ratio": 1.0,
+      "count": 263
+    },
+    {
+      "pattern": "skilled workers n",
+      "regex": "\\bskilled\\ workers\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 263
+    },
+    {
+      "pattern": "they kill",
+      "regex": "\\bthey\\ kill\\b",
+      "toxicity_ratio": 1.0,
+      "count": 233
+    },
+    {
+      "pattern": "kill another",
+      "regex": "\\bkill\\ another\\b",
+      "toxicity_ratio": 1.0,
+      "count": 231
+    },
+    {
+      "pattern": "animals they kill",
+      "regex": "\\banimals\\ they\\ kill\\b",
+      "toxicity_ratio": 1.0,
+      "count": 231
+    },
+    {
+      "pattern": "they kill another",
+      "regex": "\\bthey\\ kill\\ another\\b",
+      "toxicity_ratio": 1.0,
+      "count": 231
+    },
+    {
+      "pattern": "kill another human",
+      "regex": "\\bkill\\ another\\ human\\b",
+      "toxicity_ratio": 1.0,
+      "count": 231
+    },
+    {
+      "pattern": "have stable",
+      "regex": "\\bhave\\ stable\\b",
+      "toxicity_ratio": 1.0,
+      "count": 68
+    },
+    {
+      "pattern": "stable relationships",
+      "regex": "\\bstable\\ relationships\\b",
+      "toxicity_ratio": 1.0,
+      "count": 68
+    },
+    {
+      "pattern": "to have stable",
+      "regex": "\\bto\\ have\\ stable\\b",
+      "toxicity_ratio": 1.0,
+      "count": 68
+    },
+    {
+      "pattern": "have stable relationships",
+      "regex": "\\bhave\\ stable\\ relationships\\b",
+      "toxicity_ratio": 1.0,
+      "count": 68
+    },
+    {
+      "pattern": "stable relationships n",
+      "regex": "\\bstable\\ relationships\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 68
+    },
+    {
+      "pattern": "emotionally stable",
+      "regex": "\\bemotionally\\ stable\\b",
+      "toxicity_ratio": 1.0,
+      "count": 67
+    },
+    {
+      "pattern": "stable or",
+      "regex": "\\bstable\\ or\\b",
+      "toxicity_ratio": 1.0,
+      "count": 67
+    },
+    {
+      "pattern": "less emotionally stable",
+      "regex": "\\bless\\ emotionally\\ stable\\b",
+      "toxicity_ratio": 1.0,
+      "count": 67
+    },
+    {
+      "pattern": "emotionally stable or",
+      "regex": "\\bemotionally\\ stable\\ or\\b",
+      "toxicity_ratio": 1.0,
+      "count": 67
+    },
+    {
+      "pattern": "stable or less",
+      "regex": "\\bstable\\ or\\ less\\b",
+      "toxicity_ratio": 1.0,
+      "count": 67
+    },
+    {
+      "pattern": "about hurting",
+      "regex": "\\babout\\ hurting\\b",
+      "toxicity_ratio": 1.0,
+      "count": 56
+    },
+    {
+      "pattern": "hurting your",
+      "regex": "\\bhurting\\ your\\b",
+      "toxicity_ratio": 1.0,
+      "count": 56
+    },
+    {
+      "pattern": "worry about hurting",
+      "regex": "\\bworry\\ about\\ hurting\\b",
+      "toxicity_ratio": 1.0,
+      "count": 56
+    },
+    {
+      "pattern": "about hurting your",
+      "regex": "\\babout\\ hurting\\ your\\b",
+      "toxicity_ratio": 1.0,
+      "count": 56
+    },
+    {
+      "pattern": "hurting your feelings",
+      "regex": "\\bhurting\\ your\\ feelings\\b",
+      "toxicity_ratio": 1.0,
+      "count": 56
+    },
+    {
+      "pattern": "unstable",
+      "regex": "\\bunstable\\b",
+      "toxicity_ratio": 1.0,
+      "count": 52
+    },
+    {
+      "pattern": "are unstable",
+      "regex": "\\bare\\ unstable\\b",
+      "toxicity_ratio": 1.0,
+      "count": 52
+    },
+    {
+      "pattern": "unstable n",
+      "regex": "\\bunstable\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 52
+    },
+    {
+      "pattern": "lesbians are unstable",
+      "regex": "\\blesbians\\ are\\ unstable\\b",
+      "toxicity_ratio": 1.0,
+      "count": 52
+    },
+    {
+      "pattern": "are unstable n",
+      "regex": "\\bare\\ unstable\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 52
+    },
+    {
+      "pattern": "kill me",
+      "regex": "\\bkill\\ me\\b",
+      "toxicity_ratio": 1.0,
+      "count": 11
+    },
+    {
+      "pattern": "hurts",
+      "regex": "\\bhurts\\b",
+      "toxicity_ratio": 1.0,
+      "count": 10
+    },
+    {
+      "pattern": "t kill",
+      "regex": "\\bt\\ kill\\b",
+      "toxicity_ratio": 1.0,
+      "count": 9
+    },
+    {
+      "pattern": "kill you",
+      "regex": "\\bkill\\ you\\b",
+      "toxicity_ratio": 1.0,
+      "count": 8
+    },
+    {
+      "pattern": "unstable n in",
+      "regex": "\\bunstable\\ n\\ in\\b",
+      "toxicity_ratio": 1.0,
+      "count": 8
+    },
+    {
+      "pattern": "kill that",
+      "regex": "\\bkill\\ that\\b",
+      "toxicity_ratio": 1.0,
+      "count": 7
+    },
+    {
+      "pattern": "unstable n the",
+      "regex": "\\bunstable\\ n\\ the\\b",
+      "toxicity_ratio": 1.0,
+      "count": 7
+    },
+    {
+      "pattern": "shoot that",
+      "regex": "\\bshoot\\ that\\b",
+      "toxicity_ratio": 1.0,
+      "count": 6
+    },
+    {
+      "pattern": "kill yo",
+      "regex": "\\bkill\\ yo\\b",
+      "toxicity_ratio": 1.0,
+      "count": 6
+    },
+    {
+      "pattern": "ll kill",
+      "regex": "\\bll\\ kill\\b",
+      "toxicity_ratio": 1.0,
+      "count": 6
+    },
+    {
+      "pattern": "i ll kill",
+      "regex": "\\bi\\ ll\\ kill\\b",
+      "toxicity_ratio": 1.0,
+      "count": 6
+    },
+    {
+      "pattern": "kill my",
+      "regex": "\\bkill\\ my\\b",
+      "toxicity_ratio": 1.0,
+      "count": 5
+    },
+    {
+      "pattern": "kill my vibe",
+      "regex": "\\bkill\\ my\\ vibe\\b",
+      "toxicity_ratio": 1.0,
+      "count": 5
+    },
+    {
+      "pattern": "killa",
+      "regex": "\\bkilla\\b",
+      "toxicity_ratio": 1.0,
+      "count": 5
+    },
+    {
+      "pattern": "ima kill",
+      "regex": "\\bima\\ kill\\b",
+      "toxicity_ratio": 1.0,
+      "count": 5
+    },
+    {
+      "pattern": "killed that",
+      "regex": "\\bkilled\\ that\\b",
+      "toxicity_ratio": 1.0,
+      "count": 5
+    },
+    {
+      "pattern": "butthurt",
+      "regex": "\\bbutthurt\\b",
+      "toxicity_ratio": 1.0,
+      "count": 5
+    },
+    {
+      "pattern": "bitch kill",
+      "regex": "\\bbitch\\ kill\\b",
+      "toxicity_ratio": 1.0,
+      "count": 5
+    },
+    {
+      "pattern": "killer but",
+      "regex": "\\bkiller\\ but\\b",
+      "toxicity_ratio": 1.0,
+      "count": 5
+    },
+    {
+      "pattern": "t a killer",
+      "regex": "\\bt\\ a\\ killer\\b",
+      "toxicity_ratio": 1.0,
+      "count": 5
+    },
+    {
+      "pattern": "a killer but",
+      "regex": "\\ba\\ killer\\ but\\b",
+      "toxicity_ratio": 1.0,
+      "count": 5
+    },
+    {
+      "pattern": "killer but don",
+      "regex": "\\bkiller\\ but\\ don\\b",
+      "toxicity_ratio": 1.0,
+      "count": 5
+    },
+    {
+      "pattern": "attacked",
+      "regex": "\\battacked\\b",
+      "toxicity_ratio": 0.9983633387888707,
+      "count": 610
+    },
+    {
+      "pattern": "attacked and",
+      "regex": "\\battacked\\ and\\b",
+      "toxicity_ratio": 0.9983579638752053,
+      "count": 608
+    },
+    {
+      "pattern": "attacks against",
+      "regex": "\\battacks\\ against\\b",
+      "toxicity_ratio": 0.9982668977469671,
+      "count": 576
+    },
+    {
+      "pattern": "to kill",
+      "regex": "\\bto\\ kill\\b",
+      "toxicity_ratio": 0.9982238010657194,
+      "count": 562
+    },
+    {
+      "pattern": "attacks",
+      "regex": "\\battacks\\b",
+      "toxicity_ratio": 0.9974293059125964,
+      "count": 1552
+    },
+    {
+      "pattern": "destroyed",
+      "regex": "\\bdestroyed\\b",
+      "toxicity_ratio": 0.9962962962962963,
+      "count": 269
+    },
+    {
+      "pattern": "hurting",
+      "regex": "\\bhurting\\b",
+      "toxicity_ratio": 0.9954441913439636,
+      "count": 437
+    },
+    {
+      "pattern": "skills",
+      "regex": "\\bskills\\b",
+      "toxicity_ratio": 0.9929742388758782,
+      "count": 424
+    },
+    {
+      "pattern": "stable",
+      "regex": "\\bstable\\b",
+      "toxicity_ratio": 0.9927536231884058,
+      "count": 137
+    },
+    {
+      "pattern": "kill",
+      "regex": "\\bkill\\b",
+      "toxicity_ratio": 0.9890230515916575,
+      "count": 901
+    },
+    {
+      "pattern": "hurt",
+      "regex": "\\bhurt\\b",
+      "toxicity_ratio": 0.9852320675105485,
+      "count": 467
+    },
+    {
+      "pattern": "killed",
+      "regex": "\\bkilled\\b",
+      "toxicity_ratio": 0.9826302729528535,
+      "count": 792
+    },
+    {
+      "pattern": "shooting",
+      "regex": "\\bshooting\\b",
+      "toxicity_ratio": 0.9166666666666666,
+      "count": 11
+    },
+    {
+      "pattern": "a killer",
+      "regex": "\\ba\\ killer\\b",
+      "toxicity_ratio": 0.8571428571428571,
+      "count": 6
+    },
+    {
+      "pattern": "shoot",
+      "regex": "\\bshoot\\b",
+      "toxicity_ratio": 0.8392857142857143,
+      "count": 47
+    },
+    {
+      "pattern": "kill a",
+      "regex": "\\bkill\\ a\\b",
+      "toxicity_ratio": 0.8333333333333334,
+      "count": 10
+    },
+    {
+      "pattern": "killin",
+      "regex": "\\bkillin\\b",
+      "toxicity_ratio": 0.8333333333333334,
+      "count": 10
+    },
+    {
+      "pattern": "destroying",
+      "regex": "\\bdestroying\\b",
+      "toxicity_ratio": 0.8333333333333334,
+      "count": 5
+    },
+    {
+      "pattern": "will kill",
+      "regex": "\\bwill\\ kill\\b",
+      "toxicity_ratio": 0.8333333333333334,
+      "count": 5
+    },
+    {
+      "pattern": "killed the",
+      "regex": "\\bkilled\\ the\\b",
+      "toxicity_ratio": 0.8333333333333334,
+      "count": 5
+    }
+  ],
+  "threat": [
+    {
+      "pattern": "always going to",
+      "regex": "\\balways\\ going\\ to\\b",
+      "toxicity_ratio": 1.0,
+      "count": 264
+    },
+    {
+      "pattern": "were going to",
+      "regex": "\\bwere\\ going\\ to\\b",
+      "toxicity_ratio": 1.0,
+      "count": 79
+    },
+    {
+      "pattern": "going to be",
+      "regex": "\\bgoing\\ to\\ be\\b",
+      "toxicity_ratio": 0.9835164835164835,
+      "count": 358
+    },
+    {
+      "pattern": "going to",
+      "regex": "\\bgoing\\ to\\b",
+      "toxicity_ratio": 0.9322381930184805,
+      "count": 454
+    },
+    {
+      "pattern": "watch out",
+      "regex": "\\bwatch\\ out\\b",
+      "toxicity_ratio": 0.9,
+      "count": 9
+    },
+    {
+      "pattern": "going to the",
+      "regex": "\\bgoing\\ to\\ the\\b",
+      "toxicity_ratio": 0.8888888888888888,
+      "count": 8
+    },
+    {
+      "pattern": "is going to",
+      "regex": "\\bis\\ going\\ to\\b",
+      "toxicity_ratio": 0.8888888888888888,
+      "count": 8
+    },
+    {
+      "pattern": "going to get",
+      "regex": "\\bgoing\\ to\\ get\\b",
+      "toxicity_ratio": 0.875,
+      "count": 7
+    },
+    {
+      "pattern": "not going to",
+      "regex": "\\bnot\\ going\\ to\\b",
+      "toxicity_ratio": 0.8571428571428571,
+      "count": 6
+    },
+    {
+      "pattern": "am going to",
+      "regex": "\\bam\\ going\\ to\\b",
+      "toxicity_ratio": 0.8333333333333334,
+      "count": 5
+    },
+    {
+      "pattern": "was going to",
+      "regex": "\\bwas\\ going\\ to\\b",
+      "toxicity_ratio": 0.8333333333333334,
+      "count": 5
+    },
+    {
+      "pattern": "m going to",
+      "regex": "\\bm\\ going\\ to\\b",
+      "toxicity_ratio": 0.7878787878787878,
+      "count": 26
+    },
+    {
+      "pattern": "are going to",
+      "regex": "\\bare\\ going\\ to\\b",
+      "toxicity_ratio": 0.7142857142857143,
+      "count": 5
+    }
+  ],
+  "self_harm": [
+    {
+      "pattern": "to suicide",
+      "regex": "\\bto\\ suicide\\b",
+      "toxicity_ratio": 1.0,
+      "count": 45
+    },
+    {
+      "pattern": "suicide n",
+      "regex": "\\bsuicide\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 45
+    },
+    {
+      "pattern": "leads to suicide",
+      "regex": "\\bleads\\ to\\ suicide\\b",
+      "toxicity_ratio": 1.0,
+      "count": 45
+    },
+    {
+      "pattern": "to suicide n",
+      "regex": "\\bto\\ suicide\\ n\\b",
+      "toxicity_ratio": 1.0,
+      "count": 45
+    },
+    {
+      "pattern": "suicide",
+      "regex": "\\bsuicide\\b",
+      "toxicity_ratio": 0.9423076923076923,
+      "count": 49
+    }
+  ]
+}

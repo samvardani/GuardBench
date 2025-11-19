@@ -116,7 +116,25 @@ except Exception:  # pragma: no cover
 from . import db
 from evaluation import evaluate
 from guards.baseline import predict as baseline_predict
-from guards.candidate import predict as candidate_predict
+from guards.candidate import predict as rules_predict
+
+# Import ensemble guard (rules + ML + transformer with intelligent routing)
+try:
+    from guards.ensemble_guard import predict_ensemble
+    candidate_predict = predict_ensemble  # Use ensemble (rules + ML + transformer)
+    ENSEMBLE_AVAILABLE = True
+    print("✓ Ensemble guard loaded (rules + ML + transformer)")
+except ImportError:
+    # Fallback to ML hybrid guard
+    try:
+        from guards.ml_guard import predict_hybrid
+        candidate_predict = predict_hybrid  # Use hybrid (rules + ML)
+        ENSEMBLE_AVAILABLE = False
+        print("✓ ML hybrid guard loaded (rules + ML)")
+    except ImportError:
+        candidate_predict = rules_predict  # Fallback to rules-only
+        ENSEMBLE_AVAILABLE = False
+        print("⚠ Using rules-only guard")
 from report.build_report import (
     cluster_failures,
     histogram,
@@ -156,38 +174,53 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Lifespan context manager for startup/shutdown."""
-    # Startup
+    # Startup - these are defined later in this module
     _configure_tracing()
     db.ensure_schema()
     logger.info("Safety service initialised with multi-tenant schema")
-    logger.info("Service started - version=%s build=%s", app.version, BUILD_ID)
-    
     yield
-    
-    # Graceful shutdown
-    logger.info("Service shutting down gracefully...")
-    PREDICT_EXECUTOR.shutdown(wait=True, cancel_futures=False)
-    logger.info("Service shutdown complete")
+    # Shutdown (if needed in future)
 
 
 app = FastAPI(
-    title="SeaRei AI Safety Platform",
-    description="Enterprise-grade AI safety with policy-as-code, evidence packs, and red-team automation",
-    version="0.3.1",
+    title="Sentinel Safety Service",
+    version="2024.10",
     json_dumps=orjson_dumps,
     json_loads=orjson_loads,
     default_response_class=ORJSONResponse,
     lifespan=lifespan,
-    docs_url=None,  # Disable default docs
-    redoc_url=None,  # Disable redoc
-    swagger_ui_parameters={
-        "deepLinking": True,
-        "displayRequestDuration": True,
-        "docExpansion": "none",
-        "syntaxHighlight.theme": "monokai",
-    },
 )
 seed_all_from_env("SEVAL_SEED")
+
+# Include AEGIS Federation endpoints
+try:
+    from src.service.federation_endpoints import router as federation_router
+    app.include_router(federation_router)
+    print("✅ AEGIS Federation endpoints enabled at /federation/*")
+except ImportError as e:
+    print(f"⚠️  AEGIS Federation endpoints not available: {e}")
+
+# Include Policy Customization endpoints
+try:
+    from src.service.policy_endpoints import router as policy_router
+    app.include_router(policy_router)
+    print("✅ Policy Customization endpoints enabled at /policy/*")
+except ImportError as e:
+    print(f"⚠️  Policy Customization endpoints not available: {e}")
+
+# Include Staging Platform endpoints
+try:
+    from service.staging_api import router as staging_router
+    from service.staging_upload import router as staging_upload_router
+    from service.staging_payments import router as staging_payments_router
+    from service.staging_admin import router as staging_admin_router
+    app.include_router(staging_router)
+    app.include_router(staging_upload_router)
+    app.include_router(staging_payments_router)
+    app.include_router(staging_admin_router)
+    print("✅ Staging Platform endpoints enabled at /api/staging/*")
+except ImportError as e:
+    print(f"⚠️  Staging Platform endpoints not available: {e}")
 # Templates
 ROOT_DIR = Path(__file__).resolve().parents[2]
 TPL_DIR = ROOT_DIR / "templates"
@@ -216,26 +249,17 @@ _cors = get_settings().cors_allow_origins
 if _cors and _cors.strip():
     _origins = [o.strip() for o in _cors.split(",") if o.strip()]
 else:
-    # SECURITY: Default to localhost only, not wildcard
-    _origins = ["http://localhost:3000", "http://localhost:8000", "http://127.0.0.1:3000", "http://127.0.0.1:8000"]
-    logger.warning("CORS_ALLOW_ORIGINS not set, using localhost-only default")
+    _origins = ["*"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # Session support (for CSRF tokens on policy page, etc.)
-# SECURITY: Require SESSION_SECRET in production
-_session_secret = os.getenv("SESSION_SECRET")
-if not _session_secret:
-    if os.getenv("ENV", "development") == "production":
-        raise RuntimeError("SESSION_SECRET environment variable is required in production")
-    _session_secret = "dev-insecure-secret-change-in-production"
-    logger.warning("SESSION_SECRET not set, using insecure default for development")
-app.add_middleware(SessionMiddleware, secret_key=_session_secret)
+app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET", "dev-not-secret"))
 
 # Provenance headers for governance and audit trails
 app.add_middleware(
@@ -250,12 +274,21 @@ app.add_middleware(
 @app.middleware("http")
 async def add_policy_headers(request: Request, call_next):  # type: ignore
     """Inject policy version and checksum into response headers."""
-    # Lazy import to avoid circular dependency
-    from src.seval.settings import POLICY_VERSION as SEVAL_VERSION, POLICY_CHECKSUM as SEVAL_CHECKSUM
+    # Use new policy loader for accurate checksums
+    try:
+        from policy.loader import get_policy_metadata
+        metadata = get_policy_metadata()
+        policy_version = metadata.get("version", "unknown")
+        policy_checksum = metadata.get("checksum_short", "unknown")
+    except Exception:
+        # Fallback to old method
+        from src.seval.settings import POLICY_VERSION as SEVAL_VERSION, POLICY_CHECKSUM as SEVAL_CHECKSUM
+        policy_version = SEVAL_VERSION
+        policy_checksum = SEVAL_CHECKSUM
     
     response = await call_next(request)
-    response.headers["X-Policy-Version"] = SEVAL_VERSION
-    response.headers["X-Policy-Checksum"] = SEVAL_CHECKSUM
+    response.headers["X-Policy-Version"] = str(policy_version)
+    response.headers["X-Policy-Checksum"] = str(policy_checksum)
     # Expose custom headers to JavaScript clients for CORS
     response.headers["Access-Control-Expose-Headers"] = "X-Policy-Version, X-Policy-Checksum"
     return response
@@ -266,6 +299,16 @@ TEMPLATE_DIR = ROOT / "templates"
 SCORECARD_ROOT = Path("dist/scorecards")
 SCORECARD_ROOT.mkdir(parents=True, exist_ok=True)
 app.mount("/scorecards", StaticFiles(directory=SCORECARD_ROOT), name="scorecards")
+
+# Mount dashboard directory for playground and other HTML files
+DASHBOARD_ROOT = ROOT / "dashboard"
+if DASHBOARD_ROOT.exists():
+    # Mount at /dashboard to avoid conflicts with API routes
+    app.mount("/dashboard", StaticFiles(directory=DASHBOARD_ROOT, html=True), name="dashboard")
+    # Also mount staging at root level for easier access
+    STAGING_ROOT = DASHBOARD_ROOT / "staging"
+    if STAGING_ROOT.exists():
+        app.mount("/staging", StaticFiles(directory=STAGING_ROOT, html=True), name="staging")
 
 CONFIG_FILE = Path("config.yaml")
 AUTOPATCH_THRESHOLD_PATH = Path("tuned_thresholds.yaml")
@@ -307,9 +350,9 @@ _settings = get_settings()
 PREDICT_TIMEOUT_SECONDS = float(_settings.predict_timeout_seconds)
 PREDICT_MAX_WORKERS = int(_settings.predict_max_workers)
 
-TOKEN_RATE_LIMIT = int(_settings.token_rate_limit)
-TOKEN_RATE_WINDOW_SECONDS = int(_settings.token_rate_window_seconds)
-RATE_LIMIT_ENABLED = _settings.rate_limit_enabled
+TOKEN_RATE_LIMIT = 2
+TOKEN_RATE_WINDOW_SECONDS = 60
+RATE_LIMIT_ENABLED = os.getenv("RATE_LIMIT_ENABLED", "true").lower() == "true"
 REDIS_URL = _settings.redis_url
 
 CB_FAILURE_THRESHOLD = int(os.getenv("CB_FAILURE_THRESHOLD", "3"))
@@ -638,7 +681,18 @@ async def post_policy_reload(request: Request, csrf_token: str = Form(...), admi
         "checksum": POLICY_CHECKSUM,
     })
 
-ROLE_RANK = {"viewer": 1, "analyst": 2, "admin": 3, "owner": 4}
+# Role hierarchy: lower number = less privilege
+# Staging platform roles: client (1), staff (2), manager (3), admin (4), owner (5)
+# Legacy roles: viewer (1), analyst (2), admin (4), owner (5)
+ROLE_RANK = {
+    "viewer": 1,
+    "client": 1,
+    "analyst": 2,
+    "staff": 2,
+    "manager": 3,
+    "admin": 4,
+    "owner": 5,
+}
 
 MAX_ROWS_PER_RUN = int(os.getenv("SAFETY_MAX_ROWS", "5000"))
 
@@ -783,6 +837,17 @@ def _key_from_request(request: Request) -> str:
 
 
 def _predict_call(predict_fn, text: str, category: Optional[str], language: Optional[str]):
+    # Handle async functions
+    if asyncio.iscoroutinefunction(predict_fn):
+        # Run async function in new event loop (since we're in executor thread)
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            return loop.run_until_complete(predict_fn(text, category, language))
+        finally:
+            loop.close()
+    
+    # Handle sync functions (original behavior)
     trials = [
         ((text,), {}),
         ((text, category), {}),
@@ -1097,6 +1162,37 @@ def _require_role(ctx: AuthContext, *, minimum: str = "viewer") -> None:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient role for this operation")
 
 
+def require_role(*allowed_roles: str):
+    """Decorator to require specific roles for an endpoint."""
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            # Find AuthContext in kwargs or args
+            ctx = None
+            for arg in args:
+                if isinstance(arg, AuthContext):
+                    ctx = arg
+                    break
+            if not ctx:
+                ctx = kwargs.get("ctx") or kwargs.get("auth") or next((v for k, v in kwargs.items() if isinstance(v, AuthContext)), None)
+            if not ctx:
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required")
+            if ctx.role not in allowed_roles:
+                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Role must be one of: {', '.join(allowed_roles)}")
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+
+def require_any_role(*allowed_roles: str):
+    """Dependency function to require one of the specified roles."""
+    def check_role(ctx: AuthContext = Depends(require_auth)) -> AuthContext:
+        if ctx.role not in allowed_roles:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=f"Role must be one of: {', '.join(allowed_roles)}")
+        return ctx
+    return check_role
+
+
 async def _subscribe_run(run_id: str) -> tuple[asyncio.Queue, List[Dict[str, Any]]]:
     queue: asyncio.Queue = asyncio.Queue(maxsize=32)
     async with RUN_LOCK:
@@ -1376,81 +1472,6 @@ def me(ctx: AuthContext = Depends(require_auth)) -> Dict[str, Any]:
     }
 
 
-# MFA Endpoints
-@app.post("/mfa/setup")
-def mfa_setup(ctx: AuthContext = Depends(require_auth)) -> Dict[str, Any]:
-    """Setup MFA for current user. Returns QR code and backup codes."""
-    from service.mfa import generate_secret, generate_qr_code, generate_backup_codes
-    
-    secret = generate_secret()
-    qr_code = generate_qr_code(secret, ctx.email)
-    backup_codes = generate_backup_codes(10)
-    
-    # Store in database (not enabled yet - awaiting verification)
-    import json
-    with db.db_conn() as con:
-        con.execute(
-            """UPDATE users 
-               SET mfa_secret = ?, mfa_backup_codes = ?, mfa_enabled = 0 
-               WHERE user_id = ?""",
-            (secret, json.dumps(backup_codes), ctx.user_id)
-        )
-    
-    return {
-        "secret": secret,
-        "qr_code": qr_code,
-        "qr_code_url": f"data:image/png;base64,{qr_code}",
-        "backup_codes": backup_codes,
-        "message": "Scan QR code with Google Authenticator or Authy, then call /mfa/enable with code"
-    }
-
-
-@app.post("/mfa/enable")
-def mfa_enable(code: str = Form(...), ctx: AuthContext = Depends(require_auth)) -> Dict[str, Any]:
-    """Verify setup code and enable MFA."""
-    from service.mfa import verify_code
-    
-    with db.db_conn(commit=False) as con:
-        row = con.execute("SELECT mfa_secret FROM users WHERE user_id = ?", (ctx.user_id,)).fetchone()
-    
-    if not row or not row['mfa_secret']:
-        raise HTTPException(400, "MFA not set up. Call /mfa/setup first")
-    
-    if not verify_code(row['mfa_secret'], code):
-        raise HTTPException(400, "Invalid verification code")
-    
-    with db.db_conn() as con:
-        con.execute("UPDATE users SET mfa_enabled = 1 WHERE user_id = ?", (ctx.user_id,))
-    
-    db.create_audit_event(ctx.tenant_id, action="mfa_enabled", user_id=ctx.user_id)
-    
-    return {"status": "enabled", "message": "MFA is now active for your account"}
-
-
-@app.post("/mfa/disable")
-def mfa_disable(ctx: AuthContext = Depends(require_auth)) -> Dict[str, Any]:
-    """Disable MFA for current user."""
-    with db.db_conn() as con:
-        con.execute(
-            "UPDATE users SET mfa_enabled = 0, mfa_secret = NULL, mfa_backup_codes = NULL WHERE user_id = ?",
-            (ctx.user_id,)
-        )
-    
-    db.create_audit_event(ctx.tenant_id, action="mfa_disabled", user_id=ctx.user_id)
-    
-    return {"status": "disabled", "message": "MFA has been disabled"}
-
-
-@app.get("/mfa/status")
-def mfa_status(ctx: AuthContext = Depends(require_auth)) -> Dict[str, Any]:
-    """Check if current user has MFA enabled."""
-    with db.db_conn(commit=False) as con:
-        row = con.execute("SELECT mfa_enabled FROM users WHERE user_id = ?", (ctx.user_id,)).fetchone()
-    
-    enabled = bool(row and row['mfa_enabled']) if row else False
-    return {"enabled": enabled}
-
-
 @app.get("/guards")
 def list_guards() -> Dict[str, str]:
     # Public endpoint: return a simple mapping id -> display name for ease of discovery
@@ -1506,13 +1527,8 @@ async def score_endpoint(request: ScoreRequest, ctx: Optional[AuthContext] = Dep
             slices = result.get("slices") or []
 
             privacy_mode = privacy_mode_for("score")
-            prediction = result.get("prediction")
-            threshold = result.get("threshold", 0.5)
-            
             response_payload = {
                 "score": score_value,
-                "prediction": prediction,
-                "threshold": threshold,
                 "slices": slices,
                 "policy_version": POLICY_VERSION,
                 "policy_checksum": POLICY_CHECKSUM,
@@ -1525,6 +1541,7 @@ async def score_endpoint(request: ScoreRequest, ctx: Optional[AuthContext] = Dep
             if rationale:
                 response_payload["rationale"] = rationale
 
+            prediction = result.get("prediction")
             if isinstance(prediction, bool):
                 outcome_label = "flag" if prediction else "allow"
             else:
@@ -2140,301 +2157,6 @@ except ImportError:
 def metrics_endpoint() -> Response:
     payload = generate_latest()
     return Response(content=payload, media_type=CONTENT_TYPE_LATEST)
-
-
-from fastapi.openapi.docs import get_swagger_ui_html
-from fastapi.responses import HTMLResponse
-
-@app.get("/docs", include_in_schema=False)
-async def custom_swagger_ui_html() -> HTMLResponse:
-    """Custom dark-themed Swagger UI matching SeaRei dashboard design."""
-    return HTMLResponse(content="""
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>SeaRei API - Documentation</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
-        
-        body {
-            margin: 0;
-            background: #000;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        }
-        
-        /* Dark theme */
-        .swagger-ui {
-            background: #000;
-            color: #fff;
-        }
-        
-        .swagger-ui .topbar {
-            background: rgba(255,255,255,0.04);
-            backdrop-filter: blur(40px);
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-            padding: 20px 0;
-        }
-        
-        .swagger-ui .topbar-wrapper {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 40px;
-        }
-        
-        .swagger-ui .topbar-wrapper .link {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .swagger-ui .topbar-wrapper .link::before {
-            content: '';
-            display: block;
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, #3b82f6, #06b6d4);
-            border-radius: 8px;
-        }
-        
-        .swagger-ui .topbar-wrapper .link span {
-            font-size: 20px;
-            font-weight: 600;
-            color: #fff !important;
-        }
-        
-        .swagger-ui .info {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 16px;
-            padding: 32px;
-            margin: 40px auto;
-            max-width: 1400px;
-        }
-        
-        .swagger-ui .info .title {
-            color: #fff !important;
-            font-size: 32px !important;
-            font-weight: 700;
-        }
-        
-        .swagger-ui .info .description {
-            color: #9ca3af !important;
-            font-size: 16px;
-            margin-top: 12px;
-        }
-        
-        .swagger-ui .scheme-container {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 12px;
-            padding: 20px;
-            max-width: 1400px;
-            margin: 0 auto 20px;
-        }
-        
-        .swagger-ui .opblock {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 12px;
-            margin-bottom: 16px;
-        }
-        
-        .swagger-ui .opblock.opblock-post { border-left: 4px solid #10b981; }
-        .swagger-ui .opblock.opblock-get { border-left: 4px solid #3b82f6; }
-        .swagger-ui .opblock.opblock-put { border-left: 4px solid #f59e0b; }
-        .swagger-ui .opblock.opblock-delete { border-left: 4px solid #ef4444; }
-        
-        .swagger-ui .opblock .opblock-summary {
-            background: transparent;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        
-        .swagger-ui .opblock .opblock-summary-path {
-            color: #e5e7eb !important;
-            font-family: 'JetBrains Mono', monospace;
-        }
-        
-        .swagger-ui .opblock .opblock-summary-description {
-            color: #9ca3af !important;
-        }
-        
-        .swagger-ui .opblock .opblock-body {
-            background: rgba(0,0,0,0.3);
-        }
-        
-        .swagger-ui .btn {
-            background: #3b82f6 !important;
-            color: #fff !important;
-            border: none !important;
-            border-radius: 8px;
-            padding: 10px 20px;
-            font-weight: 500;
-        }
-        
-        .swagger-ui .btn:hover {
-            background: #2563eb !important;
-        }
-        
-        .swagger-ui table {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-        
-        .swagger-ui table thead tr {
-            background: rgba(255,255,255,0.04);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .swagger-ui table thead tr th {
-            color: #9ca3af !important;
-            font-weight: 500;
-        }
-        
-        .swagger-ui table tbody tr {
-            color: #e5e7eb !important;
-        }
-        
-        .swagger-ui .parameter__name {
-            color: #60a5fa !important;
-            font-family: 'JetBrains Mono', monospace;
-        }
-        
-        .swagger-ui .parameter__type {
-            color: #34d399 !important;
-            font-family: 'JetBrains Mono', monospace;
-        }
-        
-        .swagger-ui .response-col_status {
-            color: #10b981 !important;
-            font-family: 'JetBrains Mono', monospace;
-        }
-        
-        .swagger-ui .model-box {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 8px;
-        }
-        
-        .swagger-ui .model {
-            color: #e5e7eb !important;
-            font-family: 'JetBrains Mono', monospace;
-        }
-        
-        .swagger-ui code {
-            background: rgba(255,255,255,0.05) !important;
-            color: #60a5fa !important;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: 'JetBrains Mono', monospace;
-        }
-        
-        .swagger-ui pre {
-            background: rgba(0,0,0,0.4) !important;
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px;
-            color: #e5e7eb !important;
-            font-family: 'JetBrains Mono', monospace;
-        }
-        
-        .swagger-ui .scheme-container .schemes > label {
-            color: #9ca3af !important;
-        }
-        
-        .swagger-ui select {
-            background: rgba(255,255,255,0.05) !important;
-            border: 1px solid rgba(255,255,255,0.1) !important;
-            color: #fff !important;
-            border-radius: 6px;
-        }
-        
-        .swagger-ui input[type=text],
-        .swagger-ui textarea {
-            background: rgba(255,255,255,0.05) !important;
-            border: 1px solid rgba(255,255,255,0.1) !important;
-            color: #fff !important;
-            border-radius: 6px;
-        }
-        
-        .swagger-ui .dialog-ux {
-            background: rgba(0,0,0,0.95) !important;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .swagger-ui .modal-ux-content {
-            background: #0a0a0a !important;
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 16px;
-        }
-        
-        /* Fix responses */
-        .swagger-ui .responses-inner {
-            background: transparent;
-        }
-        
-        .swagger-ui .response .response-col_description {
-            color: #e5e7eb !important;
-        }
-        
-        /* Microlight syntax (code examples) */
-        .swagger-ui .microlight {
-            background: rgba(0,0,0,0.5) !important;
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 8px;
-        }
-        
-        /* Tab headers */
-        .swagger-ui .tab {
-            color: #9ca3af !important;
-        }
-        
-        .swagger-ui .tab.active {
-            color: #3b82f6 !important;
-        }
-        
-        /* Version badge */
-        .swagger-ui .info .version {
-            background: rgba(59,130,246,0.2) !important;
-            color: #60a5fa !important;
-            border-radius: 6px;
-            padding: 4px 12px;
-            font-size: 13px;
-        }
-        
-        /* Improve contrast */
-        .swagger-ui .renderedMarkdown p,
-        .swagger-ui .renderedMarkdown li {
-            color: #d1d5db !important;
-        }
-    </style>
-</head>
-<body>
-    <div id="swagger-ui"></div>
-    <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
-    <script>
-        window.onload = () => {
-            window.ui = SwaggerUIBundle({
-                url: '/openapi.json',
-                dom_id: '#swagger-ui',
-                deepLinking: true,
-                displayRequestDuration: true,
-                docExpansion: 'none',
-                syntaxHighlight: {
-                    activate: true,
-                    theme: 'monokai'
-                },
-                presets: [
-                    SwaggerUIBundle.presets.apis,
-                    SwaggerUIBundle.SwaggerUIStandalonePreset
-                ],
-            });
-        };
-    </script>
-</body>
-</html>
-""")
 
 
 @app.get("/healthz", response_class=ORJSONResponse)

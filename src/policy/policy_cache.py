@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import threading
 from functools import lru_cache
 from pathlib import Path
 from typing import Optional
@@ -9,7 +8,6 @@ from .compiler import load_compiled_policy, CompiledPolicy
 
 
 LOAD_COUNTER: int = 0
-_COUNTER_LOCK = threading.Lock()
 
 
 def _policy_mtime(path: Path) -> float:
@@ -22,8 +20,7 @@ def _policy_mtime(path: Path) -> float:
 @lru_cache(maxsize=8)
 def _load_by_mtime(path_str: str, mtime: float) -> CompiledPolicy:
     global LOAD_COUNTER
-    with _COUNTER_LOCK:
-        LOAD_COUNTER += 1
+    LOAD_COUNTER += 1
     return load_compiled_policy(Path(path_str))
 
 
@@ -39,14 +36,12 @@ def get_compiled_policy(path: Optional[Path] = None) -> CompiledPolicy:
 
 
 def load_count() -> int:
-    with _COUNTER_LOCK:
-        return LOAD_COUNTER
+    return LOAD_COUNTER
 
 
 def clear_cache() -> None:
     global LOAD_COUNTER
-    with _COUNTER_LOCK:
-        LOAD_COUNTER = 0
+    LOAD_COUNTER = 0
     _load_by_mtime.cache_clear()  # type: ignore[attr-defined]
 
 

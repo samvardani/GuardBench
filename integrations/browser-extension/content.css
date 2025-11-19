@@ -1,0 +1,85 @@
+/* SeaRei Browser Extension - Content Styles */
+
+/* Notification animations */
+@keyframes searei-slideIn {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes searei-slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+}
+
+/* Unsafe content highlighting */
+.searei-unsafe-highlight {
+    background-color: rgba(239, 68, 68, 0.3);
+    border-bottom: 2px solid #ef4444;
+    cursor: help;
+    position: relative;
+}
+
+.searei-unsafe-highlight:hover::after {
+    content: '⚠️ Flagged by SeaRei';
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    background: #1f2937;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 999999;
+    margin-bottom: 4px;
+}
+
+/* Safe content highlighting (optional) */
+.searei-safe-highlight {
+    background-color: rgba(34, 197, 94, 0.2);
+    border-bottom: 2px solid #22c55e;
+}
+
+/* Loading indicator */
+.searei-loading {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 999999;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 14px;
+    animation: searei-slideIn 0.3s ease;
+}
+
+.searei-loading::before {
+    content: '🔍';
+    margin-right: 8px;
+}
+
+
+
+
+
+
+
+
+
+
+
+

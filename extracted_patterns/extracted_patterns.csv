@@ -1,0 +1,601 @@
+category,pattern,regex,toxicity_ratio,count
+general,n if,\bn\ if\b,1.0,7685
+general,n we,\bn\ we\b,1.0,6192
+general,mexicans,\bmexicans\b,1.0,6170
+general,n there,\bn\ there\b,1.0,6081
+general,n i,\bn\ i\b,1.0,5721
+general,n it,\bn\ it\b,1.0,4150
+general,n when,\bn\ when\b,1.0,3983
+general,bi,\bbi\b,1.0,3771
+general,middle east,\bmiddle\ east\b,1.0,3646
+general,the middle east,\bthe\ middle\ east\b,1.0,3646
+general,with mental,\bwith\ mental\b,1.0,3561
+general,the chinese,\bthe\ chinese\b,1.0,3409
+general,country n,\bcountry\ n\b,1.0,3348
+general,asians,\basians\b,1.0,3327
+general,african americans,\bafrican\ americans\b,1.0,3296
+general,middle eastern,\bmiddle\ eastern\b,1.0,3234
+general,them n,\bthem\ n\b,1.0,3160
+general,bitches,\bbitches\b,1.0,3118
+general,illness,\billness\b,1.0,3016
+general,mental illness,\bmental\ illness\b,1.0,3016
+general,n she,\bn\ she\b,1.0,2881
+general,n many,\bn\ many\b,1.0,2850
+general,chinese n,\bchinese\ n\b,1.0,2629
+general,easterners,\beasterners\b,1.0,2425
+general,middle easterners,\bmiddle\ easterners\b,1.0,2425
+general,of asian,\bof\ asian\b,1.0,2399
+general,african american,\bafrican\ american\b,1.0,2348
+general,arabs,\barabs\b,1.0,2313
+general,a mental,\ba\ mental\b,1.0,2174
+general,our country,\bour\ country\b,1.0,2110
+general,n my,\bn\ my\b,1.0,2039
+general,portrayed,\bportrayed\b,1.0,2026
+general,wheelchair,\bwheelchair\b,1.0,2003
+general,trans women,\btrans\ women\b,1.0,1991
+general,mexican friends,\bmexican\ friends\b,1.0,1963
+general,years n,\byears\ n\b,1.0,1894
+general,from the middle,\bfrom\ the\ middle\b,1.0,1884
+general,women n,\bwomen\ n\b,1.0,1856
+general,n most,\bn\ most\b,1.0,1814
+general,hundreds,\bhundreds\b,1.0,1792
+general,hundreds of,\bhundreds\ of\b,1.0,1791
+general,society n,\bsociety\ n\b,1.0,1784
+general,n its,\bn\ its\b,1.0,1774
+general,asian americans,\basian\ americans\b,1.0,1771
+general,diverse,\bdiverse\b,1.0,1735
+general,attracted to,\battracted\ to\b,1.0,1672
+general,couples,\bcouples\b,1.0,1653
+general,native american,\bnative\ american\b,1.0,1641
+general,have n,\bhave\ n\b,1.0,1628
+general,women and,\bwomen\ and\b,1.0,1600
+general,mental health,\bmental\ health\b,1.0,1598
+general,americans n,\bamericans\ n\b,1.0,1593
+general,our country n,\bour\ country\ n\b,1.0,1554
+general,greedy,\bgreedy\b,1.0,1550
+general,indigenous,\bindigenous\b,1.0,1548
+general,dealt,\bdealt\b,1.0,1546
+general,some native,\bsome\ native\b,1.0,1545
+general,n women,\bn\ women\b,1.0,1543
+general,with jews,\bwith\ jews\b,1.0,1542
+general,my fashion,\bmy\ fashion\b,1.0,1536
+general,violent,\bviolent\b,1.0,1535
+general,jews they,\bjews\ they\b,1.0,1534
+general,greed,\bgreed\b,1.0,1526
+general,from china,\bfrom\ china\b,1.0,1524
+general,increase,\bincrease\b,1.0,1523
+general,just want to,\bjust\ want\ to\b,1.0,1505
+general,treated,\btreated\b,1.0,1501
+general,language n,\blanguage\ n\b,1.0,1491
+general,be treated,\bbe\ treated\b,1.0,1490
+general,workers n,\bworkers\ n\b,1.0,1482
+general,transition,\btransition\b,1.0,1469
+general,to them,\bto\ them\b,1.0,1468
+general,n most of,\bn\ most\ of\b,1.0,1461
+general,from mexico,\bfrom\ mexico\b,1.0,1447
+general,n african,\bn\ african\b,1.0,1441
+general,dont want,\bdont\ want\b,1.0,1439
+general,that trans,\bthat\ trans\b,1.0,1426
+general,that woman,\bthat\ woman\b,1.0,1412
+general,a wheelchair,\ba\ wheelchair\b,1.0,1406
+general,better n,\bbetter\ n\b,1.0,1401
+general,community n,\bcommunity\ n\b,1.0,1388
+general,to society n,\bto\ society\ n\b,1.0,1374
+general,woman n,\bwoman\ n\b,1.0,1366
+general,a rich,\ba\ rich\b,1.0,1364
+general,world n,\bworld\ n\b,1.0,1363
+general,jew,\bjew\b,1.0,1361
+general,crimes,\bcrimes\b,1.0,1359
+general,valid,\bvalid\b,1.0,1359
+general,n they,\bn\ they\b,1.0,1358
+general,immigration,\bimmigration\b,1.0,1350
+general,a jew,\ba\ jew\b,1.0,1350
+general,inherently,\binherently\b,1.0,1348
+general,n a lot,\bn\ a\ lot\b,1.0,1342
+general,americans and,\bamericans\ and\b,1.0,1329
+general,n middle,\bn\ middle\b,1.0,1317
+general,brutes,\bbrutes\b,1.0,1313
+general,n when i,\bn\ when\ i\b,1.0,1309
+general,n indigenous,\bn\ indigenous\b,1.0,1303
+general,n these,\bn\ these\b,1.0,1287
+general,women have,\bwomen\ have\b,1.0,1270
+general,n some,\bn\ some\b,1.0,1270
+general,n some native,\bn\ some\ native\b,1.0,1270
+general,america n,\bamerica\ n\b,1.0,1268
+general,n for,\bn\ for\b,1.0,1261
+general,over our,\bover\ our\b,1.0,1261
+general,over our country,\bover\ our\ country\b,1.0,1261
+general,illnesses,\billnesses\b,1.0,1251
+general,mental illnesses,\bmental\ illnesses\b,1.0,1251
+general,gender,\bgender\b,1.0,1245
+general,she will,\bshe\ will\b,1.0,1244
+general,n i have,\bn\ i\ have\b,1.0,1244
+general,nigga,\bnigga\b,1.0,1229
+general,the mexicans,\bthe\ mexicans\b,1.0,1223
+general,than their,\bthan\ their\b,1.0,1221
+general,counterparts,\bcounterparts\b,1.0,1219
+general,learning,\blearning\b,1.0,1217
+general,a society,\ba\ society\b,1.0,1215
+general,illness n,\billness\ n\b,1.0,1205
+general,mental illness n,\bmental\ illness\ n\b,1.0,1205
+general,college students,\bcollege\ students\b,1.0,1198
+general,descent,\bdescent\b,1.0,1196
+general,asian descent,\basian\ descent\b,1.0,1196
+general,of asian descent,\bof\ asian\ descent\b,1.0,1196
+general,of asians,\bof\ asians\b,1.0,1194
+general,n in,\bn\ in\b,1.0,1167
+general,cultures,\bcultures\b,1.0,1164
+general,drain,\bdrain\b,1.0,1163
+general,n trans,\bn\ trans\b,1.0,1158
+general,we do not,\bwe\ do\ not\b,1.0,1152
+general,n we need,\bn\ we\ need\b,1.0,1150
+general,dont want to,\bdont\ want\ to\b,1.0,1137
+general,they have been,\bthey\ have\ been\b,1.0,1131
+general,n immigrants,\bn\ immigrants\b,1.0,1120
+general,many different,\bmany\ different\b,1.0,1110
+general,but now,\bbut\ now\b,1.0,1092
+general,of african,\bof\ african\b,1.0,1090
+general,our jobs,\bour\ jobs\b,1.0,1079
+general,jobs n,\bjobs\ n\b,1.0,1079
+general,our jobs n,\bour\ jobs\ n\b,1.0,1079
+general,many women,\bmany\ women\b,1.0,1079
+general,friends who,\bfriends\ who\b,1.0,1078
+general,the idea,\bthe\ idea\b,1.0,1076
+general,in their own,\bin\ their\ own\b,1.0,1074
+general,women in,\bwomen\ in\b,1.0,1072
+general,economy,\beconomy\b,1.0,1070
+general,hijab,\bhijab\b,1.0,1070
+general,at their,\bat\ their\b,1.0,1069
+general,be chinese,\bbe\ chinese\b,1.0,1067
+general,be chinese n,\bbe\ chinese\ n\b,1.0,1067
+general,n we must,\bn\ we\ must\b,1.0,1066
+harassment,disabilities,\bdisabilities\b,1.0,6304
+harassment,n people,\bn\ people\b,1.0,4336
+harassment,n if you,\bn\ if\ you\b,1.0,4140
+harassment,disability,\bdisability\b,1.0,4117
+harassment,with disabilities,\bwith\ disabilities\b,1.0,3723
+harassment,people with disabilities,\bpeople\ with\ disabilities\b,1.0,3723
+harassment,people n,\bpeople\ n\b,1.0,3493
+harassment,n you,\bn\ you\b,1.0,3465
+harassment,n it is,\bn\ it\ is\b,1.0,3345
+harassment,people from,\bpeople\ from\b,1.0,3209
+harassment,trans people,\btrans\ people\b,1.0,2961
+harassment,people with mental,\bpeople\ with\ mental\b,1.0,2810
+harassment,mentally ill,\bmentally\ ill\b,1.0,2798
+harassment,n there are,\bn\ there\ are\b,1.0,2529
+harassment,n people with,\bn\ people\ with\b,1.0,2341
+harassment,n there is,\bn\ there\ is\b,1.0,2282
+harassment,you cant,\byou\ cant\b,1.0,2248
+harassment,disabilities are,\bdisabilities\ are\b,1.0,2141
+harassment,discrimination,\bdiscrimination\b,1.0,2080
+harassment,african americans are,\bafrican\ americans\ are\b,1.0,1979
+harassment,mental disabilities,\bmental\ disabilities\b,1.0,1957
+harassment,with mental disabilities,\bwith\ mental\ disabilities\b,1.0,1957
+harassment,african american people,\bafrican\ american\ people\b,1.0,1944
+harassment,disabled people,\bdisabled\ people\b,1.0,1840
+harassment,chinese people,\bchinese\ people\b,1.0,1598
+harassment,mexicans are,\bmexicans\ are\b,1.0,1596
+harassment,are asian,\bare\ asian\b,1.0,1559
+harassment,indigenous people,\bindigenous\ people\b,1.0,1548
+harassment,trans women are,\btrans\ women\ are\b,1.0,1543
+harassment,are often,\bare\ often\b,1.0,1535
+harassment,history n,\bhistory\ n\b,1.0,1524
+harassment,the mentally,\bthe\ mentally\b,1.0,1487
+harassment,are portrayed,\bare\ portrayed\b,1.0,1426
+harassment,immigrants are,\bimmigrants\ are\b,1.0,1401
+harassment,risk,\brisk\b,1.0,1393
+harassment,with disabilities are,\bwith\ disabilities\ are\b,1.0,1380
+harassment,are hundreds,\bare\ hundreds\b,1.0,1367
+harassment,there are hundreds,\bthere\ are\ hundreds\b,1.0,1367
+harassment,are hundreds of,\bare\ hundreds\ of\b,1.0,1367
+harassment,are criminals,\bare\ criminals\b,1.0,1345
+harassment,n disabled,\bn\ disabled\b,1.0,1343
+harassment,stupid and,\bstupid\ and\b,1.0,1328
+harassment,n indigenous people,\bn\ indigenous\ people\b,1.0,1303
+harassment,n people from,\bn\ people\ from\b,1.0,1226
+harassment,a jewish,\ba\ jewish\b,1.0,1213
+harassment,people from the,\bpeople\ from\ the\b,1.0,1209
+harassment,they should be,\bthey\ should\ be\b,1.0,1206
+harassment,of people with,\bof\ people\ with\b,1.0,1189
+harassment,disability is,\bdisability\ is\b,1.0,1171
+harassment,n disabled people,\bn\ disabled\ people\b,1.0,1164
+harassment,it is a,\bit\ is\ a\b,1.0,1145
+harassment,people think,\bpeople\ think\b,1.0,1128
+harassment,of discrimination,\bof\ discrimination\b,1.0,1125
+harassment,native americans are,\bnative\ americans\ are\b,1.0,1120
+harassment,the mentally ill,\bthe\ mentally\ ill\b,1.0,1118
+harassment,youre not,\byoure\ not\b,1.0,1116
+harassment,hispanics,\bhispanics\b,1.0,1113
+harassment,disability n,\bdisability\ n\b,1.0,1094
+harassment,arabs are,\barabs\ are\b,1.0,1089
+harassment,immigration is,\bimmigration\ is\b,1.0,1086
+harassment,trans people are,\btrans\ people\ are\b,1.0,1074
+harassment,are chinese n,\bare\ chinese\ n\b,1.0,1071
+harassment,it is not,\bit\ is\ not\b,1.0,1063
+harassment,shouldnt,\bshouldnt\b,1.0,1061
+harassment,shouldnt be,\bshouldnt\ be\b,1.0,1060
+harassment,n jewish,\bn\ jewish\b,1.0,1025
+harassment,generally,\bgenerally\b,1.0,1020
+harassment,middle east is,\bmiddle\ east\ is\b,1.0,1017
+harassment,historically,\bhistorically\b,1.0,1007
+harassment,china are,\bchina\ are\b,1.0,1007
+harassment,from china are,\bfrom\ china\ are\b,1.0,1007
+harassment,is because,\bis\ because\b,1.0,1005
+harassment,are portrayed in,\bare\ portrayed\ in\b,1.0,1001
+harassment,awareness and,\bawareness\ and\b,1.0,995
+harassment,long history of,\blong\ history\ of\b,1.0,973
+harassment,people think about,\bpeople\ think\ about\b,1.0,954
+harassment,are mentally,\bare\ mentally\b,1.0,949
+harassment,they are just,\bthey\ are\ just\b,1.0,909
+harassment,n immigration is,\bn\ immigration\ is\b,1.0,905
+harassment,n immigrants are,\bn\ immigrants\ are\b,1.0,900
+harassment,and should,\band\ should\b,1.0,893
+harassment,should be treated,\bshould\ be\ treated\b,1.0,890
+harassment,easterners are,\beasterners\ are\b,1.0,886
+harassment,middle easterners are,\bmiddle\ easterners\ are\b,1.0,886
+harassment,are many,\bare\ many\b,1.0,881
+harassment,there are many,\bthere\ are\ many\b,1.0,881
+harassment,if youre,\bif\ youre\b,1.0,880
+harassment,learning spanish,\blearning\ spanish\b,1.0,879
+harassment,there are so,\bthere\ are\ so\b,1.0,877
+harassment,are so many,\bare\ so\ many\b,1.0,877
+harassment,people are all,\bpeople\ are\ all\b,1.0,873
+harassment,people were,\bpeople\ were\b,1.0,873
+harassment,shouldnt be allowed,\bshouldnt\ be\ allowed\b,1.0,863
+harassment,n when people,\bn\ when\ people\b,1.0,863
+harassment,animalistic,\banimalistic\b,1.0,853
+harassment,extremists,\bextremists\b,1.0,832
+harassment,american people are,\bamerican\ people\ are\b,1.0,825
+harassment,fashion is,\bfashion\ is\b,1.0,825
+harassment,people should,\bpeople\ should\b,1.0,810
+harassment,people dont,\bpeople\ dont\b,1.0,807
+harassment,that people,\bthat\ people\b,1.0,802
+harassment,all of our,\ball\ of\ our\b,1.0,802
+harassment,hispanic,\bhispanic\b,1.0,801
+harassment,steal all,\bsteal\ all\b,1.0,801
+harassment,steal all of,\bsteal\ all\ of\b,1.0,801
+harassment,hate me,\bhate\ me\b,1.0,786
+harassment,should try,\bshould\ try\b,1.0,785
+harassment,we should try,\bwe\ should\ try\b,1.0,784
+harassment,should try and,\bshould\ try\ and\b,1.0,784
+harassment,naturally less,\bnaturally\ less\b,1.0,783
+harassment,naturally less productive,\bnaturally\ less\ productive\b,1.0,783
+harassment,if they are,\bif\ they\ are\b,1.0,782
+harassment,scientist,\bscientist\b,1.0,781
+harassment,a scientist,\ba\ scientist\b,1.0,781
+harassment,scientist or,\bscientist\ or\b,1.0,781
+harassment,whether a scientist,\bwhether\ a\ scientist\b,1.0,781
+harassment,a scientist or,\ba\ scientist\ or\b,1.0,781
+harassment,scientist or janitor,\bscientist\ or\ janitor\b,1.0,781
+harassment,people are mentally,\bpeople\ are\ mentally\b,1.0,781
+harassment,who are not,\bwho\ are\ not\b,1.0,781
+harassment,the british,\bthe\ british\b,1.0,781
+harassment,british were,\bbritish\ were\b,1.0,781
+harassment,after the british,\bafter\ the\ british\b,1.0,781
+harassment,the british were,\bthe\ british\ were\b,1.0,781
+harassment,british were defeated,\bbritish\ were\ defeated\b,1.0,781
+harassment,asian are,\basian\ are\b,1.0,781
+harassment,moms who are,\bmoms\ who\ are\b,1.0,781
+harassment,who are asian,\bwho\ are\ asian\b,1.0,781
+harassment,are asian are,\bare\ asian\ are\b,1.0,781
+harassment,asian are known,\basian\ are\ known\b,1.0,781
+harassment,are known to,\bare\ known\ to\b,1.0,781
+harassment,are not behaving,\bare\ not\ behaving\b,1.0,781
+harassment,jews some are,\bjews\ some\ are\b,1.0,781
+harassment,some are complete,\bsome\ are\ complete\b,1.0,781
+harassment,are complete pigs,\bare\ complete\ pigs\b,1.0,781
+harassment,illness is,\billness\ is\b,1.0,780
+harassment,mental illness is,\bmental\ illness\ is\b,1.0,780
+harassment,drivers are,\bdrivers\ are\b,1.0,779
+harassment,you have been,\byou\ have\ been\b,1.0,778
+harassment,lately it is,\blately\ it\ is\b,1.0,778
+harassment,it is pretty,\bit\ is\ pretty\b,1.0,778
+harassment,is pretty obvious,\bis\ pretty\ obvious\b,1.0,778
+harassment,worst drivers are,\bworst\ drivers\ are\b,1.0,778
+harassment,drivers are asian,\bdrivers\ are\ asian\b,1.0,778
+harassment,are asian women,\bare\ asian\ women\b,1.0,778
+harassment,indigenous people are,\bindigenous\ people\ are\b,1.0,777
+harassment,people are often,\bpeople\ are\ often\b,1.0,777
+harassment,are often left,\bare\ often\ left\b,1.0,777
+harassment,hate me because,\bhate\ me\ because\b,1.0,776
+harassment,they hate,\bthey\ hate\b,1.0,776
+sexual,bisexual,\bbisexual\b,1.0,5311
+sexual,fuck,\bfuck\b,1.0,1599
+sexual,bisexuality,\bbisexuality\b,1.0,1524
+sexual,bisexuals,\bbisexuals\b,1.0,1425
+sexual,heterosexual,\bheterosexual\b,1.0,1391
+sexual,sex couples,\bsex\ couples\b,1.0,969
+sexual,fucking,\bfucking\b,1.0,923
+sexual,same sex couples,\bsame\ sex\ couples\b,1.0,914
+sexual,bisexual there,\bbisexual\ there\b,1.0,789
+sexual,bisexual there are,\bbisexual\ there\ are\b,1.0,789
+sexual,youre bisexual,\byoure\ bisexual\b,1.0,777
+sexual,sex marriage,\bsex\ marriage\b,1.0,772
+sexual,same sex marriage,\bsame\ sex\ marriage\b,1.0,772
+sexual,be bisexual,\bbe\ bisexual\b,1.0,712
+sexual,your sexuality,\byour\ sexuality\b,1.0,712
+sexual,bisexuals are,\bbisexuals\ are\b,1.0,709
+sexual,n bisexuals,\bn\ bisexuals\b,1.0,691
+sexual,n bisexuality,\bn\ bisexuality\b,1.0,574
+sexual,im bisexual,\bim\ bisexual\b,1.0,549
+sexual,n bisexuals are,\bn\ bisexuals\ are\b,1.0,541
+sexual,bisexuality is,\bbisexuality\ is\b,1.0,469
+sexual,heterosexual couples,\bheterosexual\ couples\b,1.0,460
+sexual,sexuality is,\bsexuality\ is\b,1.0,448
+sexual,your sexuality is,\byour\ sexuality\ is\b,1.0,448
+sexual,mean youre bisexual,\bmean\ youre\ bisexual\b,1.0,444
+sexual,opposite sex,\bopposite\ sex\b,1.0,431
+sexual,not bisexual,\bnot\ bisexual\b,1.0,421
+sexual,bisexual you,\bbisexual\ you\b,1.0,421
+sexual,not bisexual you,\bnot\ bisexual\ you\b,1.0,421
+sexual,the bisexual,\bthe\ bisexual\b,1.0,401
+sexual,sex marriages,\bsex\ marriages\b,1.0,388
+sexual,same sex marriages,\bsame\ sex\ marriages\b,1.0,388
+sexual,the opposite sex,\bthe\ opposite\ sex\b,1.0,376
+sexual,sex n,\bsex\ n\b,1.0,374
+sexual,opposite sex n,\bopposite\ sex\ n\b,1.0,374
+sexual,bisexual if,\bbisexual\ if\b,1.0,364
+sexual,bisexual if youre,\bbisexual\ if\ youre\b,1.0,364
+sexual,are sexual,\bare\ sexual\b,1.0,354
+sexual,sexual deviants,\bsexual\ deviants\b,1.0,354
+sexual,are sexual deviants,\bare\ sexual\ deviants\b,1.0,354
+sexual,a heterosexual,\ba\ heterosexual\b,1.0,353
+sexual,in a heterosexual,\bin\ a\ heterosexual\b,1.0,352
+sexual,dresses sexy,\bdresses\ sexy\b,1.0,326
+sexual,sexy she,\bsexy\ she\b,1.0,326
+sexual,woman dresses sexy,\bwoman\ dresses\ sexy\b,1.0,326
+sexual,dresses sexy she,\bdresses\ sexy\ she\b,1.0,326
+sexual,sexy she is,\bsexy\ she\ is\b,1.0,326
+sexual,heterosexual relationships,\bheterosexual\ relationships\b,1.0,324
+sexual,heterosexual relationships n,\bheterosexual\ relationships\ n\b,1.0,324
+sexual,being bisexual,\bbeing\ bisexual\b,1.0,318
+sexual,with being bisexual,\bwith\ being\ bisexual\b,1.0,318
+sexual,n bisexuality is,\bn\ bisexuality\ is\b,1.0,315
+sexual,asexual,\basexual\b,1.0,304
+sexual,sexually,\bsexually\b,1.0,303
+sexual,the same sex,\bthe\ same\ sex\b,1.0,299
+sexual,homosexuality,\bhomosexuality\b,1.0,295
+sexual,fucking people,\bfucking\ people\b,1.0,293
+sexual,those fucking,\bthose\ fucking\b,1.0,293
+sexual,want those fucking,\bwant\ those\ fucking\b,1.0,292
+sexual,those fucking people,\bthose\ fucking\ people\b,1.0,292
+sexual,fucking people in,\bfucking\ people\ in\b,1.0,292
+sexual,bisexual end,\bbisexual\ end\b,1.0,276
+sexual,about im bisexual,\babout\ im\ bisexual\b,1.0,276
+sexual,im bisexual end,\bim\ bisexual\ end\b,1.0,276
+sexual,bisexual end of,\bbisexual\ end\ of\b,1.0,276
+sexual,bisexuals are valid,\bbisexuals\ are\ valid\b,1.0,274
+sexual,a sexuality,\ba\ sexuality\b,1.0,273
+sexual,sexuality its,\bsexuality\ its\b,1.0,273
+sexual,mean im bisexual,\bmean\ im\ bisexual\b,1.0,273
+sexual,im bisexual there,\bim\ bisexual\ there\b,1.0,273
+sexual,identify a sexuality,\bidentify\ a\ sexuality\b,1.0,273
+sexual,a sexuality its,\ba\ sexuality\ its\b,1.0,273
+sexual,sexuality its just,\bsexuality\ its\ just\b,1.0,273
+sexual,bisexuals are attracted,\bbisexuals\ are\ attracted\b,1.0,271
+sexual,bisexual means,\bbisexual\ means\b,1.0,270
+sexual,bisexual means that,\bbisexual\ means\ that\b,1.0,270
+sexual,a bisexual,\ba\ bisexual\b,1.0,266
+sexual,bisexual character,\bbisexual\ character\b,1.0,266
+sexual,see a bisexual,\bsee\ a\ bisexual\b,1.0,266
+sexual,a bisexual character,\ba\ bisexual\ character\b,1.0,266
+sexual,bisexual character we,\bbisexual\ character\ we\b,1.0,266
+sexual,bisexual sure,\bbisexual\ sure\b,1.0,264
+sexual,sexuality based,\bsexuality\ based\b,1.0,264
+sexual,to be bisexual,\bto\ be\ bisexual\b,1.0,264
+sexual,be bisexual sure,\bbe\ bisexual\ sure\b,1.0,264
+sexual,bisexual sure ive,\bbisexual\ sure\ ive\b,1.0,264
+sexual,im not bisexual,\bim\ not\ bisexual\b,1.0,264
+sexual,bisexual you dont,\bbisexual\ you\ dont\b,1.0,264
+sexual,of your sexuality,\bof\ your\ sexuality\b,1.0,264
+sexual,your sexuality based,\byour\ sexuality\ based\b,1.0,264
+sexual,sexuality based on,\bsexuality\ based\ on\b,1.0,264
+sexual,about your sexuality,\babout\ your\ sexuality\b,1.0,264
+sexual,sexuality is that,\bsexuality\ is\ that\b,1.0,264
+sexual,sex couples are,\bsex\ couples\ are\b,1.0,264
+sexual,bisexual and,\bbisexual\ and\b,1.0,263
+sexual,and asexual,\band\ asexual\b,1.0,263
+sexual,asexual at,\basexual\ at\b,1.0,263
+sexual,can be bisexual,\bcan\ be\ bisexual\b,1.0,263
+sexual,be bisexual and,\bbe\ bisexual\ and\b,1.0,263
+sexual,bisexual and asexual,\bbisexual\ and\ asexual\b,1.0,263
+sexual,and asexual at,\band\ asexual\ at\b,1.0,263
+sexual,asexual at the,\basexual\ at\ the\b,1.0,263
+sexual,sex with another,\bsex\ with\ another\b,1.0,263
+sexual,your bisexuality,\byour\ bisexuality\b,1.0,263
+sexual,bisexuality its,\bbisexuality\ its\b,1.0,263
+sexual,express your bisexuality,\bexpress\ your\ bisexuality\b,1.0,263
+sexual,your bisexuality its,\byour\ bisexuality\ its\b,1.0,263
+sexual,bisexuality its a,\bbisexuality\ its\ a\b,1.0,263
+sexual,many bisexuals,\bmany\ bisexuals\b,1.0,261
+sexual,bisexuals exist,\bbisexuals\ exist\b,1.0,261
+sexual,of bisexuals,\bof\ bisexuals\b,1.0,261
+sexual,bisexuals in,\bbisexuals\ in\b,1.0,261
+sexual,term heterosexual,\bterm\ heterosexual\b,1.0,261
+sexual,being bisexual there,\bbeing\ bisexual\ there\b,1.0,261
+sexual,how many bisexuals,\bhow\ many\ bisexuals\b,1.0,261
+sexual,many bisexuals exist,\bmany\ bisexuals\ exist\b,1.0,261
+sexual,bisexuals exist there,\bbisexuals\ exist\ there\b,1.0,261
+sexual,tons of bisexuals,\btons\ of\ bisexuals\b,1.0,261
+sexual,of bisexuals in,\bof\ bisexuals\ in\b,1.0,261
+sexual,bisexuals in happy,\bbisexuals\ in\ happy\b,1.0,261
+sexual,long term heterosexual,\blong\ term\ heterosexual\b,1.0,261
+sexual,term heterosexual relationships,\bterm\ heterosexual\ relationships\b,1.0,261
+sexual,recognizing same sex,\brecognizing\ same\ sex\b,1.0,260
+sexual,blame bisexuality,\bblame\ bisexuality\b,1.0,259
+sexual,bisexuality on,\bbisexuality\ on\b,1.0,259
+sexual,to blame bisexuality,\bto\ blame\ bisexuality\b,1.0,259
+sexual,blame bisexuality on,\bblame\ bisexuality\ on\b,1.0,259
+sexual,bisexuality on your,\bbisexuality\ on\ your\b,1.0,259
+sexual,fuckin,\bfuckin\b,1.0,258
+sexual,as bisexual,\bas\ bisexual\b,1.0,256
+sexual,bisexual when,\bbisexual\ when\b,1.0,256
+sexual,my sexuality,\bmy\ sexuality\b,1.0,256
+sexual,sexuality any,\bsexuality\ any\b,1.0,256
+sexual,out as bisexual,\bout\ as\ bisexual\b,1.0,256
+sexual,as bisexual when,\bas\ bisexual\ when\b,1.0,256
+sexual,bisexual when i,\bbisexual\ when\ i\b,1.0,256
+sexual,make my sexuality,\bmake\ my\ sexuality\b,1.0,256
+sexual,my sexuality any,\bmy\ sexuality\ any\b,1.0,256
+sexual,sexuality any less,\bsexuality\ any\ less\b,1.0,256
+sexual,youre bisexual there,\byoure\ bisexual\ there\b,1.0,255
+sexual,bisexuality is for,\bbisexuality\ is\ for\b,1.0,253
+sexual,was bisexual,\bwas\ bisexual\b,1.0,250
+sexual,bisexual before,\bbisexual\ before\b,1.0,250
+sexual,i was bisexual,\bi\ was\ bisexual\b,1.0,250
+sexual,was bisexual before,\bwas\ bisexual\ before\b,1.0,250
+sexual,bisexual before i,\bbisexual\ before\ i\b,1.0,250
+sexual,sex with someone,\bsex\ with\ someone\b,1.0,250
+sexual,still sexually,\bstill\ sexually\b,1.0,245
+sexual,sexually attracted,\bsexually\ attracted\b,1.0,245
+sexual,active sex,\bactive\ sex\b,1.0,245
+violence,even killed,\beven\ killed\b,1.0,754
+violence,killed off,\bkilled\ off\b,1.0,754
+violence,were even killed,\bwere\ even\ killed\b,1.0,754
+violence,even killed off,\beven\ killed\ off\b,1.0,754
+violence,killed off n,\bkilled\ off\ n\b,1.0,754
+violence,been attacked,\bbeen\ attacked\b,1.0,608
+violence,have been attacked,\bhave\ been\ attacked\b,1.0,608
+violence,been attacked and,\bbeen\ attacked\ and\b,1.0,608
+violence,attacked and threatened,\battacked\ and\ threatened\b,1.0,608
+violence,face attacks,\bface\ attacks\b,1.0,589
+violence,attacks it,\battacks\ it\b,1.0,589
+violence,oppression face attacks,\boppression\ face\ attacks\b,1.0,589
+violence,face attacks it,\bface\ attacks\ it\b,1.0,589
+violence,attacks it is,\battacks\ it\ is\b,1.0,589
+violence,hurtful,\bhurtful\b,1.0,586
+violence,being hurtful,\bbeing\ hurtful\b,1.0,586
+violence,hurtful so,\bhurtful\ so\b,1.0,586
+violence,them being hurtful,\bthem\ being\ hurtful\b,1.0,586
+violence,being hurtful so,\bbeing\ hurtful\ so\b,1.0,586
+violence,hurtful so i,\bhurtful\ so\ i\b,1.0,586
+violence,in attacks,\bin\ attacks\b,1.0,575
+violence,increase in attacks,\bincrease\ in\ attacks\b,1.0,575
+violence,in attacks against,\bin\ attacks\ against\b,1.0,575
+violence,attacks against asian,\battacks\ against\ asian\b,1.0,575
+violence,kill the,\bkill\ the\b,1.0,553
+violence,to kill the,\bto\ kill\ the\b,1.0,549
+violence,need to kill,\bneed\ to\ kill\b,1.0,547
+violence,kill the chinese,\bkill\ the\ chinese\b,1.0,547
+violence,kills,\bkills\b,1.0,424
+violence,to skills,\bto\ skills\b,1.0,418
+violence,skills in,\bskills\ in\b,1.0,418
+violence,them to skills,\bthem\ to\ skills\b,1.0,418
+violence,to skills in,\bto\ skills\ in\b,1.0,418
+violence,skills in computer,\bskills\ in\ computer\b,1.0,418
+violence,who kills,\bwho\ kills\b,1.0,414
+violence,kills an,\bkills\ an\b,1.0,414
+violence,officer who kills,\bofficer\ who\ kills\b,1.0,414
+violence,who kills an,\bwho\ kills\ an\b,1.0,414
+violence,kills an unarmed,\bkills\ an\ unarmed\b,1.0,414
+violence,hurt the,\bhurt\ the\b,1.0,411
+violence,and hurt,\band\ hurt\b,1.0,410
+violence,schools and hurt,\bschools\ and\ hurt\b,1.0,410
+violence,and hurt the,\band\ hurt\ the\b,1.0,410
+violence,hurt the quality,\bhurt\ the\ quality\b,1.0,410
+violence,terrorist attacks,\bterrorist\ attacks\b,1.0,386
+violence,attacks increase,\battacks\ increase\b,1.0,386
+violence,terrorist attacks increase,\bterrorist\ attacks\ increase\b,1.0,386
+violence,attacks increase the,\battacks\ increase\ the\b,1.0,386
+violence,from hurting,\bfrom\ hurting\b,1.0,376
+violence,hurting others,\bhurting\ others\b,1.0,376
+violence,them from hurting,\bthem\ from\ hurting\b,1.0,376
+violence,from hurting others,\bfrom\ hurting\ others\b,1.0,376
+violence,hurting others n,\bhurting\ others\ n\b,1.0,376
+violence,n terrorist attacks,\bn\ terrorist\ attacks\b,1.0,322
+violence,being destroyed,\bbeing\ destroyed\b,1.0,267
+violence,destroyed by,\bdestroyed\ by\b,1.0,267
+violence,is being destroyed,\bis\ being\ destroyed\b,1.0,267
+violence,being destroyed by,\bbeing\ destroyed\ by\b,1.0,267
+violence,destroyed by the,\bdestroyed\ by\ the\b,1.0,267
+violence,skilled,\bskilled\b,1.0,264
+violence,high skilled,\bhigh\ skilled\b,1.0,263
+violence,skilled workers,\bskilled\ workers\b,1.0,263
+violence,are high skilled,\bare\ high\ skilled\b,1.0,263
+violence,high skilled workers,\bhigh\ skilled\ workers\b,1.0,263
+violence,skilled workers n,\bskilled\ workers\ n\b,1.0,263
+violence,they kill,\bthey\ kill\b,1.0,233
+violence,kill another,\bkill\ another\b,1.0,231
+violence,animals they kill,\banimals\ they\ kill\b,1.0,231
+violence,they kill another,\bthey\ kill\ another\b,1.0,231
+violence,kill another human,\bkill\ another\ human\b,1.0,231
+violence,have stable,\bhave\ stable\b,1.0,68
+violence,stable relationships,\bstable\ relationships\b,1.0,68
+violence,to have stable,\bto\ have\ stable\b,1.0,68
+violence,have stable relationships,\bhave\ stable\ relationships\b,1.0,68
+violence,stable relationships n,\bstable\ relationships\ n\b,1.0,68
+violence,emotionally stable,\bemotionally\ stable\b,1.0,67
+violence,stable or,\bstable\ or\b,1.0,67
+violence,less emotionally stable,\bless\ emotionally\ stable\b,1.0,67
+violence,emotionally stable or,\bemotionally\ stable\ or\b,1.0,67
+violence,stable or less,\bstable\ or\ less\b,1.0,67
+violence,about hurting,\babout\ hurting\b,1.0,56
+violence,hurting your,\bhurting\ your\b,1.0,56
+violence,worry about hurting,\bworry\ about\ hurting\b,1.0,56
+violence,about hurting your,\babout\ hurting\ your\b,1.0,56
+violence,hurting your feelings,\bhurting\ your\ feelings\b,1.0,56
+violence,unstable,\bunstable\b,1.0,52
+violence,are unstable,\bare\ unstable\b,1.0,52
+violence,unstable n,\bunstable\ n\b,1.0,52
+violence,lesbians are unstable,\blesbians\ are\ unstable\b,1.0,52
+violence,are unstable n,\bare\ unstable\ n\b,1.0,52
+violence,kill me,\bkill\ me\b,1.0,11
+violence,hurts,\bhurts\b,1.0,10
+violence,t kill,\bt\ kill\b,1.0,9
+violence,kill you,\bkill\ you\b,1.0,8
+violence,unstable n in,\bunstable\ n\ in\b,1.0,8
+violence,kill that,\bkill\ that\b,1.0,7
+violence,unstable n the,\bunstable\ n\ the\b,1.0,7
+violence,shoot that,\bshoot\ that\b,1.0,6
+violence,kill yo,\bkill\ yo\b,1.0,6
+violence,ll kill,\bll\ kill\b,1.0,6
+violence,i ll kill,\bi\ ll\ kill\b,1.0,6
+violence,kill my,\bkill\ my\b,1.0,5
+violence,kill my vibe,\bkill\ my\ vibe\b,1.0,5
+violence,killa,\bkilla\b,1.0,5
+violence,ima kill,\bima\ kill\b,1.0,5
+violence,killed that,\bkilled\ that\b,1.0,5
+violence,butthurt,\bbutthurt\b,1.0,5
+violence,bitch kill,\bbitch\ kill\b,1.0,5
+violence,killer but,\bkiller\ but\b,1.0,5
+violence,t a killer,\bt\ a\ killer\b,1.0,5
+violence,a killer but,\ba\ killer\ but\b,1.0,5
+violence,killer but don,\bkiller\ but\ don\b,1.0,5
+violence,attacked,\battacked\b,0.9983633387888707,610
+violence,attacked and,\battacked\ and\b,0.9983579638752053,608
+violence,attacks against,\battacks\ against\b,0.9982668977469671,576
+violence,to kill,\bto\ kill\b,0.9982238010657194,562
+violence,attacks,\battacks\b,0.9974293059125964,1552
+violence,destroyed,\bdestroyed\b,0.9962962962962963,269
+violence,hurting,\bhurting\b,0.9954441913439636,437
+violence,skills,\bskills\b,0.9929742388758782,424
+violence,stable,\bstable\b,0.9927536231884058,137
+violence,kill,\bkill\b,0.9890230515916575,901
+violence,hurt,\bhurt\b,0.9852320675105485,467
+violence,killed,\bkilled\b,0.9826302729528535,792
+violence,shooting,\bshooting\b,0.9166666666666666,11
+violence,a killer,\ba\ killer\b,0.8571428571428571,6
+violence,shoot,\bshoot\b,0.8392857142857143,47
+violence,kill a,\bkill\ a\b,0.8333333333333334,10
+violence,killin,\bkillin\b,0.8333333333333334,10
+violence,destroying,\bdestroying\b,0.8333333333333334,5
+violence,will kill,\bwill\ kill\b,0.8333333333333334,5
+violence,killed the,\bkilled\ the\b,0.8333333333333334,5
+threat,always going to,\balways\ going\ to\b,1.0,264
+threat,were going to,\bwere\ going\ to\b,1.0,79
+threat,going to be,\bgoing\ to\ be\b,0.9835164835164835,358
+threat,going to,\bgoing\ to\b,0.9322381930184805,454
+threat,watch out,\bwatch\ out\b,0.9,9
+threat,going to the,\bgoing\ to\ the\b,0.8888888888888888,8
+threat,is going to,\bis\ going\ to\b,0.8888888888888888,8
+threat,going to get,\bgoing\ to\ get\b,0.875,7
+threat,not going to,\bnot\ going\ to\b,0.8571428571428571,6
+threat,am going to,\bam\ going\ to\b,0.8333333333333334,5
+threat,was going to,\bwas\ going\ to\b,0.8333333333333334,5
+threat,m going to,\bm\ going\ to\b,0.7878787878787878,26
+threat,are going to,\bare\ going\ to\b,0.7142857142857143,5
+self_harm,to suicide,\bto\ suicide\b,1.0,45
+self_harm,suicide n,\bsuicide\ n\b,1.0,45
+self_harm,leads to suicide,\bleads\ to\ suicide\b,1.0,45
+self_harm,to suicide n,\bto\ suicide\ n\b,1.0,45
+self_harm,suicide,\bsuicide\b,0.9423076923076923,49

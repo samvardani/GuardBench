@@ -15,13 +15,6 @@ from typing import Any, Dict, Optional
 
 from store import init_db
 
-try:
-    from service.settings import get_settings
-    _SETTINGS = get_settings()
-    DB_TIMEOUT = _SETTINGS.db_timeout_seconds
-except Exception:
-    DB_TIMEOUT = 5.0
-
 DB_PATH = Path(__file__).resolve().parents[2] / "history.db"
 _PBKDF2_ROUNDS = 160_000
 _TOKEN_BYTES = 32
@@ -38,12 +31,8 @@ def ensure_schema() -> None:
 
 
 def _connect() -> sqlite3.Connection:
-    con = sqlite3.connect(DB_PATH, timeout=DB_TIMEOUT)
+    con = sqlite3.connect(DB_PATH)
     con.row_factory = sqlite3.Row
-    # Enable WAL mode for better concurrent read performance
-    con.execute("PRAGMA journal_mode=WAL")
-    # Set busy timeout to handle concurrent writes
-    con.execute(f"PRAGMA busy_timeout={int(DB_TIMEOUT * 1000)}")
     return con
 
 
@@ -538,6 +527,18 @@ def store_report_record(
         )
 
 
+def get_user(user_id: str, tenant_id: str) -> Optional[Dict[str, Any]]:
+    """Get a single user by ID."""
+    ensure_schema()
+    with db_conn(commit=False) as con:
+        row = con.execute("SELECT * FROM users WHERE user_id = ? AND tenant_id = ?", (user_id, tenant_id)).fetchone()
+    if not row:
+        return None
+    data = dict(row)
+    data.pop("password_hash", None)
+    return data
+
+
 def list_users(tenant_id: str) -> list[Dict[str, Any]]:
     ensure_schema()
     with db_conn(commit=False) as con:
@@ -555,6 +556,25 @@ def update_user_status(user_id: str, status: str) -> None:
             "UPDATE users SET status = ? WHERE user_id = ?",
             (status, user_id),
         )
+
+
+def update_user(user_id: str, tenant_id: str, updates: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """Update user fields."""
+    ensure_schema()
+    if not updates:
+        return get_user(user_id, tenant_id)
+    set_clauses = []
+    params: list[Any] = []
+    for key, value in updates.items():
+        if value is not None and key not in ["password_hash", "user_id", "tenant_id"]:
+            set_clauses.append(f"{key} = ?")
+            params.append(value)
+    if not set_clauses:
+        return get_user(user_id, tenant_id)
+    params.extend([user_id, tenant_id])
+    with db_conn() as con:
+        con.execute(f"UPDATE users SET {', '.join(set_clauses)} WHERE user_id = ? AND tenant_id = ?", params)
+    return get_user(user_id, tenant_id)
 
 
 def update_user_role(user_id: str, role: str) -> None:
