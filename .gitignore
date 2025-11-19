@@ -280,3 +280,12 @@ virtual-staging/temp/
 
 # WordPress plugin builds (archives)
 wp-ai-engine-pro-*.zip
+
+# Large dataset files (exceed GitHub 100MB limit)
+datasets_raw/*.zip
+datasets_raw/*.csv
+datasets_raw/*.zst
+datasets_raw/jigsaw_cleaned.csv
+datasets_raw/test.csv
+datasets_raw/train.csv
+datasets_raw/jigsaw-toxic-comment-classification-challenge.zip
