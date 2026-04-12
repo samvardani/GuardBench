@@ -268,4 +268,4 @@ MIT — see [LICENSE](LICENSE).
 
 ---
 
-*Built by [SeaTechOne LLC](https://searei.com) · Seattle, WA*
+*Built by [SeaTechOne LLC](https://seatechone.com) · Seattle, WA*
