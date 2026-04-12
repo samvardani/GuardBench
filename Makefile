@@ -1,4 +1,32 @@
-.PHONY: compare report sweep store demo open runtime-demo service quick-demo service-http service-grpc build-wheel docker pack grpc-gen grpc-serve grpc-client grpc-health grpc-score grpc-batch grpc-serve-tls serve-rest serve-grpc test fmt
+## GuardBench targets (new CLI)
+.PHONY: install test gb-compare gb-report gb-gate gb-demo gb-clean
+
+install:
+	pip install -e ".[dev]"
+
+test:
+	pytest tests/guardbench/ --cov=guardbench -q
+
+gb-compare:
+	guardbench compare --baseline regex --candidate regex --dataset dataset/sample.csv
+
+gb-report:
+	guardbench report --run latest --open
+
+gb-gate:
+	guardbench gate --config gate.json
+
+gb-demo: gb-compare gb-report gb-gate
+
+gb-clean:
+	find . -name ".DS_Store" -delete
+	find . -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
+
+## Legacy targets (src/ based)
+.PHONY: legacy-compare legacy-report
+
+legacy-compare:
+	python -m src.runner.run_compare
 
 compare:
 	python -m src.runner.run_compare

@@ -1,0 +1,26 @@
+name: GuardBench CI
+
+on:
+  push:
+    branches: [main, feat/**]
+  pull_request:
+    branches: [main]
+
+jobs:
+  guardbench:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install guardbench
+        run: pip install -e ".[dev]"
+      - name: Run tests
+        run: pytest tests/guardbench/ --cov=guardbench -q
+      - name: Compare guards
+        run: guardbench compare --baseline regex --candidate regex --dataset dataset/sample.csv
+      - name: Generate report
+        run: guardbench report --run latest
+      - name: Run CI gate
+        run: guardbench gate --config gate.json --run latest
