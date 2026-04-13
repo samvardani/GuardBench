@@ -7,7 +7,7 @@ python-multipart==0.0.20
 pydantic==2.11.9
 anyio==4.11.0
 prometheus-client==0.23.1
-jinja2==3.1.4
+jinja2==3.1.6
 pyyaml==6.0.3
 
 # plots (used by report code; force non-GUI backend in CI)
