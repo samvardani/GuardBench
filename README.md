@@ -1,3 +1,5 @@
+<p align="center"><img src="branding/guardbench-wordmark.svg" alt="GuardBench" width="440"/></p>
+
 # sea-guard — AI Safety Guard Evaluation Framework
 
 **Stop shipping AI safety regressions. Benchmark, compare, and gate your guards in CI.**
@@ -94,6 +96,24 @@ guardbench compare \
 guardbench report --run latest --open
 guardbench gate --config gate.json
 ```
+
+---
+
+## Dashboard
+
+After running evaluations, view an interactive multi-run dashboard:
+
+```bash
+guardbench dashboard
+```
+
+Opens `report/dashboard.html` in your browser. The dashboard is also auto-rebuilt every time you run `guardbench report`.
+
+**Four tabs:**
+- **Overview** — run history table with F1, recall, FPR, McNemar p-value, and pass/fail gate badges. Click any row to drill in.
+- **Run Detail** — baseline vs candidate metric cards (with Wilson CIs), per-slice recall/FPR breakdown, and a 200-row sample results table. Strict/Lenient toggle.
+- **Trends** — line charts of recall, F1, FPR, and McNemar p-value over all runs (chronological). p-value chart uses log scale with a p=0.05 reference line.
+- **Compare** — pick any two runs from dropdowns; see a delta table for every metric with green/red improvement/regression arrows.
 
 ---
 
@@ -265,6 +285,14 @@ See [CONTRIBUTING.md](CONTRIBUTING.md). All contributions welcome — new guard 
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+## Branding
+
+Logo assets are in the `branding/` directory.
+
+- `guardbench-logo.svg` — shield mark (use for favicon, PyPI, GitHub avatar)
+- `guardbench-wordmark.svg` — full lockup with tagline
+- `guardbench-social-card.svg` — 1280×640 OG image for GitHub social preview
 
 ---
 

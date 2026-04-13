@@ -33,7 +33,38 @@
 </head>
 <body>
 <div class="page">
-  <h1>GuardBench Evaluation Report</h1>
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:4px">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="40" height="40">
+      <defs>
+        <linearGradient id="nb-sg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#0f2744"/>
+          <stop offset="100%" style="stop-color:#0a1f3d"/>
+        </linearGradient>
+        <linearGradient id="nb-cg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#22d3ee"/>
+          <stop offset="100%" style="stop-color:#06b6d4"/>
+        </linearGradient>
+        <linearGradient id="nb-si" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:#1e3a5f"/>
+          <stop offset="100%" style="stop-color:#0d1f38"/>
+        </linearGradient>
+        <filter id="nb-glow">
+          <feGaussianBlur stdDeviation="2" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <path d="M60 8 L100 24 L100 62 Q100 90 60 112 Q20 90 20 62 L20 24 Z" fill="url(#nb-sg)" stroke="#22d3ee" stroke-width="2.5" stroke-linejoin="round"/>
+      <path d="M60 14 L94 28 L94 62 Q94 86 60 106 Q26 86 26 62 L26 28 Z" fill="url(#nb-si)" opacity="0.6"/>
+      <line x1="38" y1="60" x2="82" y2="60" stroke="#22d3ee" stroke-width="1.5" opacity="0.35"/>
+      <line x1="60" y1="42" x2="60" y2="78" stroke="#22d3ee" stroke-width="1.5" opacity="0.35"/>
+      <circle cx="38" cy="60" r="2" fill="#22d3ee" opacity="0.4"/>
+      <circle cx="82" cy="60" r="2" fill="#22d3ee" opacity="0.4"/>
+      <circle cx="60" cy="42" r="2" fill="#22d3ee" opacity="0.4"/>
+      <circle cx="60" cy="78" r="2" fill="#22d3ee" opacity="0.4"/>
+      <polyline points="44,60 56,72 76,48" fill="none" stroke="url(#nb-cg)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" filter="url(#nb-glow)"/>
+    </svg>
+    <h1 style="margin:0"><span style="color:#0b1120;font-weight:700">Guard</span><span style="color:#06b6d4;font-weight:700">Bench</span> Evaluation Report</h1>
+  </div>
   <div class="meta">
     Run: <b>{{ run_id }}</b> · Samples: <b>{{ total_samples }}</b> · Dataset SHA: <b>{{ dataset_sha[:12] }}</b>
     · Git: <b>{{ git_commit[:8] }}</b> · Generated: {{ generated_at }}

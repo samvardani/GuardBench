@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 72" width="880" height="144">
+  <defs>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f2744;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0a1f3d;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#22d3ee;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="shieldInner" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e3a5f;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0d1f38;stop-opacity:1" />
+    </linearGradient>
+    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="1.2" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Dark background -->
+  <rect x="0" y="0" width="440" height="72" rx="10" fill="#080f1e"/>
+
+  <!--
+    Shield: original viewBox is 0 0 120 120.
+    We want it ~56px tall with 8px top/bottom padding → scale = 56/104 ≈ 0.538
+    Shield spans x: 20–100 in original = 80px wide → scaled = 43px
+    Center shield horizontally in first 60px of canvas → translateX = (60-43)/2 = 8.5
+    Center vertically: top of content in original = y8, bottom = y112 → height 104px
+    translateY = 8 - 8*0.538 = 8 - 4.3 = 3.7 → use 4
+  -->
+  <g transform="translate(8, 4) scale(0.538)">
+    <!-- Shield body -->
+    <path d="M60 8 L100 24 L100 62 Q100 90 60 112 Q20 90 20 62 L20 24 Z"
+          fill="url(#shieldGrad)"
+          stroke="#22d3ee"
+          stroke-width="2.2"
+          stroke-linejoin="round"/>
+    <!-- Shield inner -->
+    <path d="M60 14 L94 28 L94 62 Q94 86 60 106 Q26 86 26 62 L26 28 Z"
+          fill="url(#shieldInner)"
+          opacity="0.6"/>
+    <!-- Rim highlights -->
+    <path d="M60 8 L100 24" stroke="#67e8f9" stroke-width="0.8" opacity="0.45" fill="none"/>
+    <path d="M60 8 L20 24" stroke="#67e8f9" stroke-width="0.8" opacity="0.45" fill="none"/>
+    <!-- Circuit traces -->
+    <line x1="38" y1="60" x2="82" y2="60" stroke="#22d3ee" stroke-width="1.4" opacity="0.35"/>
+    <line x1="60" y1="42" x2="60" y2="78" stroke="#22d3ee" stroke-width="1.4" opacity="0.35"/>
+    <circle cx="38" cy="60" r="2" fill="#22d3ee" opacity="0.45"/>
+    <circle cx="82" cy="60" r="2" fill="#22d3ee" opacity="0.45"/>
+    <circle cx="60" cy="42" r="2" fill="#22d3ee" opacity="0.45"/>
+    <circle cx="60" cy="78" r="2" fill="#22d3ee" opacity="0.45"/>
+    <line x1="38" y1="60" x2="38" y2="52" stroke="#22d3ee" stroke-width="0.9" opacity="0.22"/>
+    <line x1="82" y1="60" x2="82" y2="68" stroke="#22d3ee" stroke-width="0.9" opacity="0.22"/>
+    <!-- Checkmark -->
+    <polyline points="44,60 56,72 76,48"
+              fill="none"
+              stroke="url(#cyanGrad)"
+              stroke-width="5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              filter="url(#softGlow)"/>
+  </g>
+
+  <!-- Vertical divider between shield and text -->
+  <line x1="62" y1="12" x2="62" y2="60" stroke="#1e3a5f" stroke-width="1"/>
+
+  <!-- "Guard" in white — starts right after divider -->
+  <text x="74" y="44"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Helvetica, Arial, sans-serif"
+        font-size="30"
+        font-weight="700"
+        letter-spacing="-0.8"
+        fill="#f0f9ff">Guard</text>
+
+  <!-- "Bench" in cyan — immediately follows, no gap -->
+  <!-- "Guard" at 30px ≈ ~86px wide → x = 74 + 86 = 160 -->
+  <text x="160" y="44"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Helvetica, Arial, sans-serif"
+        font-size="30"
+        font-weight="700"
+        letter-spacing="-0.8"
+        fill="#22d3ee">Bench</text>
+
+  <!-- Tagline — aligned with "Guard" x -->
+  <text x="74" y="60"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Helvetica, Arial, sans-serif"
+        font-size="9"
+        font-weight="500"
+        letter-spacing="2.4"
+        fill="#38bdf8"
+        opacity="0.65">AI SAFETY GUARD EVALUATION</text>
+</svg>
