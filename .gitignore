@@ -299,3 +299,7 @@ report/ci_summary.md
 report/ci_summary.json
 report/*.csv
 assets/latency_*.png
+
+# Un-ignore guardbench package subdirectories that match ignored patterns
+!guardbench/report/
+!guardbench/report/**

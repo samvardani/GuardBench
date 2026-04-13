@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>GuardBench Report — {{ run_id }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root{color-scheme:light}
+    body{font-family:"SF Pro Text",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;font-size:16px;line-height:1.6;margin:0;padding:48px 0;background:#f9fafb;color:#0f172a}
+    .page{max-width:1200px;margin:0 auto;padding:0 32px 48px}
+    h1{margin:0 0 16px;font-size:28px;font-weight:600;letter-spacing:-0.01em;color:#0b1120}
+    h2{margin:0 0 12px;font-size:20px;font-weight:600;color:#111827}
+    h3{margin:20px 0 12px;font-size:16px;font-weight:600;color:#1f2937}
+    .meta{color:#6b7280;font-size:13px;margin-bottom:12px}
+    .row{display:flex;flex-wrap:wrap;gap:24px}
+    .card{border:1px solid rgba(148,163,184,0.25);border-radius:12px;padding:20px 24px;flex:1 1 360px;min-width:320px;background:#fff;box-shadow:0 12px 32px rgba(15,23,42,0.08),0 1px 2px rgba(15,23,42,0.05)}
+    table{width:100%;border-collapse:collapse;font-size:13px;margin-top:16px}
+    th,td{border-bottom:1px solid #e5e7eb;padding:10px 8px;text-align:left;vertical-align:top}
+    th{background:#f1f5f9;font-weight:600;color:#1f2937;white-space:nowrap}
+    tr:last-child td{border-bottom:none}
+    .ok{color:#0c7d36}.warn{color:#b45309}.err{color:#b91c1c}
+    .badge{display:inline-block;border:1px solid rgba(148,163,184,0.4);border-radius:999px;padding:4px 10px;margin-right:8px;font-size:12px;background:#fff}
+    .section{margin-top:32px}
+    .toggle{display:flex;gap:24px;align-items:center;margin:16px 0;font-size:14px;color:#1f2937}
+    .toggle label{display:flex;align-items:center;gap:8px;cursor:pointer}
+    .hidden{display:none}
+    .pass-cell{background:#dcfce7}.fail-cell{background:#fee2e2}
+    canvas{max-width:100%;margin-top:12px}
+    .footer{margin-top:48px;text-align:center;font-size:12px;color:#9ca3af}
+    @media(max-width:900px){.row{flex-direction:column}.card{min-width:0}}
+  </style>
+</head>
+<body>
+<div class="page">
+  <h1>GuardBench Evaluation Report</h1>
+  <div class="meta">
+    Run: <b>{{ run_id }}</b> · Samples: <b>{{ total_samples }}</b> · Dataset SHA: <b>{{ dataset_sha[:12] }}</b>
+    · Git: <b>{{ git_commit[:8] }}</b> · Generated: {{ generated_at }}
+    <br>Baseline: <b>{{ baseline_name }}</b> · Candidate: <b>{{ candidate_name }}</b>
+    {% if mcnemar_p is not none %} · McNemar p: <b>{{ mcnemar_p }}</b>{% endif %}
+  </div>
+
+  <div class="toggle">
+    <label><input type="radio" name="policyView" value="strict" checked> <b>Strict</b> (borderline = unsafe)</label>
+    <label><input type="radio" name="policyView" value="lenient"> <b>Lenient</b> (borderline = benign)</label>
+  </div>
+
+  <!-- STRICT VIEW -->
+  <div id="view-strict" class="section">
+    <div class="row">
+      <div class="card">
+        <h2>Baseline — Strict</h2>
+        <div>Recall: <b>{{ strict_base.recall }}</b> <span class="meta">({{ strict_base.recall_lo }}–{{ strict_base.recall_hi }})</span></div>
+        <div>Precision: <b>{{ strict_base.precision }}</b></div>
+        <div>F1: <b>{{ strict_base.f1 }}</b></div>
+        <div>FPR: <b>{{ strict_base.fpr }}</b> <span class="meta">({{ strict_base.fpr_lo }}–{{ strict_base.fpr_hi }})</span></div>
+        <div>FNR: <b>{{ strict_base.fnr }}</b></div>
+        <div class="meta">TP:{{ strict_base.tp }} FP:{{ strict_base.fp }} TN:{{ strict_base.tn }} FN:{{ strict_base.fn }}</div>
+        <div>Latency p50/p90/p99: {{ strict_base.latency_p50 }}/{{ strict_base.latency_p90 }}/{{ strict_base.latency_p99 }} ms</div>
+      </div>
+      <div class="card">
+        <h2>Candidate — Strict</h2>
+        <div>Recall: <b>{{ strict_cand.recall }}</b> <span class="meta">({{ strict_cand.recall_lo }}–{{ strict_cand.recall_hi }})</span></div>
+        <div>Precision: <b>{{ strict_cand.precision }}</b></div>
+        <div>F1: <b>{{ strict_cand.f1 }}</b></div>
+        <div>FPR: <b>{{ strict_cand.fpr }}</b> <span class="meta">({{ strict_cand.fpr_lo }}–{{ strict_cand.fpr_hi }})</span></div>
+        <div>FNR: <b>{{ strict_cand.fnr }}</b></div>
+        <div class="meta">TP:{{ strict_cand.tp }} FP:{{ strict_cand.fp }} TN:{{ strict_cand.tn }} FN:{{ strict_cand.fn }}</div>
+        <div>Latency p50/p90/p99: {{ strict_cand.latency_p50 }}/{{ strict_cand.latency_p90 }}/{{ strict_cand.latency_p99 }} ms</div>
+      </div>
+    </div>
+
+    <div class="card section">
+      <h2>Slice Breakdown — Strict (Category × Language)</h2>
+      <div class="row">
+        <div class="card">
+          <h3>Baseline</h3>
+          <table>
+            <tr><th>Category</th><th>Lang</th><th>N</th><th>Recall</th><th>FPR</th><th>FNR</th></tr>
+            {% for s in strict_base_slices %}
+            <tr>
+              <td>{{ s.category }}</td><td>{{ s.language }}</td><td>{{ s.n }}</td>
+              <td class="{{ s.recall_class }}">{{ s.recall }}</td>
+              <td class="{{ s.fpr_class }}">{{ s.fpr }}</td>
+              <td>{{ s.fnr }}</td>
+            </tr>
+            {% endfor %}
+          </table>
+        </div>
+        <div class="card">
+          <h3>Candidate</h3>
+          <table>
+            <tr><th>Category</th><th>Lang</th><th>N</th><th>Recall</th><th>FPR</th><th>FNR</th></tr>
+            {% for s in strict_cand_slices %}
+            <tr>
+              <td>{{ s.category }}</td><td>{{ s.language }}</td><td>{{ s.n }}</td>
+              <td class="{{ s.recall_class }}">{{ s.recall }}</td>
+              <td class="{{ s.fpr_class }}">{{ s.fpr }}</td>
+              <td>{{ s.fnr }}</td>
+            </tr>
+            {% endfor %}
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LENIENT VIEW -->
+  <div id="view-lenient" class="section hidden">
+    <div class="row">
+      <div class="card">
+        <h2>Baseline — Lenient</h2>
+        <div>Recall: <b>{{ lenient_base.recall }}</b></div>
+        <div>Precision: <b>{{ lenient_base.precision }}</b></div>
+        <div>F1: <b>{{ lenient_base.f1 }}</b></div>
+        <div>FPR: <b>{{ lenient_base.fpr }}</b></div>
+        <div>FNR: <b>{{ lenient_base.fnr }}</b></div>
+        <div class="meta">TP:{{ lenient_base.tp }} FP:{{ lenient_base.fp }} TN:{{ lenient_base.tn }} FN:{{ lenient_base.fn }}</div>
+      </div>
+      <div class="card">
+        <h2>Candidate — Lenient</h2>
+        <div>Recall: <b>{{ lenient_cand.recall }}</b></div>
+        <div>Precision: <b>{{ lenient_cand.precision }}</b></div>
+        <div>F1: <b>{{ lenient_cand.f1 }}</b></div>
+        <div>FPR: <b>{{ lenient_cand.fpr }}</b></div>
+        <div>FNR: <b>{{ lenient_cand.fnr }}</b></div>
+        <div class="meta">TP:{{ lenient_cand.tp }} FP:{{ lenient_cand.fp }} TN:{{ lenient_cand.tn }} FN:{{ lenient_cand.fn }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Latency Charts -->
+  <div class="row section">
+    <div class="card">
+      <h2>Latency Distribution (Baseline)</h2>
+      <canvas id="latencyBaseline" height="140"></canvas>
+    </div>
+    <div class="card">
+      <h2>Latency Distribution (Candidate)</h2>
+      <canvas id="latencyCandidate" height="140"></canvas>
+    </div>
+  </div>
+
+  <!-- Threshold Sweep Chart -->
+  {% if sweep_data %}
+  <div class="card section">
+    <h2>Threshold Sweep (Candidate)</h2>
+    <canvas id="thresholdSweep" height="120"></canvas>
+  </div>
+  {% endif %}
+
+  <!-- Sample Results -->
+  {% if sample_results %}
+  <div class="card section">
+    <h2>Sample Results</h2>
+    <table>
+      <tr><th>Text</th><th>Label</th><th>Category</th><th>Lang</th><th>Baseline</th><th>Candidate</th>{% if has_judge %}<th>Judge</th>{% endif %}</tr>
+      {% for s in sample_results %}
+      <tr>
+        <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ s.text|e }}</td>
+        <td>{{ s.label }}</td>
+        <td>{{ s.category }}</td>
+        <td>{{ s.language }}</td>
+        <td>{{ s.baseline_pred }}</td>
+        <td>{{ s.candidate_pred }}</td>
+        {% if has_judge %}<td>{{ s.judge_verdict or '—' }}</td>{% endif %}
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% endif %}
+
+  <!-- Compliance Section -->
+  <div class="card section" id="compliance">
+    <h2>Compliance Reference</h2>
+    <table>
+      <tr><th>Framework</th><th>Requirement</th><th>How GuardBench Addresses It</th></tr>
+      <tr>
+        <td>EU AI Act Art. 9</td>
+        <td>Risk management system for high-risk AI</td>
+        <td>Automated evaluation pipeline quantifies guard performance risk per slice, with CI gate enforcement</td>
+      </tr>
+      <tr>
+        <td>EU AI Act Art. 15</td>
+        <td>Accuracy, robustness and cybersecurity</td>
+        <td>Per-slice recall/FPR metrics with Wilson confidence intervals; adversarial augmentation testing</td>
+      </tr>
+      <tr>
+        <td>NIST AI RMF Measure 2.5</td>
+        <td>AI risk monitoring and measurement</td>
+        <td>Run history stored with dataset SHA + git commit for full reproducibility; regression detection via comparison thresholds</td>
+      </tr>
+      <tr>
+        <td>ISO 42001 §8.4</td>
+        <td>AI system performance assessment</td>
+        <td>Structured EvalResults with McNemar significance test; HTML report exportable for audit evidence</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="footer">GuardBench {{ version }} · Run {{ run_id }}</div>
+</div>
+
+<script>
+const baseLatencies = {{ base_latencies_json }};
+const candLatencies = {{ cand_latencies_json }};
+const sweepData = {{ sweep_data_json }};
+
+function latencyBuckets(lats) {
+  if (!lats.length) return {labels:[], data:[]};
+  const max = Math.max(...lats);
+  const buckets = 10;
+  const size = Math.max(1, Math.ceil(max / buckets));
+  const counts = new Array(buckets).fill(0);
+  lats.forEach(v => {
+    const i = Math.min(Math.floor(v / size), buckets - 1);
+    counts[i]++;
+  });
+  const labels = counts.map((_, i) => `${i*size}–${(i+1)*size}`);
+  return {labels, data: counts};
+}
+
+const bBuckets = latencyBuckets(baseLatencies);
+new Chart(document.getElementById('latencyBaseline'), {
+  type: 'bar',
+  data: {labels: bBuckets.labels, datasets: [{label:'Count', data:bBuckets.data, backgroundColor:'#3b82f6'}]},
+  options: {plugins:{legend:{display:false}}, scales:{x:{title:{display:true,text:'ms'}}, y:{title:{display:true,text:'Count'}}}}
+});
+
+const cBuckets = latencyBuckets(candLatencies);
+new Chart(document.getElementById('latencyCandidate'), {
+  type: 'bar',
+  data: {labels: cBuckets.labels, datasets: [{label:'Count', data:cBuckets.data, backgroundColor:'#10b981'}]},
+  options: {plugins:{legend:{display:false}}, scales:{x:{title:{display:true,text:'ms'}}, y:{title:{display:true,text:'Count'}}}}
+});
+
+if (sweepData && sweepData.thresholds && document.getElementById('thresholdSweep')) {
+  new Chart(document.getElementById('thresholdSweep'), {
+    type: 'line',
+    data: {
+      labels: sweepData.thresholds,
+      datasets: [
+        {label:'Precision', data: sweepData.precision, borderColor:'#3b82f6', fill:false},
+        {label:'Recall', data: sweepData.recall, borderColor:'#10b981', fill:false},
+        {label:'FPR', data: sweepData.fpr, borderColor:'#ef4444', fill:false},
+      ]
+    },
+    options: {scales:{x:{title:{display:true,text:'Threshold'}}, y:{min:0,max:1}}}
+  });
+}
+
+// Policy view toggle
+document.querySelectorAll('input[name="policyView"]').forEach(radio => {
+  radio.addEventListener('change', e => {
+    document.getElementById('view-strict').classList.toggle('hidden', e.target.value !== 'strict');
+    document.getElementById('view-lenient').classList.toggle('hidden', e.target.value !== 'lenient');
+  });
+});
+</script>
+</body>
+</html>
